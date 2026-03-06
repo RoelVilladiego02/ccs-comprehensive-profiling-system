@@ -4,7 +4,7 @@ import StudentTable from './StudentTable'
 import FilterPanel from './FilterPanel'
 import SearchBar from './SearchBar'
 
-function StudentDashboard() {
+function StudentDashboard({ studentData, onLogout }) {
   const [students, setStudents] = useState([
     // Mock data - will be replaced with API calls
     {
@@ -217,8 +217,25 @@ function StudentDashboard() {
   return (
     <div className="student-dashboard">
       <div className="dashboard-header">
-        <h1>Student Dashboard</h1>
-        <p className="subtitle">Comprehensive student management and profiling system</p>
+        <div className="header-left">
+          <h1>Student Dashboard</h1>
+          <p className="subtitle">Comprehensive student management and profiling system</p>
+        </div>
+        <div className="header-right">
+          {studentData && (
+            <div className="user-info">
+              <span className="user-label">Logged in as:</span>
+              <span className="user-id">{studentData.studentNumber}</span>
+              <button 
+                className="logout-btn"
+                onClick={onLogout}
+                title="Logout from dashboard"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="dashboard-container">
