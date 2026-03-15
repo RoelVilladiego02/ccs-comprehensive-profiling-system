@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Student;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+class StudentService
+{
+    /**
+     * Get all students with pagination
+     */
+    public function getAllStudents(int $perPage = 15): LengthAwarePaginator
+    {
+        return Student::paginate($perPage);
+    }
+
+    /**
+     * Get student by ID with all relationships
+     */
+    public function getStudentById(int $studentId): ?Student
+    {
+        return Student::with([
+            'classStatuses',
+            'programs',
+            'attendance',
+            'grades',
+            'violations',
+            'medicalRecords',
+            'affiliations',
+            'academicHistory',
+            'nonAcademicHistory',
+            'skills'
+        ])->find($studentId);
+    }
+
+    /**
+     * Get student by student number
+     */
+    public function getStudentByNumber(string $studentNumber): ?Student
+    {
+        return Student::where('student_number', $studentNumber)->first();
+    }
+
+    /**
+     * Search students by name or email
+     */
+    public function searchStudents(string $query): Collection
+    {
+        return Student::where('first_name', 'like', "%{$query}%")
+            ->orWhere('last_name', 'like', "%{$query}%")
+            ->orWhere('email', 'like', "%{$query}%")
+            ->orWhere('student_number', 'like', "%{$query}%")
+            ->get();
+    }
+
+    /**
+     * Create new student
+     */
+    public function createStudent(array $data): Student
+    {
+        return Student::create($data);
+    }
+
+    /**
+     * Update student information
+     */
+    public function updateStudent(int $studentId, array $data): bool
+    {
+        $student = Student::find($studentId);
+        if (!$student) {
+            return false;
+        }
+        return $student->update($data);
+    }
+
+    /**
+     * Delete student
+     */
+    public function deleteStudent(int $studentId): bool
+    {
+        $student = Student::find($studentId);
+        if (!$student) {
+            return false;
+        }
+        return $student->delete();
+    }
+
+    /**
+     * Get students by identification status
+     */
+    public function getStudentsByStatus(string $status): Collection
+    {
+        return Student::where('student_identification', $status)->get();
+    }
+
+    /**
+     * Get students by curriculum
+     */
+    public function getStudentsByCurriculum(string $curriculum): Collection
+    {
+        return Student::where('curriculum', $curriculum)->get();
+    }
+}
