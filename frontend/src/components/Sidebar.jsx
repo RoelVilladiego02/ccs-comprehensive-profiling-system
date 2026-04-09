@@ -9,6 +9,11 @@ function Sidebar({ userRole, userData, onLogout, activeSection, onSectionChange 
       { id: 'profile', label: 'My Profile', icon: '👤' },
       { id: 'courses', label: 'My Courses', icon: '📚' },
       { id: 'grades', label: 'Grades', icon: '📊' },
+      { id: 'academic-history', label: 'Academic History', icon: '📖' },
+      { id: 'activities', label: 'Non-Academic Activities', icon: '🎯' },
+      { id: 'violations', label: 'Violations', icon: '⚠️' },
+      { id: 'skills', label: 'Skills', icon: '✨' },
+      { id: 'affiliations', label: 'Affiliations', icon: '🏛️' },
     ],
     faculty: [
       { id: 'dashboard', label: 'Dashboard', icon: '📱' },

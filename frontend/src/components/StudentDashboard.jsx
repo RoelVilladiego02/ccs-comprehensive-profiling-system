@@ -13,12 +13,30 @@ function StudentDashboard({ userData, onLogout }) {
 
   // Fetch student's own profile data when activeSection changes
   useEffect(() => {
-    if (activeSection === 'profile' || activeSection === 'courses' || activeSection === 'grades') {
+    // Guard: only fetch if we have a valid student_id
+    if (!userData || !userData.student_id) {
+      setError('Student ID not found. Please log in again.')
+      setLoading(false)
+      return
+    }
+
+    const shouldFetch = activeSection === 'profile' || activeSection === 'courses' || activeSection === 'grades' || 
+        activeSection === 'academic-history' || activeSection === 'activities' || 
+        activeSection === 'violations' || activeSection === 'skills' || activeSection === 'affiliations'
+    
+    if (shouldFetch) {
       fetchStudentProfile()
     }
-  }, [userData, activeSection])
+  }, [userData?.student_id, activeSection])
 
   const fetchStudentProfile = async () => {
+    // Guard: ensure student_id exists
+    if (!userData?.student_id) {
+      setError('Student ID is required. Please log in again.')
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       setError('')
@@ -42,8 +60,8 @@ function StudentDashboard({ userData, onLogout }) {
         setCurrentCourses(coursesRes.data.data || [])
       }
     } catch (err) {
-      setError('Failed to load student profile')
-      console.error(err)
+      setError('Failed to load student profile. ' + (err.response?.data?.message || err.message))
+      console.error('Profile fetch error:', err)
     } finally {
       setLoading(false)
     }
@@ -189,6 +207,234 @@ function StudentDashboard({ userData, onLogout }) {
                 </div>
               </section>
             )}
+                </div>
+              )}
+
+              {activeSection === 'academic-history' && (
+                <div className="profile-content">
+                  <section className="profile-section">
+                    <h2>Academic History</h2>
+                    {profileData?.academic_history && profileData.academic_history.length > 0 ? (
+                      <div className="history-list">
+                        {profileData.academic_history.map(history => (
+                          <div key={history.academic_id} className="history-item">
+                            <div className="history-header">
+                              <h3>{history.school_name || 'School Name N/A'}</h3>
+                              <span className="graduation-year">Level: {history.academic_level || 'N/A'}</span>
+                            </div>
+                            <div className="history-details">
+                              <div className="detail-row">
+                                <span className="label">Program/Course:</span>
+                                <span className="value">{history.program_course || 'N/A'}</span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="label">GPA:</span>
+                                <span className="value">{history.gpa ? history.gpa.toFixed(2) : 'N/A'}</span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="label">Honors/Awards:</span>
+                                <span className="value">{history.honors_awards || 'None'}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="empty-message">No academic history records found.</p>
+                    )}
+                  </section>
+                </div>
+              )}
+
+              {activeSection === 'activities' && (
+                <div className="profile-content">
+                  <section className="profile-section">
+                    <h2>Non-Academic Activities</h2>
+                    {profileData?.non_academic_history && profileData.non_academic_history.length > 0 ? (
+                      <div className="activities-list">
+                        {profileData.non_academic_history.map(activity => (
+                          <div key={activity.nonacad_id} className="activity-item">
+                            <div className="activity-header">
+                              <h3>{activity.activity_name}</h3>
+                              <span className={`activity-type activity-type-${activity.activity_type?.toLowerCase()}`}>
+                                {activity.activity_type}
+                              </span>
+                            </div>
+                            <div className="activity-details">
+                              <div className="detail-row">
+                                <span className="label">Organization:</span>
+                                <span className="value">{activity.organization || 'N/A'}</span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="label">Role/Position:</span>
+                                <span className="value">{activity.role_position || 'N/A'}</span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="label">Description:</span>
+                                <span className="value">{activity.description || 'N/A'}</span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="label">Achievement:</span>
+                                <span className="value">{activity.achievement || 'None'}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="empty-message">No non-academic activities recorded.</p>
+                    )}
+                  </section>
+                </div>
+              )}
+
+              {activeSection === 'violations' && (
+                <div className="profile-content">
+                  <section className="profile-section">
+                    <h2>Violations</h2>
+                    {profileData?.violations && profileData.violations.length > 0 ? (
+                      <div className="violations-list">
+                        {profileData.violations.map(violation => (
+                          <div key={violation.violation_id} className={`violation-item violation-status-${violation.status?.toLowerCase()?.replace(/\s+/g, '-')}`}>
+                            <div className="violation-header">
+                              <h3>{violation.violation_type}</h3>
+                              <span className={`violation-status violation-${violation.status?.toLowerCase()?.replace(/\s+/g, '-')}`}>
+                                {violation.status}
+                              </span>
+                            </div>
+                            <div className="violation-details">
+                              <div className="detail-row">
+                                <span className="label">Date:</span>
+                                <span className="value">{violation.violation_date || 'N/A'}</span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="label">Offense Level:</span>
+                                <span className="value">{violation.offense_level || 'N/A'}</span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="label">Description:</span>
+                                <span className="value">{violation.violation_description || 'N/A'}</span>
+                              </div>
+                              {violation.reported_by && (
+                                <div className="detail-row">
+                                  <span className="label">Reported By:</span>
+                                  <span className="value">{violation.reported_by}</span>
+                                </div>
+                              )}
+                              {violation.action_taken && (
+                                <div className="detail-row">
+                                  <span className="label">Action Taken:</span>
+                                  <span className="value">{violation.action_taken}</span>
+                                </div>
+                              )}
+                              {violation.penalty && (
+                                <div className="detail-row">
+                                  <span className="label">Penalty:</span>
+                                  <span className="value">{violation.penalty}</span>
+                                </div>
+                              )}
+                              {violation.resolution_date && (
+                                <div className="detail-row">
+                                  <span className="label">Resolution Date:</span>
+                                  <span className="value">{violation.resolution_date}</span>
+                                </div>
+                              )}
+                              {violation.remarks && (
+                                <div className="detail-row">
+                                  <span className="label">Remarks:</span>
+                                  <span className="value">{violation.remarks}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="empty-message">No violations on record.</p>
+                    )}
+                  </section>
+                </div>
+              )}
+
+              {activeSection === 'skills' && (
+                <div className="profile-content">
+                  <section className="profile-section">
+                    <h2>Skills</h2>
+                    {profileData?.skills && profileData.skills.length > 0 ? (
+                      <div className="skills-grid">
+                        {profileData.skills.map(skill => (
+                          <div key={skill.skill_id} className="skill-card">
+                            <div className="skill-header">
+                              <h3>{skill.skill_name}</h3>
+                              <span className="skill-category">{skill.skill_category}</span>
+                            </div>
+                            <div className="skill-details">
+                              <div className="detail-row">
+                                <span className="label">Proficiency:</span>
+                                <span className={`proficiency-badge proficiency-${skill.proficiency_level?.toLowerCase()}`}>
+                                  {skill.proficiency_level}
+                                </span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="label">Years of Experience:</span>
+                                <span className="value">{skill.years_experience || '0'}</span>
+                              </div>
+                              {skill.description && (
+                                <div className="detail-row">
+                                  <span className="label">Description:</span>
+                                  <span className="value">{skill.description}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="empty-message">No skills listed.</p>
+                    )}
+                  </section>
+                </div>
+              )}
+
+              {activeSection === 'affiliations' && (
+                <div className="profile-content">
+                  <section className="profile-section">
+                    <h2>Affiliations (Organizations & Sports)</h2>
+                    {profileData?.affiliations && profileData.affiliations.length > 0 ? (
+                      <div className="affiliations-list">
+                        {profileData.affiliations.map(affiliation => (
+                          <div key={affiliation.affiliation_id} className="affiliation-item">
+                            <div className="affiliation-header">
+                              <h3>{affiliation.organization_name}</h3>
+                              <span className={`org-type org-type-${affiliation.organization_type?.toLowerCase()?.replace(/\s+/g, '-')}`}>
+                                {affiliation.organization_type}
+                              </span>
+                            </div>
+                            <div className="affiliation-details">
+                              <div className="detail-row">
+                                <span className="label">Position/Role:</span>
+                                <span className="value">{affiliation.position_role || 'Member'}</span>
+                              </div>
+                              {affiliation.achievements && (
+                                <div className="detail-row">
+                                  <span className="label">Achievements:</span>
+                                  <span className="value">{affiliation.achievements}</span>
+                                </div>
+                              )}
+                              {affiliation.description && (
+                                <div className="detail-row">
+                                  <span className="label">Description:</span>
+                                  <span className="value">{affiliation.description}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="empty-message">No affiliations recorded.</p>
+                    )}
+                  </section>
                 </div>
               )}
             </>
@@ -339,10 +585,370 @@ function StudentDashboard({ userData, onLogout }) {
           background: #fee2e2;
           color: #7f1d1d;
         }
-      `}</style>
+
+        /* Academic History Styles */
+        .history-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .history-item {
+          background: var(--color-gray-50);
+          border-left: 4px solid #3b82f6;
+          padding: 16px;
+          border-radius: 4px;
+        }
+
+        .history-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .history-header h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--color-gray-900);
+          margin: 0;
+        }
+
+        .graduation-year {
+          background: #dbeafe;
+          color: #1e40af;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.85rem;
+          font-weight: 600;
+        }
+
+        .history-details {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 12px;
+        }
+
+        /* Activities Styles */
+        .activities-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .activity-item {
+          background: var(--color-gray-50);
+          border-left: 4px solid #10b981;
+          padding: 16px;
+          border-radius: 4px;
+        }
+
+        .activity-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .activity-header h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--color-gray-900);
+          margin: 0;
+        }
+
+        .activity-type {
+          display: inline-block;
+          padding: 4px 12px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .activity-type-award {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        .activity-type-competition {
+          background: #dbeafe;
+          color: #1e40af;
+        }
+
+        .activity-type-volunteer {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        .activity-type-leadership {
+          background: #fad5e4;
+          color: #831843;
+        }
+
+        .activity-details {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 12px;
+        }
+
+        /* Violations Styles */
+        .violations-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .violation-item {
+          background: var(--color-gray-50);
+          border-left: 4px solid #ef4444;
+          padding: 16px;
+          border-radius: 4px;
+        }
+
+        .violation-item.violation-status-resolved {
+          border-left-color: #10b981;
+          background: #f0fdf4;
+        }
+
+        .violation-item.violation-status-pending {
+          border-left-color: #f59e0b;
+          background: #fffbeb;
+        }
+
+        .violation-item.violation-status-under-investigation {
+          border-left-color: #8b5cf6;
+          background: #faf5ff;
+        }
+
+        .violation-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .violation-header h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--color-gray-900);
+          margin: 0;
+        }
+
+        .violation-status {
+          display: inline-block;
+          padding: 4px 12px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .violation-status.violation-resolved {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        .violation-status.violation-pending {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        .violation-status.violation-under-investigation {
+          background: #f3e8ff;
+          color: #6b21a8;
+        }
+
+        .violation-details {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 12px;
+        }
+
+        /* Skills Styles */
+        .skills-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 16px;
+        }
+
+        .skill-card {
+          background: var(--color-gray-50);
+          border: 1px solid var(--color-gray-200);
+          border-radius: 8px;
+          padding: 16px;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .skill-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .skill-header {
+          margin-bottom: 12px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        .skill-header h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--color-gray-900);
+          margin: 0;
+          flex: 1;
+        }
+
+        .skill-category {
+          background: #e0e7ff;
+          color: #3730a3;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          white-space: nowrap;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+        }
+
+        .skill-details {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .proficiency-badge {
+          display: inline-block;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          width: fit-content;
+        }
+
+        .proficiency-badge.proficiency-beginner {
+          background: #fed7aa;
+          color: #7c2d12;
+        }
+
+        .proficiency-badge.proficiency-intermediate {
+          background: #fbbf24;
+          color: #78350f;
+        }
+
+        .proficiency-badge.proficiency-advanced {
+          background: #86efac;
+          color: #15803d;
+        }
+
+        .proficiency-badge.proficiency-expert {
+          background: #60a5fa;
+          color: #1e3a8a;
+        }
+
+        /* Affiliations Styles */
+        .affiliations-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .affiliation-item {
+          background: var(--color-gray-50);
+          border-left: 4px solid #8b5cf6;
+          padding: 16px;
+          border-radius: 4px;
+        }
+
+        .affiliation-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .affiliation-header h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--color-gray-900);
+          margin: 0;
+        }
+
+        .org-type {
+          display: inline-block;
+          padding: 4px 12px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .org-type-organization {
+          background: #dbeafe;
+          color: #1e40af;
+        }
+
+        .org-type-sports {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        .org-type-club {
+          background: #fad5e4;
+          color: #831843;
+        }
+
+        .org-type-fraternity {
+          background: #fed7aa;
+          color: #7c2d12;
+        }
+
+        .affiliation-details {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 12px;
+        }
+
+        /* Common Detail Row Styles */
+        .detail-row {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .detail-row .label {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: var(--color-gray-600);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .detail-row .value {
+          font-size: 0.9rem;
+          color: var(--color-gray-900);
+          font-weight: 500;
+        }
+
+        /* Empty Message */
+        .empty-message {
+          text-align: center;
+          padding: 40px 20px;
+          color: var(--color-gray-500);
+          font-style: italic;
+          font-size: 1rem;
+        }
+      `}
+
+    </style>
     </div>
   )
 }
 
 export default StudentDashboard
-

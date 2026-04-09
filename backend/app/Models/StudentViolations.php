@@ -12,16 +12,21 @@ class StudentViolations extends Model
 
     protected $table = 'student_violations';
     protected $primaryKey = 'violation_id';
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'student_id',
         'violation_type',
-        'description',
+        'violation_description',
         'violation_date',
+        'offense_level',
+        'reported_by',
+        'action_taken',
+        'penalty',
         'status',
         'resolution_date',
-        'penalty',
+        'remarks',
+        'supporting_document',
     ];
 
     protected $casts = [

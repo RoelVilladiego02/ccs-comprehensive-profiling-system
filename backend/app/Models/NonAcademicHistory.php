@@ -11,21 +11,20 @@ class NonAcademicHistory extends Model
     use HasFactory;
 
     protected $table = 'non_academic_history';
-    protected $primaryKey = 'history_id';
+    protected $primaryKey = 'nonacad_id';
     public $timestamps = true;
 
     protected $fillable = [
         'student_id',
         'activity_name',
         'activity_type',
-        'achievement_date',
+        'organization',
+        'role_position',
+        'achievement',
         'description',
-        'award_or_recognition',
     ];
 
-    protected $casts = [
-        'achievement_date' => 'date',
-    ];
+    protected $casts = [];
 
     // Relationships
     public function student(): BelongsTo

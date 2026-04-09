@@ -11,20 +11,19 @@ class AcademicHistory extends Model
     use HasFactory;
 
     protected $table = 'academic_history';
-    protected $primaryKey = 'history_id';
+    protected $primaryKey = 'academic_id';
     public $timestamps = true;
 
     protected $fillable = [
         'student_id',
-        'previous_school',
-        'degree_obtained',
-        'graduation_date',
-        'honors',
+        'school_name',
+        'program_course',
+        'academic_level',
+        'honors_awards',
         'gpa',
     ];
 
     protected $casts = [
-        'graduation_date' => 'date',
         'gpa' => 'float',
     ];
 
