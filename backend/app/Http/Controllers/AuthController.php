@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -65,11 +66,20 @@ class AuthController extends Controller
             ], 401);
         }
 
+        $userData = $user->load('roles')->toArray();
+        
+        // Try to find associated student record by email
+        $student = Student::where('email', $user->email)->first();
+        if ($student) {
+            $userData['student_id'] = $student->student_id;
+            $userData['student_number'] = $student->student_number;
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
             'data' => [
-                'user' => $user->load('roles'),
+                'user' => $userData,
                 'token' => $user->createToken('api-token')->plainTextToken,
             ],
         ]);
@@ -81,9 +91,19 @@ class AuthController extends Controller
      */
     public function me(Request $request): JsonResponse
     {
+        $user = $request->user()->load('roles.permissions');
+        $userData = $user->toArray();
+        
+        // Try to find associated student record by email
+        $student = Student::where('email', $user->email)->first();
+        if ($student) {
+            $userData['student_id'] = $student->student_id;
+            $userData['student_number'] = $student->student_number;
+        }
+        
         return response()->json([
             'success' => true,
-            'data' => $request->user()->load('roles.permissions'),
+            'data' => $userData,
         ]);
     }
 

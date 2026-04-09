@@ -118,7 +118,7 @@ class RolePermissionSeeder extends Seeder
 
         // Assign relevant permissions to Student
         $studentPermissions = [
-            'students.view_profile', 'courses.view', 'classes.view',
+            'students.view', 'students.view_profile', 'courses.view', 'classes.view',
             'grades.view', 'attendance.view'
         ];
         foreach ($studentPermissions as $permName) {

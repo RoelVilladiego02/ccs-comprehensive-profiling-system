@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react'
-import { Link, useLocation } from 'react-router-dom'
 import '../styles/FacultyDashboard.css'
 import FacultyTable from './FacultyTable'
 import FacultyFilterPanel from './FacultyFilterPanel'
 import SearchBar from './SearchBar'
+import Sidebar from './Sidebar'
 
-function FacultyDashboard({ facultyData, onLogout }) {
-  const location = useLocation()
+function FacultyDashboard({ userData, onLogout }) {
+  const [activeSection, setActiveSection] = useState('dashboard')
   const [faculty, _setFaculty] = useState([
     {
       faculty_id: 1,
@@ -259,168 +259,77 @@ function FacultyDashboard({ facultyData, onLogout }) {
   }
 
   return (
-    <div className="faculty-dashboard">
-      <div className="dashboard-header">
-        <div className="header-left">
-          <h1>CCS Comprehensive Profiling System</h1>
-          <p className="subtitle">Faculty management and academic profiling platform</p>
-        </div>
-        <div className="header-right">
-          {facultyData && (
-            <div className="user-info">
-              <span className="user-label">Logged in as:</span>
-              <span className="user-id">{facultyData.facultyNumber}</span>
-              <button
-                className="logout-btn"
-                onClick={onLogout}
-                title="Logout from dashboard"
-              >
-                Logout
-              </button>
+    <div className="dashboard-layout">
+      <Sidebar 
+        userRole="faculty" 
+        userData={userData} 
+        onLogout={onLogout}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
+      <div className="dashboard-content">
+        {activeSection === 'dashboard' && (
+          <div className="dashboard-welcome">
+            <h1>Welcome, {userData?.name}!</h1>
+            <p>Faculty Dashboard</p>
+            <div className="dashboard-stats">
+              <div className="stat-card">
+                <span className="stat-icon">👥</span>
+                <h3>My Classes</h3>
+                <p className="stat-value">0</p>
+              </div>
+              <div className="stat-card">
+                <span className="stat-icon">📊</span>
+                <h3>Students</h3>
+                <p className="stat-value">0</p>
+              </div>
+              <div className="stat-card">
+                <span className="stat-icon">✏️</span>
+                <h3>Grades Submitted</h3>
+                <p className="stat-value">0</p>
+              </div>
+              <div className="stat-card">
+                <span className="stat-icon">✓</span>
+                <h3>Attendance Tracked</h3>
+                <p className="stat-value">0</p>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {activeSection === 'classes' && (
+          <div className="section-content">
+            <h2>My Classes</h2>
+            <p>List of classes and sections you are teaching.</p>
+            {/* Placeholder for classes list */}
+            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
+              <p style={{ color: '#999' }}>No classes assigned yet</p>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'grades' && (
+          <div className="section-content">
+            <h2>Grades Management</h2>
+            <p>View and manage student grades.</p>
+            {/* Placeholder for grades */}
+            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
+              <p style={{ color: '#999' }}>No grades to display</p>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'attendance' && (
+          <div className="section-content">
+            <h2>Attendance Tracking</h2>
+            <p>Track and manage student attendance records.</p>
+            {/* Placeholder for attendance */}
+            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
+              <p style={{ color: '#999' }}>No attendance records</p>
+            </div>
+          </div>
+        )}
       </div>
-
-      <nav className="module-navigation">
-        <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>
-          Student Dashboard
-        </Link>
-        <Link to="/faculty" className={`nav-link ${location.pathname === '/faculty' ? 'active' : ''}`}>
-          Faculty Dashboard
-        </Link>
-        <Link to="/instruction" className={`nav-link ${location.pathname === '/instruction' ? 'active' : ''}`}>
-          Instruction Module
-        </Link>
-        <Link to="/scheduling" className={`nav-link ${location.pathname === '/scheduling' ? 'active' : ''}`}>
-          Scheduling Module
-        </Link>
-      </nav>
-
-      <div className="dashboard-container">
-        <aside className={`filters-sidebar ${isFilterOpen ? 'open' : ''}`}>
-          <div className="filters-header">
-            <h3>Filters</h3>
-            <button
-              className="close-filters"
-              onClick={() => setIsFilterOpen(false)}
-              aria-label="Close filters"
-            >
-              ✕
-            </button>
-          </div>
-          <FacultyFilterPanel
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onReset={handleResetFilters}
-          />
-        </aside>
-
-        <main className="dashboard-content">
-          <div className="content-header">
-            <button
-              className="filter-toggle"
-              onClick={() => setIsFilterOpen(prev => !prev)}
-              aria-label="Toggle filters"
-            >
-              ☰ Filters
-            </button>
-
-            <SearchBar
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              placeholder="Search by faculty number, name, email, department, or specialization..."
-            />
-
-            <div className="view-controls">
-              <button
-                className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
-                onClick={() => setViewMode('table')}
-                title="Table view"
-              >
-                ≡ Table
-              </button>
-              <button
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-                title="Grid view"
-              >
-                ⊞ Grid
-              </button>
-            </div>
-          </div>
-
-          <div className="results-info">
-            <span className="result-count">
-              Showing <strong>{filteredAndSortedFaculty.length}</strong> faculty members
-            </span>
-          </div>
-
-          {filteredAndSortedFaculty.length > 0 ? (
-            viewMode === 'table' ? (
-              <FacultyTable
-                faculty={filteredAndSortedFaculty}
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-            ) : (
-              <FacultyGrid faculty={filteredAndSortedFaculty} />
-            )
-          ) : (
-            <div className="empty-state">
-              <p>No faculty members found matching your criteria</p>
-              <button className="reset-btn" onClick={handleResetFilters}>
-                Reset Filters
-              </button>
-            </div>
-          )}
-        </main>
-      </div>
-    </div>
-  )
-}
-
-// Grid view component
-function FacultyGrid({ faculty }) {
-  return (
-    <div className="faculty-grid">
-      {faculty.map(facultyMember => (
-        <div key={facultyMember.faculty_id} className="faculty-card">
-          <div className="card-header">
-            <h3>{facultyMember.first_name} {facultyMember.last_name}</h3>
-            <span className={`status-badge status-${facultyMember.status.toLowerCase().replace(' ', '-')}`}>
-              {facultyMember.status}
-            </span>
-          </div>
-
-          <div className="card-body">
-            <p><strong>Faculty #:</strong> {facultyMember.faculty_number}</p>
-            <p><strong>Email:</strong> {facultyMember.email}</p>
-            <p><strong>Department:</strong> {facultyMember.department}</p>
-            <p><strong>Position:</strong> {facultyMember.position}</p>
-            <p><strong>Specialization:</strong> {facultyMember.specialization}</p>
-
-            <div className="card-stats">
-              <div className="stat">
-                <span className="stat-label">Years of Service</span>
-                <span className="stat-value">{facultyMember.years_of_service}</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Teaching Load</span>
-                <span className="stat-value">{facultyMember.teaching_load}h</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Publications</span>
-                <span className="stat-value">{facultyMember.publications_count}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="card-footer">
-            <button className="card-action-btn">View Profile</button>
-          </div>
-        </div>
-      ))}
     </div>
   )
 }

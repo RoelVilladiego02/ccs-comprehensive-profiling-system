@@ -130,18 +130,22 @@ class StudentService
     /**
      * Get available skills
      */
-    public function getAvailableSkills(): Collection
+    public function getAvailableSkills()
     {
-        return \App\Models\Skills::distinct('skill_name')
-            ->pluck('skill_name');
+        return \App\Models\Skills::select('skill_category')
+            ->distinct()
+            ->pluck('skill_category')
+            ->values();
     }
 
     /**
      * Get available affiliation types
      */
-    public function getAvailableAffiliationTypes(): Collection
+    public function getAvailableAffiliationTypes()
     {
-        return \App\Models\Affiliation::distinct('affiliation_type')
-            ->pluck('affiliation_type');
+        return \App\Models\Affiliation::select('organization_type')
+            ->distinct()
+            ->pluck('organization_type')
+            ->values();
     }
 }

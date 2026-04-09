@@ -29,7 +29,7 @@ class StudentProfileService
         }
 
         return [
-            'student' => $student,
+            'student' => $student->toArray(),
             'academic_summary' => [
                 'total_courses' => $student->classStatuses->count(),
                 'completed_courses' => $student->classStatuses->where('enrollment_status', 'Completed')->count(),

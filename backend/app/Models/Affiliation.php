@@ -17,17 +17,13 @@ class Affiliation extends Model
     protected $fillable = [
         'student_id',
         'organization_name',
-        'affiliation_type',
-        'start_date',
-        'end_date',
-        'role',
-        'status',
+        'organization_type',
+        'position_role',
+        'achievements',
+        'description',
     ];
 
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-    ];
+    protected $casts = [];
 
     // Relationships
     public function student(): BelongsTo

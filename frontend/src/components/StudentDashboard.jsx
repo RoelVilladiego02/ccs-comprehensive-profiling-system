@@ -1,401 +1,348 @@
-import { useState, useMemo, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import '../styles/StudentDashboard.css'
-import StudentTable from './StudentTable'
-import FilterPanel from './FilterPanel'
-import SearchBar from './SearchBar'
-import { studentAPI } from '../services/api'
+import { studentProfileAPI } from '../services/api'
+import Sidebar from './Sidebar'
 
-function StudentDashboard({ studentData, onLogout }) {
-  const location = useLocation()
-  const [students, setStudents] = useState([])
+function StudentDashboard({ userData, onLogout }) {
+  const [activeSection, setActiveSection] = useState('profile')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [availableSkills, setAvailableSkills] = useState([])
-  const [availableAffiliations, setAvailableAffiliations] = useState([])
+  const [profileData, setProfileData] = useState(null)
+  const [academicPerformance, setAcademicPerformance] = useState(null)
+  const [currentCourses, setCurrentCourses] = useState([])
 
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filters, setFilters] = useState({
-    gender: [],
-    student_identification: [],
-    year_level: [],
-    status: [],
-    gpa_min: 0,
-    gpa_max: 4.0,
-    violations_min: 0,
-    violations_max: 10,
-    attendance_min: 0,
-    attendance_max: 100,
-    skills: [],
-    affiliations: []
-  })
-
-  const [sortConfig, setSortConfig] = useState({
-    field: 'student_number',
-    direction: 'asc'
-  })
-
-  const [viewMode, setViewMode] = useState('table') // 'table' or 'grid'
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
-
-  // Fetch students on component mount
+  // Fetch student's own profile data when activeSection changes
   useEffect(() => {
-    fetchStudents()
-    fetchFilterOptions()
-  }, [])
+    if (activeSection === 'profile' || activeSection === 'courses' || activeSection === 'grades') {
+      fetchStudentProfile()
+    }
+  }, [userData, activeSection])
 
-  const fetchStudents = async () => {
+  const fetchStudentProfile = async () => {
     try {
       setLoading(true)
-      const response = await studentAPI.getAll(100)
-      if (response.data.success) {
-        setStudents(response.data.data || [])
-      }
-    } catch (err) {
-      setError('Failed to load students')
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchFilterOptions = async () => {
-    try {
-      const [skillsRes, affiliationsRes] = await Promise.all([
-        studentAPI.getAvailableSkills(),
-        studentAPI.getAvailableAffiliations()
-      ])
+      setError('')
       
-      if (skillsRes.data.success) {
-        setAvailableSkills(skillsRes.data.data || [])
+      // Get profile data
+      const profileRes = await studentProfileAPI.getProfile(userData.student_id)
+      if (profileRes.data.success) {
+        console.log('Profile data received:', profileRes.data.data)
+        setProfileData(profileRes.data.data)
       }
-      if (affiliationsRes.data.success) {
-        setAvailableAffiliations(affiliationsRes.data.data || [])
-      }
-    } catch (err) {
-      console.error('Failed to load filter options', err)
-    }
-  }
 
-  const handleFilterBySkill = async (skillName) => {
-    if (!skillName) return
-    try {
-      setLoading(true)
-      const response = await studentAPI.getBySkill(skillName)
-      if (response.data.success) {
-        setStudents(response.data.data || [])
-        setFilters(prev => ({ ...prev, skills: [skillName] }))
+      // Get academic performance
+      const perfRes = await studentProfileAPI.getAcademicPerformance(userData.student_id)
+      if (perfRes.data.success) {
+        setAcademicPerformance(perfRes.data.data)
+      }
+
+      // Get current courses
+      const coursesRes = await studentProfileAPI.getCurrentCourses(userData.student_id)
+      if (coursesRes.data.success) {
+        setCurrentCourses(coursesRes.data.data || [])
       }
     } catch (err) {
-      setError('Failed to filter by skill')
+      setError('Failed to load student profile')
       console.error(err)
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleFilterByAffiliation = async (affiliationType) => {
-    if (!affiliationType) return
-    try {
-      setLoading(true)
-      const response = await studentAPI.getByAffiliation(affiliationType)
-      if (response.data.success) {
-        setStudents(response.data.data || [])
-        setFilters(prev => ({ ...prev, affiliations: [affiliationType] }))
-      }
-    } catch (err) {
-      setError('Failed to filter by affiliation')
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Filter and search logic
-  const filteredAndSortedStudents = useMemo(() => {
-    let result = [...students]
-
-    // Search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      result = result.filter(student =>
-        student.student_number.toLowerCase().includes(term) ||
-        student.first_name.toLowerCase().includes(term) ||
-        student.last_name.toLowerCase().includes(term) ||
-        student.email.toLowerCase().includes(term)
-      )
-    }
-
-    // Filter by gender
-    if (filters.gender.length > 0) {
-      result = result.filter(student => filters.gender.includes(student.gender))
-    }
-
-    // Filter by student identification
-    if (filters.student_identification.length > 0) {
-      result = result.filter(student => 
-        filters.student_identification.includes(student.student_identification)
-      )
-    }
-
-    // Filter by year level
-    if (filters.year_level.length > 0) {
-      result = result.filter(student => 
-        filters.year_level.includes(student.year_level)
-      )
-    }
-
-    // Filter by status
-    if (filters.status.length > 0) {
-      result = result.filter(student => 
-        filters.status.includes(student.status)
-      )
-    }
-
-    // Filter by GPA range
-    result = result.filter(student =>
-      student.gpa >= filters.gpa_min && student.gpa <= filters.gpa_max
-    )
-
-    // Filter by violations
-    result = result.filter(student =>
-      student.violations_count >= filters.violations_min && 
-      student.violations_count <= filters.violations_max
-    )
-
-    // Filter by attendance rate
-    result = result.filter(student =>
-      student.attendance_rate >= filters.attendance_min && 
-      student.attendance_rate <= filters.attendance_max
-    )
-
-    // Sort
-    result.sort((a, b) => {
-      const aValue = a[sortConfig.field]
-      const bValue = b[sortConfig.field]
-
-      if (typeof aValue === 'string') {
-        return sortConfig.direction === 'asc'
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue)
-      } else {
-        return sortConfig.direction === 'asc'
-          ? aValue - bValue
-          : bValue - aValue
-      }
-    })
-
-    return result
-  }, [students, searchTerm, filters, sortConfig])
-
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters)
-  }
-
-  const handleSort = (field) => {
-    setSortConfig(prev => ({
-      field,
-      direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc'
-    }))
-  }
-
-  const handleResetFilters = () => {
-    setFilters({
-      gender: [],
-      student_identification: [],
-      year_level: [],
-      status: [],
-      gpa_min: 0,
-      gpa_max: 4.0,
-      violations_min: 0,
-      violations_max: 10,
-      attendance_min: 0,
-      attendance_max: 100,
-      skills: [],
-      affiliations: []
-    })
-    setSearchTerm('')
-    fetchStudents()
   }
 
   return (
-    <div className="student-dashboard">
-      <div className="dashboard-header">
-        <div className="header-left">
-          <h1>CCS Comprehensive Profiling System</h1>
-          <p className="subtitle">Student management and academic profiling platform</p>
-        </div>
-        <div className="header-right">
-          {studentData && (
-            <div className="user-info">
-              <span className="user-label">Logged in as:</span>
-              <span className="user-id">{studentData.studentNumber}</span>
-              <button 
-                className="logout-btn"
-                onClick={onLogout}
-                title="Logout from dashboard"
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <nav className="module-navigation">
-        <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>
-          Student Dashboard
-        </Link>
-        <Link to="/faculty" className={`nav-link ${location.pathname === '/faculty' ? 'active' : ''}`}>
-          Faculty Dashboard
-        </Link>
-        <Link to="/instruction" className={`nav-link ${location.pathname === '/instruction' ? 'active' : ''}`}>
-          Instruction Module
-        </Link>
-        <Link to="/scheduling" className={`nav-link ${location.pathname === '/scheduling' ? 'active' : ''}`}>
-          Scheduling Module
-        </Link>
-      </nav>
-
-      <div className="dashboard-container">
-        <aside className={`filters-sidebar ${isFilterOpen ? 'open' : ''}`}>
-          <div className="filters-header">
-            <h3>Filters</h3>
-            <button
-              className="close-filters"
-              onClick={() => setIsFilterOpen(false)}
-              aria-label="Close filters"
-            >
-              ✕
-            </button>
-          </div>
-          <FilterPanel 
-            filters={filters} 
-            onFilterChange={handleFilterChange}
-            onReset={handleResetFilters}
-            availableSkills={availableSkills}
-            availableAffiliations={availableAffiliations}
-            onFilterBySkill={handleFilterBySkill}
-            onFilterByAffiliation={handleFilterByAffiliation}
-          />
-        </aside>
-
-        <main className="dashboard-content">
-          <div className="content-header">
-            <button
-              className="filter-toggle"
-              onClick={() => setIsFilterOpen(prev => !prev)}
-              aria-label="Toggle filters"
-            >
-              ☰ Filters
-            </button>
-
-            <SearchBar 
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              placeholder="Search by student number, name, or email..."
-            />
-            
-            <div className="view-controls">
-              <button 
-                className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
-                onClick={() => setViewMode('table')}
-                title="Table view"
-              >
-                ≡ Table
-              </button>
-              <button 
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-                title="Grid view"
-              >
-                ⊞ Grid
-              </button>
-            </div>
-          </div>
-
-          <div className="results-info">
-            <span className="result-count">
-              Showing <strong>{filteredAndSortedStudents.length}</strong> students
-            </span>
-          </div>
-
+    <div className="dashboard-layout">
+      <Sidebar 
+        userRole="student" 
+        userData={userData} 
+        onLogout={onLogout}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
+      <div className="dashboard-content">
+        <div className="student-profile-container">
           {error && (
-            <div className="error-message" style={{ margin: '20px 0', padding: '12px', background: '#fee', border: '1px solid #fcc', borderRadius: '4px', color: '#c00' }}>
+            <div className="error-message" style={{ margin: '20px', padding: '12px', background: '#fee', border: '1px solid #fcc', borderRadius: '4px', color: '#c00' }}>
               {error}
             </div>
           )}
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-              <p>Loading students...</p>
+              <p>Loading...</p>
             </div>
-          ) : filteredAndSortedStudents.length > 0 ? (
-            viewMode === 'table' ? (
-              <StudentTable 
-                students={filteredAndSortedStudents}
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
-            ) : (
-              <StudentGrid students={filteredAndSortedStudents} />
-            )
           ) : (
-            <div className="empty-state">
-              <p>No students found matching your criteria</p>
-              <button className="reset-btn" onClick={handleResetFilters}>
-                Reset Filters
-              </button>
-            </div>
-          )}
-        </main>
+            <>
+              {activeSection === 'profile' && (
+                <div className="profile-content">
+            {/* Student Info */}
+            <section className="profile-section">
+              <h2>Personal Information</h2>
+              <div className="info-grid">
+                <div className="info-item">
+                  <span className="label">Full Name:</span>
+                  <span className="value">
+                    {profileData?.student?.first_name} {profileData?.student?.last_name}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="label">Student Number:</span>
+                  <span className="value">{userData.student_number}</span>
+                </div>
+                <div className="info-item">
+                  <span className="label">Email:</span>
+                  <span className="value">{userData.email}</span>
+                </div>
+                <div className="info-item">
+                  <span className="label">Status:</span>
+                  <span className={`status-badge status-${String(profileData?.student?.student_identification || 'N/A').toLowerCase()}`}>
+                    {profileData?.student?.student_identification || 'Not Available'}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            {/* Profile Data */}
+            {profileData && (
+              <section className="profile-section">
+                <h2>Additional Information</h2>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <span className="label">Gender:</span>
+                    <span className="value">{profileData.student?.gender || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">Phone:</span>
+                    <span className="value">{profileData.student?.phone_number || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">Curriculum:</span>
+                    <span className="value">{profileData.student?.curriculum || 'N/A'}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">GPA:</span>
+                    <span className="value">{profileData.academic_summary?.gpa?.toFixed(2) || '0.00'}</span>
+                  </div>
+                </div>
+              </section>
+            )}
+                </div>
+              )}
+
+              {activeSection === 'courses' && (
+                <div className="profile-content">
+            {/* Current Courses */}
+            {currentCourses.length > 0 && (
+              <section className="profile-section">
+                <h2>Current Courses</h2>
+                <div className="courses-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Course Code</th>
+                        <th>Course Title</th>
+                        <th>Instructor</th>
+                        <th>Time</th>
+                        <th>Room</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentCourses.map(course => (
+                        <tr key={course.class_id}>
+                          <td>{course.course_code}</td>
+                          <td>{course.course_title}</td>
+                          <td>{course.faculty}</td>
+                          <td>{course.schedule_time || '-'}</td>
+                          <td>{course.room || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            )}
+                </div>
+              )}
+
+              {activeSection === 'grades' && (
+                <div className="profile-content">
+            {/* Academic Performance */}
+            {profileData && (
+              <section className="profile-section">
+                <h2>Academic Performance</h2>
+                <div className="performance-grid">
+                  <div className="performance-card">
+                    <span className="label">GPA</span>
+                    <span className="value">{profileData.academic_summary?.gpa?.toFixed(2) || '0.00'}</span>
+                  </div>
+                  <div className="performance-card">
+                    <span className="label">Attendance Rate</span>
+                    <span className="value">{profileData.attendance_summary?.attendance_rate || 0}%</span>
+                  </div>
+                  <div className="performance-card">
+                    <span className="label">Total Violations</span>
+                    <span className="value">{profileData.violations_summary?.total_violations || 0}</span>
+                  </div>
+                  <div className="performance-card">
+                    <span className="label">Current Courses</span>
+                    <span className="value">{profileData.academic_summary?.current_courses || 0}</span>
+                  </div>
+                </div>
+              </section>
+            )}
+                </div>
+              )}
+            </>
+        )}
       </div>
     </div>
-  )
-}
 
-// Grid view component
-function StudentGrid({ students }) {
-  return (
-    <div className="student-grid">
-      {students.map(student => (
-        <div key={student.student_id} className="student-card">
-          <div className="card-header">
-            <h3>{student.first_name} {student.last_name}</h3>
-            <span className={`status-badge status-${student.status.toLowerCase()}`}>
-              {student.status}
-            </span>
-          </div>
-          
-          <div className="card-body">
-            <p><strong>Student #:</strong> {student.student_number}</p>
-            <p><strong>Email:</strong> {student.email}</p>
-            <p><strong>Program:</strong> {student.program_name}</p>
-            <p><strong>Year Level:</strong> {student.year_level}</p>
-            
-            <div className="card-stats">
-              <div className="stat">
-                <span className="stat-label">GPA</span>
-                <span className="stat-value">{student.gpa.toFixed(2)}</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Attendance</span>
-                <span className="stat-value">{student.attendance_rate}%</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Violations</span>
-                <span className="stat-value">{student.violations_count}</span>
-              </div>
-            </div>
-          </div>
+    <style>{`
+        .student-profile-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 30px 20px;
+          background: var(--color-light-gray);
+          min-height: calc(100vh - 200px);
+        }
 
-          <div className="card-footer">
-            <button className="card-action-btn">View Profile</button>
-          </div>
-        </div>
-      ))}
+        .profile-section {
+          background: var(--color-white);
+          border-radius: 8px;
+          border: 1px solid var(--color-gray-200);
+          padding: 24px;
+          margin-bottom: 24px;
+          box-shadow: var(--shadow-sm);
+        }
+
+        .profile-section h2 {
+          font-size: 1.3rem;
+          font-weight: 600;
+          color: var(--color-gray-900);
+          margin-bottom: 20px;
+          letter-spacing: -0.5px;
+        }
+
+        .info-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 20px;
+        }
+
+        .info-item {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .info-item .label {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--color-gray-600);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .info-item .value {
+          font-size: 0.95rem;
+          color: var(--color-gray-900);
+          font-weight: 500;
+        }
+
+        .performance-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+        }
+
+        .performance-card {
+          background: var(--color-gray-50);
+          border: 1px solid var(--color-gray-200);
+          border-radius: 6px;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          text-align: center;
+        }
+
+        .performance-card .label {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--color-gray-600);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .performance-card .value {
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: var(--color-gray-900);
+        }
+
+        .courses-table {
+          overflow-x: auto;
+        }
+
+        .courses-table table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .courses-table th {
+          background: var(--color-gray-100);
+          padding: 12px 16px;
+          text-align: left;
+          font-weight: 600;
+          font-size: 0.85rem;
+          color: var(--color-gray-900);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          border-bottom: 1px solid var(--color-gray-200);
+        }
+
+        .courses-table td {
+          padding: 12px 16px;
+          border-bottom: 1px solid var(--color-gray-200);
+          color: var(--color-gray-700);
+          font-size: 0.9rem;
+        }
+
+        .courses-table tr:hover {
+          background: var(--color-gray-50);
+        }
+
+        .status-badge {
+          display: inline-block;
+          padding: 4px 12px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-transform: capitalize;
+        }
+
+        .status-badge.status-enrolled {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        .status-badge.status-graduated {
+          background: #e5e7eb;
+          color: #374151;
+        }
+
+        .status-badge.status-on-leave {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        .status-badge.status-dropped {
+          background: #fee2e2;
+          color: #7f1d1d;
+        }
+      `}</style>
     </div>
   )
 }
 
 export default StudentDashboard
+

@@ -17,14 +17,13 @@ class Skills extends Model
     protected $fillable = [
         'student_id',
         'skill_name',
+        'skill_category',
         'proficiency_level',
-        'certification',
-        'certification_date',
+        'years_experience',
+        'description',
     ];
 
-    protected $casts = [
-        'certification_date' => 'date',
-    ];
+    protected $casts = [];
 
     // Relationships
     public function student(): BelongsTo

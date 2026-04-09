@@ -162,7 +162,6 @@
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
-}
 
 .status-badge {
   padding: 4px 8px;

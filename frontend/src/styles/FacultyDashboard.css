@@ -1,4 +1,18 @@
 /* Faculty Dashboard Styles - Minimalist Professional Black & White */
+
+/* Layout with Sidebar */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-light-gray, #f5f5f5);
+}
+
+.dashboard-content {
+  flex: 1;
+  margin-left: 260px;
+  overflow-y: auto;
+}
+
 :root {
   --primary-color: var(--color-gray-900);
   --primary-dark: var(--color-black);

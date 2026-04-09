@@ -33,6 +33,7 @@
 .col-violations { width: 120px; }
 .col-status { width: 120px; }
 .col-actions { width: 140px; }
+.col-actions-admin { width: 250px; }
 
 .students-table thead {
   background: var(--color-gray-100);
@@ -280,22 +281,27 @@
 }
 
 /* Actions Column */
-.actions {
+.actions,
+.actions-admin {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .action-btn {
-  padding: 6px 12px;
+  padding: 6px 10px;
   border: 1px solid var(--color-gray-300);
   border-radius: 4px;
   background: var(--color-white);
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   transition: all 0.2s ease;
   white-space: nowrap;
   color: var(--color-gray-700);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .action-btn:hover {
@@ -307,21 +313,36 @@
 }
 
 .action-btn.view-btn {
-  color: var(--color-gray-700);
-  border-color: var(--color-gray-300);
+  color: #0066cc;
+  border-color: #b3d9ff;
+  background: #f0f8ff;
 }
 
 .action-btn.view-btn:hover {
-  background: var(--color-gray-50);
+  background: #d4edff;
+  border-color: #0066cc;
 }
 
 .action-btn.edit-btn {
-  color: var(--color-gray-700);
-  border-color: var(--color-gray-300);
+  color: #ff8c00;
+  border-color: #ffd9b3;
+  background: #fff5eb;
 }
 
 .action-btn.edit-btn:hover {
-  background: var(--color-gray-50);
+  background: #ffe4cc;
+  border-color: #ff8c00;
+}
+
+.action-btn.delete-btn {
+  color: #dc3545;
+  border-color: #f5c6cb;
+  background: #fcf0f1;
+}
+
+.action-btn.delete-btn:hover {
+  background: #f8d7da;
+  border-color: #dc3545;
 }
 
 /* Responsive Design */
