@@ -1,16 +1,16 @@
-/* Student Table Styles - Black & White Theme */
+/* Student Table Styles - Minimalist Professional Black & White Theme */
 .table-wrapper {
   overflow-x: auto;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: var(--shadow-sm);
 }
 
 .students-table {
   width: 100%;
   min-width: 1120px;
   border-collapse: collapse;
-  background: white;
+  background: var(--color-white);
   table-layout: fixed;
   word-break: normal;
   box-sizing: border-box;
@@ -20,7 +20,6 @@
 .students-table td {
   box-sizing: border-box;
 }
-
 
 /* Column width definitions */
 .col-student-number { width: 130px; }
@@ -36,12 +35,12 @@
 .col-actions { width: 140px; }
 
 .students-table thead {
-  background: linear-gradient(135deg, #1f2b3d, #162033);
-  color: #f7fafc;
+  background: var(--color-gray-100);
+  color: var(--color-gray-900);
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 -1px 0 var(--color-gray-200);
 }
 
 .students-table th {
@@ -50,7 +49,7 @@
   font-weight: 600;
   font-size: 0.85rem;
   white-space: nowrap;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid var(--color-gray-200);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   vertical-align: bottom;
@@ -69,37 +68,38 @@
   align-items: center;
   gap: 6px;
   flex-wrap: nowrap;
+  transition: background 0.2s ease;
 }
 
 .students-table th.sortable:hover {
-  background: #222;
+  background: var(--color-gray-200);
 }
 
 .sort-icon {
   font-size: 0.75rem;
-  opacity: 0.6;
+  opacity: 0.5;
   transition: opacity 0.2s ease;
 }
 
 .sort-icon.active {
   opacity: 1;
-  color: #fff;
+  color: var(--color-gray-900);
 }
 
 .students-table tbody tr {
-  border-bottom: 1px solid #e0e0e0;
-  transition: all 0.3s ease;
+  border-bottom: 1px solid var(--color-gray-200);
+  transition: all 0.2s ease;
 }
 
 .students-table tbody tr:hover {
-  background: #f9f9f9;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+  background: var(--color-gray-50);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.03);
 }
 
 .students-table td {
-  padding: 12px 14px;
+  padding: 12px 16px;
   font-size: 0.9rem;
-  color: #333;
+  color: var(--color-gray-700);
   vertical-align: middle;
 }
 
@@ -107,8 +107,8 @@
 .student-number .badge {
   display: inline-block;
   padding: 4px 10px;
-  background: #e0e0e0;
-  color: #000;
+  background: var(--color-gray-200);
+  color: var(--color-gray-900);
   border-radius: 4px;
   font-weight: 600;
   font-size: 0.8rem;
@@ -116,195 +116,212 @@
 
 .student-name {
   font-weight: 600;
-  color: #000;
+  color: var(--color-gray-900);
 }
 
 .email {
-  color: #666;
+  color: var(--color-gray-600);
   font-size: 0.85rem;
 }
 
 .program {
-  color: #555;
+  color: var(--color-gray-700);
   max-width: 200px;
 }
 
 .year-level {
   font-weight: 500;
-  color: #333;
+  color: var(--color-gray-800);
 }
 
 .gender {
-  color: #666;
+  color: var(--color-gray-700);
 }
 
-/* GPA Badge Styles */
+/* GPA Badge Styles - Subtle Professional */
 .gpa-badge {
   display: inline-block;
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
   font-weight: 600;
   font-size: 0.85rem;
+  border-left: 3px solid;
 }
 
 .gpa-badge.gpa-excellent {
-  background: #e8f5e9;
-  color: #1b5e20;
-  border-left: 3px solid #4caf50;
+  background: #f0fdf4;
+  color: #065f46;
+  border-left-color: #059669;
 }
 
 .gpa-badge.gpa-very-good {
-  background: #f1f8e9;
-  color: #33691e;
-  border-left: 3px solid #8bc34a;
+  background: #f9fce8;
+  color: #3f3f00;
+  border-left-color: #84cc16;
 }
 
 .gpa-badge.gpa-good {
-  background: #fffde7;
-  color: #f57f17;
-  border-left: 3px solid #ffeb3b;
+  background: #fffbeb;
+  color: #78350f;
+  border-left-color: #eab308;
 }
 
 .gpa-badge.gpa-fair {
-  background: #fff3e0;
-  color: #e65100;
-  border-left: 3px solid #ff9800;
+  background: #fed7aa;
+  color: #7c2d12;
+  border-left-color: #ea580c;
 }
 
 .gpa-badge.gpa-low {
-  background: #ffebee;
-  color: #b71c1c;
-  border-left: 3px solid #f44336;
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-left-color: #dc2626;
 }
 
 /* Attendance Badge Styles */
 .attendance-badge {
   display: inline-block;
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
   font-weight: 600;
   font-size: 0.85rem;
+  border-left: 3px solid;
 }
 
 .attendance-badge.attendance-excellent {
-  background: #e8f5e9;
-  color: #1b5e20;
-  border-left: 3px solid #4caf50;
+  background: #f0fdf4;
+  color: #065f46;
+  border-left-color: #059669;
 }
 
 .attendance-badge.attendance-good {
-  background: #f1f8e9;
-  color: #33691e;
-  border-left: 3px solid #8bc34a;
+  background: #f9fce8;
+  color: #3f3f00;
+  border-left-color: #84cc16;
 }
 
 .attendance-badge.attendance-fair {
-  background: #fff3e0;
-  color: #e65100;
-  border-left: 3px solid #ff9800;
+  background: #fffbeb;
+  color: #78350f;
+  border-left-color: #eab308;
 }
 
 .attendance-badge.attendance-poor {
-  background: #ffebee;
-  color: #b71c1c;
-  border-left: 3px solid #f44336;
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-left-color: #dc2626;
 }
 
 /* Violations Badge Styles */
 .violations-badge {
   display: inline-block;
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
   font-weight: 600;
   font-size: 0.85rem;
+  border-left: 3px solid;
 }
 
 .violations-badge.violations-none {
-  background: #e8f5e9;
-  color: #1b5e20;
-  border-left: 3px solid #4caf50;
+  background: #f0fdf4;
+  color: #065f46;
+  border-left-color: #059669;
 }
 
 .violations-badge.violations-minor {
-  background: #f1f8e9;
-  color: #33691e;
-  border-left: 3px solid #8bc34a;
+  background: #f9fce8;
+  color: #3f3f00;
+  border-left-color: #84cc16;
 }
 
 .violations-badge.violations-moderate {
-  background: #fff3e0;
-  color: #e65100;
-  border-left: 3px solid #ff9800;
+  background: #fffbeb;
+  color: #78350f;
+  border-left-color: #eab308;
 }
 
 .violations-badge.violations-major {
-  background: #ffebee;
-  color: #b71c1c;
-  border-left: 3px solid #f44336;
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-left-color: #dc2626;
 }
 
 /* Status Badge Styles */
 .status-badge {
   display: inline-block;
-  padding: 5px 12px;
+  padding: 6px 12px;
   border-radius: 4px;
   font-weight: 600;
-  font-size: 0.8rem;
-  color: white;
+  font-size: 0.85rem;
 }
 
 .status-badge.status-enrolled {
-  background: #198754;
+  background: #dcfce7;
+  color: #166534;
+  border-left: 3px solid #16a34a;
 }
 
 .status-badge.status-on-leave {
-  background: #ffc107;
-  color: #000;
+  background: #fef3c7;
+  color: #92400e;
+  border-left: 3px solid #f59e0b;
 }
 
 .status-badge.status-graduated {
-  background: #6c757d;
+  background: #e5e7eb;
+  color: #374151;
+  border-left: 3px solid #6b7280;
 }
 
 .status-badge.status-dropped {
-  background: #dc3545;
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-left: 3px solid #dc2626;
 }
 
 /* Actions Column */
 .actions {
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .action-btn {
-  padding: 6px 10px;
-  border: 1px solid #ddd;
+  padding: 6px 12px;
+  border: 1px solid var(--color-gray-300);
   border-radius: 4px;
-  background: white;
+  background: var(--color-white);
   cursor: pointer;
   font-size: 0.8rem;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  color: var(--color-gray-700);
+}
+
+.action-btn:hover {
+  background: var(--color-gray-100);
+  border-color: var(--color-gray-400);
+  color: var(--color-gray-900);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .action-btn.view-btn {
-  color: #000;
-  border-color: #000;
+  color: var(--color-gray-700);
+  border-color: var(--color-gray-300);
 }
 
 .action-btn.view-btn:hover {
-  background: #f0f0f0;
-  transform: translateY(-2px);
+  background: var(--color-gray-50);
 }
 
 .action-btn.edit-btn {
-  color: #000;
-  border-color: #000;
+  color: var(--color-gray-700);
+  border-color: var(--color-gray-300);
 }
 
 .action-btn.edit-btn:hover {
-  background: #f0f0f0;
-  transform: translateY(-2px);
+  background: var(--color-gray-50);
 }
 
 /* Responsive Design */

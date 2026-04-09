@@ -102,4 +102,46 @@ class StudentService
     {
         return Student::where('curriculum', $curriculum)->get();
     }
+
+    /**
+     * Get students by skill name
+     */
+    public function getStudentsBySkill(string $skillName): Collection
+    {
+        return Student::whereHas('skills', function ($query) use ($skillName) {
+            $query->where('skill_name', 'like', "%{$skillName}%");
+        })
+        ->with('skills')
+        ->get();
+    }
+
+    /**
+     * Get students by affiliation type
+     */
+    public function getStudentsByAffiliation(string $affiliationType): Collection
+    {
+        return Student::whereHas('affiliations', function ($query) use ($affiliationType) {
+            $query->where('affiliation_type', 'like', "%{$affiliationType}%");
+        })
+        ->with('affiliations')
+        ->get();
+    }
+
+    /**
+     * Get available skills
+     */
+    public function getAvailableSkills(): Collection
+    {
+        return \App\Models\Skills::distinct('skill_name')
+            ->pluck('skill_name');
+    }
+
+    /**
+     * Get available affiliation types
+     */
+    public function getAvailableAffiliationTypes(): Collection
+    {
+        return \App\Models\Affiliation::distinct('affiliation_type')
+            ->pluck('affiliation_type');
+    }
 }

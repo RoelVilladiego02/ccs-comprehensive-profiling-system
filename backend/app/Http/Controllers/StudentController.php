@@ -186,4 +186,80 @@ class StudentController extends Controller
             'data' => $students,
         ]);
     }
+
+    /**
+     * GET /api/students/filter/skills
+     * Get students by skill
+     */
+    public function getBySkill(Request $request): JsonResponse
+    {
+        $skillName = $request->query('skill');
+
+        if (!$skillName || strlen($skillName) < 2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Skill parameter must be at least 2 characters',
+            ], 400);
+        }
+
+        $students = $this->studentService->getStudentsBySkill($skillName);
+
+        return response()->json([
+            'success' => true,
+            'count' => count($students),
+            'data' => $students,
+        ]);
+    }
+
+    /**
+     * GET /api/students/filter/affiliations
+     * Get students by affiliation type
+     */
+    public function getByAffiliation(Request $request): JsonResponse
+    {
+        $affiliationType = $request->query('affiliation');
+
+        if (!$affiliationType || strlen($affiliationType) < 2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Affiliation parameter must be at least 2 characters',
+            ], 400);
+        }
+
+        $students = $this->studentService->getStudentsByAffiliation($affiliationType);
+
+        return response()->json([
+            'success' => true,
+            'count' => count($students),
+            'data' => $students,
+        ]);
+    }
+
+    /**
+     * GET /api/students/filter/skills-list
+     * Get available skills for filtering
+     */
+    public function getAvailableSkills(): JsonResponse
+    {
+        $skills = $this->studentService->getAvailableSkills();
+
+        return response()->json([
+            'success' => true,
+            'data' => $skills,
+        ]);
+    }
+
+    /**
+     * GET /api/students/filter/affiliations-list
+     * Get available affiliation types for filtering
+     */
+    public function getAvailableAffiliationTypes(): JsonResponse
+    {
+        $affiliationTypes = $this->studentService->getAvailableAffiliationTypes();
+
+        return response()->json([
+            'success' => true,
+            'data' => $affiliationTypes,
+        ]);
+    }
 }

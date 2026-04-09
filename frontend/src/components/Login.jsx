@@ -1,16 +1,9 @@
 import { useState } from 'react'
 import '../styles/Login.css'
-
-// Default student credentials (stored locally)
-const DEFAULT_CREDENTIALS = {
-  'STU-2024-001': 'password123',
-  'STU-2024-002': 'password123',
-  'STU-2024-003': 'password123',
-  'STU-2024-004': 'password123'
-}
+import { authAPI } from '../services/api'
 
 function Login({ onLogin }) {
-  const [studentNumber, setStudentNumber] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -21,12 +14,8 @@ function Login({ onLogin }) {
     setLoading(true)
 
     try {
-      // Simulate API call - will work with real backend when ready
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Validate credentials (mock validation)
-      if (!studentNumber.trim()) {
-        setError('Student number is required')
+      if (!email.trim()) {
+        setError('Email is required')
         setLoading(false)
         return
       }
@@ -37,35 +26,64 @@ function Login({ onLogin }) {
         return
       }
 
-      // Check credentials against default list
-      if (DEFAULT_CREDENTIALS[studentNumber] === password) {
-        // Store in localStorage for persistence
-        const studentData = {
-          studentNumber,
+      // Call the real backend API
+      const response = await authAPI.login(email, password)
+      
+      if (response.data.success) {
+        const { user, token } = response.data.data
+        
+        // Only store token - user data should come from backend
+        localStorage.setItem('auth_token', token)
+        
+        // Notify parent component with user data
+        onLogin({
+          ...user,
+          token,
           loginTime: new Date().toISOString(),
           isAuthenticated: true
-        }
-        localStorage.setItem('student_session', JSON.stringify(studentData))
-        
-        onLogin(studentData)
+        })
       } else {
-        setError('Invalid student number or password')
+        setError(response.data.message || 'Login failed')
         setLoading(false)
       }
     } catch (err) {
-      setError('An error occurred. Please try again.')
+      if (err.response?.data?.message) {
+        setError(err.response.data.message)
+      } else if (err.message === 'Network Error') {
+        setError('Cannot connect to server. Make sure the backend is running on http://localhost:8000')
+      } else {
+        setError('Login failed. Please check your credentials and try again.')
+      }
       setLoading(false)
     }
   }
 
   const handleDemoLogin = () => {
-    const demoStudent = {
-      studentNumber: 'STU-2024-001',
-      loginTime: new Date().toISOString(),
-      isAuthenticated: true
+    // Demo login using admin credentials
+    handleDemoAuth('admin@ccs.edu', 'admin123456')
+  }
+
+  const handleDemoAuth = async (demoEmail, demoPassword) => {
+    setError('')
+    setLoading(true)
+    try {
+      const response = await authAPI.login(demoEmail, demoPassword)
+      if (response.data.success) {
+        const { user, token } = response.data.data
+        // Only store token - user data should come from backend
+        localStorage.setItem('auth_token', token)
+        
+        onLogin({
+          ...user,
+          token,
+          loginTime: new Date().toISOString(),
+          isAuthenticated: true
+        })
+      }
+    } catch (err) {
+      setError('Demo login failed. Make sure the backend is running.')
+      setLoading(false)
     }
-    localStorage.setItem('student_session', JSON.stringify(demoStudent))
-    onLogin(demoStudent)
   }
 
   return (
@@ -78,13 +96,13 @@ function Login({ onLogin }) {
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label htmlFor="studentNumber">Student Number</label>
+            <label htmlFor="email">Email Address</label>
             <input
-              type="text"
-              id="studentNumber"
-              value={studentNumber}
-              onChange={(e) => setStudentNumber(e.target.value)}
-              placeholder="STU-2024-001"
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="student@ccs.edu"
               disabled={loading}
               className="form-input"
             />
@@ -124,18 +142,23 @@ function Login({ onLogin }) {
           onClick={handleDemoLogin}
           disabled={loading}
         >
-          Try Demo Account
+          Try Demo Account (Admin)
         </button>
 
         <div className="login-footer">
-          <p><strong>Default Credentials:</strong></p>
-          <p>Student: <strong>STU-2024-001</strong></p>
-          <p>Password: <strong>password123</strong></p>
-          <p style={{ marginTop: '12px', fontSize: '0.75rem' }}>
-            (Also works for STU-2024-002, STU-2024-003, STU-2024-004)
+          <p><strong>Demo Credentials:</strong></p>
+          <p>Email: <strong>admin@ccs.edu</strong></p>
+          <p>Password: <strong>admin123456</strong></p>
+          <p style={{ marginTop: '12px', fontSize: '0.85rem' }}>
+            Other test accounts:
+          </p>
+          <p style={{ fontSize: '0.80rem' }}>
+            faculty@ccs.edu / faculty123456<br/>
+            student@ccs.edu / student123456<br/>
+            staff@ccs.edu / staff123456
           </p>
           <p className="login-note">
-            This is a local authentication system. In production, this will integrate with your backend API.
+            This authenticates with the backend API.
           </p>
         </div>
       </div>

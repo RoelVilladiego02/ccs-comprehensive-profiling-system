@@ -1,95 +1,18 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import '../styles/StudentDashboard.css'
 import StudentTable from './StudentTable'
 import FilterPanel from './FilterPanel'
 import SearchBar from './SearchBar'
+import { studentAPI } from '../services/api'
 
 function StudentDashboard({ studentData, onLogout }) {
   const location = useLocation()
-  const [students, setStudents] = useState([
-    // Mock data - will be replaced with API calls
-    {
-      student_id: 1,
-      student_number: 'STU-2024-001',
-      first_name: 'John',
-      middle_name: 'Patrick',
-      last_name: 'Doe',
-      email: 'john.doe@student.edu',
-      phone_number: '09123456789',
-      gender: 'Male',
-      student_identification: 'Regular',
-      curriculum: 'BS Computer Science',
-      program_name: 'BS Computer Science',
-      year_level: 2,
-      semester: 2,
-      academic_year: '2025-2026',
-      gpa: 3.75,
-      violations_count: 0,
-      attendance_rate: 95,
-      status: 'Enrolled'
-    },
-    {
-      student_id: 2,
-      student_number: 'STU-2024-002',
-      first_name: 'Maria',
-      middle_name: 'Anna',
-      last_name: 'Santos',
-      email: 'maria.santos@student.edu',
-      phone_number: '09234567890',
-      gender: 'Female',
-      student_identification: 'Regular',
-      curriculum: 'BS Information Technology',
-      program_name: 'BS Information Technology',
-      year_level: 3,
-      semester: 1,
-      academic_year: '2025-2026',
-      gpa: 3.92,
-      violations_count: 0,
-      attendance_rate: 98,
-      status: 'Enrolled'
-    },
-    {
-      student_id: 3,
-      student_number: 'STU-2024-003',
-      first_name: 'Juan',
-      middle_name: 'Carlos',
-      last_name: 'Cruz',
-      email: 'juan.cruz@student.edu',
-      phone_number: '09345678901',
-      gender: 'Male',
-      student_identification: 'Regular',
-      curriculum: 'BS Computer Science',
-      program_name: 'BS Computer Science',
-      year_level: 1,
-      semester: 2,
-      academic_year: '2025-2026',
-      gpa: 3.45,
-      violations_count: 2,
-      attendance_rate: 87,
-      status: 'Enrolled'
-    },
-    {
-      student_id: 4,
-      student_number: 'STU-2024-004',
-      first_name: 'Anna',
-      middle_name: 'Marie',
-      last_name: 'Reyes',
-      email: 'anna.reyes@student.edu',
-      phone_number: '09456789012',
-      gender: 'Female',
-      student_identification: 'On Leave',
-      curriculum: 'BS Engineering',
-      program_name: 'BS Engineering',
-      year_level: 2,
-      semester: 1,
-      academic_year: '2025-2026',
-      gpa: 3.60,
-      violations_count: 1,
-      attendance_rate: 65,
-      status: 'On Leave'
-    }
-  ])
+  const [students, setStudents] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [availableSkills, setAvailableSkills] = useState([])
+  const [availableAffiliations, setAvailableAffiliations] = useState([])
 
   const [searchTerm, setSearchTerm] = useState('')
   const [filters, setFilters] = useState({
@@ -102,7 +25,9 @@ function StudentDashboard({ studentData, onLogout }) {
     violations_min: 0,
     violations_max: 10,
     attendance_min: 0,
-    attendance_max: 100
+    attendance_max: 100,
+    skills: [],
+    affiliations: []
   })
 
   const [sortConfig, setSortConfig] = useState({
@@ -112,6 +37,79 @@ function StudentDashboard({ studentData, onLogout }) {
 
   const [viewMode, setViewMode] = useState('table') // 'table' or 'grid'
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+
+  // Fetch students on component mount
+  useEffect(() => {
+    fetchStudents()
+    fetchFilterOptions()
+  }, [])
+
+  const fetchStudents = async () => {
+    try {
+      setLoading(true)
+      const response = await studentAPI.getAll(100)
+      if (response.data.success) {
+        setStudents(response.data.data || [])
+      }
+    } catch (err) {
+      setError('Failed to load students')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchFilterOptions = async () => {
+    try {
+      const [skillsRes, affiliationsRes] = await Promise.all([
+        studentAPI.getAvailableSkills(),
+        studentAPI.getAvailableAffiliations()
+      ])
+      
+      if (skillsRes.data.success) {
+        setAvailableSkills(skillsRes.data.data || [])
+      }
+      if (affiliationsRes.data.success) {
+        setAvailableAffiliations(affiliationsRes.data.data || [])
+      }
+    } catch (err) {
+      console.error('Failed to load filter options', err)
+    }
+  }
+
+  const handleFilterBySkill = async (skillName) => {
+    if (!skillName) return
+    try {
+      setLoading(true)
+      const response = await studentAPI.getBySkill(skillName)
+      if (response.data.success) {
+        setStudents(response.data.data || [])
+        setFilters(prev => ({ ...prev, skills: [skillName] }))
+      }
+    } catch (err) {
+      setError('Failed to filter by skill')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleFilterByAffiliation = async (affiliationType) => {
+    if (!affiliationType) return
+    try {
+      setLoading(true)
+      const response = await studentAPI.getByAffiliation(affiliationType)
+      if (response.data.success) {
+        setStudents(response.data.data || [])
+        setFilters(prev => ({ ...prev, affiliations: [affiliationType] }))
+      }
+    } catch (err) {
+      setError('Failed to filter by affiliation')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Filter and search logic
   const filteredAndSortedStudents = useMemo(() => {
@@ -212,9 +210,12 @@ function StudentDashboard({ studentData, onLogout }) {
       violations_min: 0,
       violations_max: 10,
       attendance_min: 0,
-      attendance_max: 100
+      attendance_max: 100,
+      skills: [],
+      affiliations: []
     })
     setSearchTerm('')
+    fetchStudents()
   }
 
   return (
@@ -272,6 +273,10 @@ function StudentDashboard({ studentData, onLogout }) {
             filters={filters} 
             onFilterChange={handleFilterChange}
             onReset={handleResetFilters}
+            availableSkills={availableSkills}
+            availableAffiliations={availableAffiliations}
+            onFilterBySkill={handleFilterBySkill}
+            onFilterByAffiliation={handleFilterByAffiliation}
           />
         </aside>
 
@@ -315,7 +320,17 @@ function StudentDashboard({ studentData, onLogout }) {
             </span>
           </div>
 
-          {filteredAndSortedStudents.length > 0 ? (
+          {error && (
+            <div className="error-message" style={{ margin: '20px 0', padding: '12px', background: '#fee', border: '1px solid #fcc', borderRadius: '4px', color: '#c00' }}>
+              {error}
+            </div>
+          )}
+
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+              <p>Loading students...</p>
+            </div>
+          ) : filteredAndSortedStudents.length > 0 ? (
             viewMode === 'table' ? (
               <StudentTable 
                 students={filteredAndSortedStudents}

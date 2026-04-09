@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import '../styles/FilterPanel.css'
 
-function FilterPanel({ filters, onFilterChange, onReset }) {
+function FilterPanel({ filters, onFilterChange, onReset, availableSkills = [], availableAffiliations = [], onFilterBySkill, onFilterByAffiliation }) {
   const [expandedSections, setExpandedSections] = useState({
     gender: true,
     identification: true,
     yearLevel: true,
     status: true,
-    academics: true
+    academics: true,
+    skills: false,
+    affiliations: false
   })
 
   const toggleSection = (section) => {
@@ -235,6 +237,56 @@ function FilterPanel({ filters, onFilterChange, onReset }) {
           </div>
         </div>
       </FilterSection>
+
+      {/* Skills Filter */}
+      {availableSkills && availableSkills.length > 0 && (
+        <FilterSection
+          title="Skills"
+          section="skills"
+          isExpanded={expandedSections.skills}
+          onToggle={toggleSection}
+        >
+          <div className="filter-options">
+            {availableSkills.map(skill => (
+              <label key={skill} className="filter-option">
+                <input
+                  type="radio"
+                  name="skill"
+                  value={skill}
+                  checked={filters.skills.includes(skill)}
+                  onChange={() => onFilterBySkill ? onFilterBySkill(skill) : handleMultiSelect('skills', skill)}
+                />
+                <span>{skill}</span>
+              </label>
+            ))}
+          </div>
+        </FilterSection>
+      )}
+
+      {/* Affiliations Filter */}
+      {availableAffiliations && availableAffiliations.length > 0 && (
+        <FilterSection
+          title="Affiliations"
+          section="affiliations"
+          isExpanded={expandedSections.affiliations}
+          onToggle={toggleSection}
+        >
+          <div className="filter-options">
+            {availableAffiliations.map(affiliation => (
+              <label key={affiliation} className="filter-option">
+                <input
+                  type="radio"
+                  name="affiliation"
+                  value={affiliation}
+                  checked={filters.affiliations.includes(affiliation)}
+                  onChange={() => onFilterByAffiliation ? onFilterByAffiliation(affiliation) : handleMultiSelect('affiliations', affiliation)}
+                />
+                <span>{affiliation}</span>
+              </label>
+            ))}
+          </div>
+        </FilterSection>
+      )}
 
       {/* Reset Button */}
       <button className="reset-filters-btn" onClick={onReset}>

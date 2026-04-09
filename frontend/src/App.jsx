@@ -13,20 +13,39 @@ function App() {
   const [facultyData, setFacultyData] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Check if user is already logged in on mount
+  // Check if user is already logged in on mount - validate with backend
   useEffect(() => {
-    const session = localStorage.getItem('student_session')
-    if (session) {
-      try {
-        const data = JSON.parse(session)
-        setStudentData(data)
-        setIsAuthenticated(true)
-      } catch (error) {
-        console.error('Failed to parse session:', error)
-        localStorage.removeItem('student_session')
+    const validateSession = async () => {
+      const token = localStorage.getItem('auth_token')
+      if (token) {
+        try {
+          // Validate token with backend
+          const response = await import('./services/api').then(module => module.authAPI.getMe())
+          if (response.data && response.data.data) {
+            setStudentData(response.data.data)
+            setIsAuthenticated(true)
+          } else {
+            // Invalid response from backend
+            clearSession()
+          }
+        } catch (error) {
+          console.error('Session validation failed:', error)
+          // Backend returned error (e.g., 401), clear session
+          clearSession()
+        }
       }
+      setLoading(false)
     }
-    setLoading(false)
+
+    const clearSession = () => {
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user_data')
+      localStorage.removeItem('student_session')
+      setIsAuthenticated(false)
+      setStudentData(null)
+    }
+
+    validateSession()
   }, [])
 
   const handleLogin = (data) => {
@@ -34,10 +53,20 @@ function App() {
     setIsAuthenticated(true)
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('student_session')
-    setStudentData(null)
-    setIsAuthenticated(false)
+  const handleLogout = async () => {
+    try {
+      // Call backend logout endpoint
+      await import('./services/api').then(module => module.authAPI.logout())
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      // Clear all local session data
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user_data')
+      localStorage.removeItem('student_session')
+      setStudentData(null)
+      setIsAuthenticated(false)
+    }
   }
 
   if (loading) {
