@@ -1,114 +1,16 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import '../styles/FacultyDashboard.css'
 import FacultyTable from './FacultyTable'
 import FacultyFilterPanel from './FacultyFilterPanel'
 import SearchBar from './SearchBar'
 import Sidebar from './Sidebar'
+import { facultyAPI } from '../services/api'
 
 function FacultyDashboard({ userData, onLogout }) {
   const [activeSection, setActiveSection] = useState('dashboard')
-  const [faculty, _setFaculty] = useState([
-    {
-      faculty_id: 1,
-      faculty_number: 'FAC-2024-001',
-      first_name: 'Dr. Maria',
-      middle_name: 'Sofia',
-      last_name: 'Rodriguez',
-      email: 'maria.rodriguez@faculty.edu',
-      phone_number: '09123456789',
-      gender: 'Female',
-      department: 'Computer Science',
-      position: 'Associate Professor',
-      specialization: 'Artificial Intelligence',
-      employment_status: 'Full-time',
-      years_of_service: 8,
-      qualification: 'PhD in Computer Science',
-      teaching_load: 18,
-      research_projects: 5,
-      publications_count: 12,
-      status: 'Active'
-    },
-    {
-      faculty_id: 2,
-      faculty_number: 'FAC-2024-002',
-      first_name: 'Prof. Juan',
-      middle_name: 'Carlos',
-      last_name: 'Santos',
-      email: 'juan.santos@faculty.edu',
-      phone_number: '09234567890',
-      gender: 'Male',
-      department: 'Information Technology',
-      position: 'Assistant Professor',
-      specialization: 'Cybersecurity',
-      employment_status: 'Full-time',
-      years_of_service: 5,
-      qualification: 'MS in Information Technology',
-      teaching_load: 21,
-      research_projects: 3,
-      publications_count: 8,
-      status: 'Active'
-    },
-    {
-      faculty_id: 3,
-      faculty_number: 'FAC-2024-003',
-      first_name: 'Dr. Ana',
-      middle_name: 'Beatriz',
-      last_name: 'Garcia',
-      email: 'ana.garcia@faculty.edu',
-      phone_number: '09345678901',
-      gender: 'Female',
-      department: 'Computer Science',
-      position: 'Lecturer',
-      specialization: 'Software Engineering',
-      employment_status: 'Part-time',
-      years_of_service: 3,
-      qualification: 'MS in Software Engineering',
-      teaching_load: 12,
-      research_projects: 2,
-      publications_count: 5,
-      status: 'Active'
-    },
-    {
-      faculty_id: 4,
-      faculty_number: 'FAC-2024-004',
-      first_name: 'Prof. Miguel',
-      middle_name: 'Antonio',
-      last_name: 'Torres',
-      email: 'miguel.torres@faculty.edu',
-      phone_number: '09456789012',
-      gender: 'Male',
-      department: 'Mathematics',
-      position: 'Professor',
-      specialization: 'Applied Mathematics',
-      employment_status: 'Full-time',
-      years_of_service: 15,
-      qualification: 'PhD in Mathematics',
-      teaching_load: 15,
-      research_projects: 8,
-      publications_count: 25,
-      status: 'Active'
-    },
-    {
-      faculty_id: 5,
-      faculty_number: 'FAC-2024-005',
-      first_name: 'Dr. Elena',
-      middle_name: 'Rosa',
-      last_name: 'Diaz',
-      email: 'elena.diaz@faculty.edu',
-      phone_number: '09567890123',
-      gender: 'Female',
-      department: 'Information Technology',
-      position: 'Associate Professor',
-      specialization: 'Data Science',
-      employment_status: 'Full-time',
-      years_of_service: 7,
-      qualification: 'PhD in Data Science',
-      teaching_load: 16,
-      research_projects: 6,
-      publications_count: 15,
-      status: 'On Leave'
-    }
-  ])
+  const [faculty, setFaculty] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const [searchTerm, setSearchTerm] = useState('')
   const [filters, setFilters] = useState({
@@ -134,6 +36,28 @@ function FacultyDashboard({ userData, onLogout }) {
 
   const [viewMode, setViewMode] = useState('table') // 'table' or 'grid'
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+
+  // Fetch faculty data on component mount
+  useEffect(() => {
+    fetchFaculty()
+  }, [])
+
+  const fetchFaculty = async () => {
+    try {
+      setLoading(true)
+      const response = await facultyAPI.getAll()
+      if (response.data.success) {
+        setFaculty(response.data.data || [])
+      } else {
+        setError('Failed to load faculty data')
+      }
+    } catch (err) {
+      console.error('Failed to fetch faculty:', err)
+      setError('Error loading faculty data')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Filter and search logic
   const filteredAndSortedFaculty = useMemo(() => {
@@ -268,6 +192,12 @@ function FacultyDashboard({ userData, onLogout }) {
         onSectionChange={setActiveSection}
       />
       <div className="dashboard-content">
+        {error && (
+          <div style={{ background: '#fee', padding: '15px', borderRadius: '4px', marginBottom: '20px', color: '#c33', border: '1px solid #fcc' }}>
+            {error}
+          </div>
+        )}
+
         {activeSection === 'dashboard' && (
           <div className="dashboard-welcome">
             <h1>Welcome, {userData?.name}!</h1>

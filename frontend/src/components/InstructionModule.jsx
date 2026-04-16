@@ -1,141 +1,103 @@
-import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import '../styles/Module.css'
+import { courseAPI } from '../services/api'
 
-function InstructionModule({ studentData, onLogout }) {
-  const location = useLocation()
+function InstructionModule({ userData, onLogout }) {
   const [activeTab, setActiveTab] = useState('syllabus')
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const mockSyllabus = [
-    {
-      id: 1,
-      course_code: 'CS101',
-      course_name: 'Introduction to Computer Science',
-      description: 'Basic concepts of computer science and programming',
-      credits: 3,
-      prerequisites: 'None',
-      objectives: 'Understand fundamental programming concepts'
-    },
-    {
-      id: 2,
-      course_code: 'CS201',
-      course_name: 'Data Structures',
-      description: 'Advanced data structures and algorithms',
-      credits: 4,
-      prerequisites: 'CS101',
-      objectives: 'Master data structures and algorithmic thinking'
+  useEffect(() => {
+    if (activeTab === 'syllabus') {
+      fetchCourses()
     }
-  ]
+  }, [activeTab])
 
-  const mockLessons = [
-    {
-      id: 1,
-      course_code: 'CS101',
-      lesson_number: 1,
-      title: 'Variables and Data Types',
-      description: 'Introduction to variables, constants, and basic data types',
-      duration: '2 hours',
-      objectives: 'Declare variables, understand data types'
-    },
-    {
-      id: 2,
-      course_code: 'CS101',
-      lesson_number: 2,
-      title: 'Control Structures',
-      description: 'Conditional statements and loops',
-      duration: '2.5 hours',
-      objectives: 'Implement decision making and iteration'
+  const fetchCourses = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      const response = await courseAPI.getAll()
+      if (response.data.success || response.data.data) {
+        setCourses(response.data.data || [])
+      } else {
+        setError('Failed to load courses')
+      }
+    } catch (err) {
+      console.error('Failed to fetch courses:', err)
+      setError('Error loading courses. Please try again.')
+    } finally {
+      setLoading(false)
     }
-  ]
-
-  const mockCurriculum = [
-    {
-      id: 1,
-      program: 'BS Computer Science',
-      year_level: 1,
-      semester: 1,
-      courses: ['CS101', 'MATH101', 'ENG101'],
-      total_credits: 12
-    },
-    {
-      id: 2,
-      program: 'BS Computer Science',
-      year_level: 1,
-      semester: 2,
-      courses: ['CS102', 'MATH102', 'PHY101'],
-      total_credits: 13
-    }
-  ]
+  }
 
   const renderContent = () => {
+    if (loading && activeTab === 'syllabus') {
+      return (
+        <div className="module-content">
+          <h2>Syllabus Management</h2>
+          <p style={{ textAlign: 'center', color: '#999' }}>Loading...</p>
+        </div>
+      )
+    }
+
+    if (error && activeTab === 'syllabus') {
+      return (
+        <div className="module-content">
+          <h2>Syllabus Management</h2>
+          <p style={{ color: '#c33', background: '#fee', padding: '10px', borderRadius: '4px' }}>{error}</p>
+        </div>
+      )
+    }
+
     switch (activeTab) {
       case 'syllabus':
         return (
           <div className="module-content">
             <h2>Syllabus Management</h2>
-            <div className="data-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Course Code</th>
-                    <th>Course Name</th>
-                    <th>Description</th>
-                    <th>Credits</th>
-                    <th>Prerequisites</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mockSyllabus.map(course => (
-                    <tr key={course.id}>
-                      <td>{course.course_code}</td>
-                      <td>{course.course_name}</td>
-                      <td>{course.description}</td>
-                      <td>{course.credits}</td>
-                      <td>{course.prerequisites}</td>
-                      <td>
-                        <button className="action-btn">View</button>
-                        <button className="action-btn">Edit</button>
-                      </td>
+            {courses.length === 0 ? (
+              <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
+                <p style={{ color: '#999' }}>No courses available</p>
+              </div>
+            ) : (
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Course Code</th>
+                      <th>Course Name</th>
+                      <th>Department</th>
+                      <th>Credits</th>
+                      <th>Units</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {courses.map(course => (
+                      <tr key={course.id || course.course_id}>
+                        <td>{course.course_code}</td>
+                        <td>{course.course_name}</td>
+                        <td>{course.department || 'N/A'}</td>
+                        <td>{course.credits || '-'}</td>
+                        <td>{course.units || '-'}</td>
+                        <td>
+                          <span className="status-badge status-active">Active</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )
       case 'lessons':
         return (
           <div className="module-content">
             <h2>Lesson Management</h2>
-            <div className="data-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Course</th>
-                    <th>Lesson #</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Duration</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mockLessons.map(lesson => (
-                    <tr key={lesson.id}>
-                      <td>{lesson.course_code}</td>
-                      <td>{lesson.lesson_number}</td>
-                      <td>{lesson.title}</td>
-                      <td>{lesson.description}</td>
-                      <td>{lesson.duration}</td>
-                      <td>
-                        <button className="action-btn">View</button>
-                        <button className="action-btn">Edit</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
+              <p style={{ color: '#999' }}>Lesson management coming soon. Backend API available at /api/courses/curriculum</p>
             </div>
           </div>
         )
@@ -143,34 +105,8 @@ function InstructionModule({ studentData, onLogout }) {
         return (
           <div className="module-content">
             <h2>Curriculum Management</h2>
-            <div className="data-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Program</th>
-                    <th>Year</th>
-                    <th>Semester</th>
-                    <th>Courses</th>
-                    <th>Total Credits</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mockCurriculum.map(curr => (
-                    <tr key={curr.id}>
-                      <td>{curr.program}</td>
-                      <td>{curr.year_level}</td>
-                      <td>{curr.semester}</td>
-                      <td>{curr.courses.join(', ')}</td>
-                      <td>{curr.total_credits}</td>
-                      <td>
-                        <button className="action-btn">View</button>
-                        <button className="action-btn">Edit</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
+              <p style={{ color: '#999' }}>Curriculum management coming soon. Backend API available at /api/students/curricula</p>
             </div>
           </div>
         )
@@ -183,14 +119,14 @@ function InstructionModule({ studentData, onLogout }) {
     <div className="student-dashboard">
       <div className="dashboard-header">
         <div className="header-left">
-          <h1>CCS Comprehensive Profiling System</h1>
-          <p className="subtitle">Student management and academic profiling platform</p>
+          <h1>Instruction Module</h1>
+          <p className="subtitle">Course syllabus and curriculum management</p>
         </div>
         <div className="header-right">
-          {studentData && (
+          {userData && (
             <div className="user-info">
               <span className="user-label">Logged in as:</span>
-              <span className="user-id">{studentData.studentNumber}</span>
+              <span className="user-id">{userData.name}</span>
               <button
                 className="logout-btn"
                 onClick={onLogout}
@@ -203,21 +139,6 @@ function InstructionModule({ studentData, onLogout }) {
         </div>
       </div>
 
-      <nav className="module-navigation">
-        <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>
-          Student Dashboard
-        </Link>
-        <Link to="/faculty" className={`nav-link ${location.pathname === '/faculty' ? 'active' : ''}`}>
-          Faculty Dashboard
-        </Link>
-        <Link to="/instruction" className={`nav-link ${location.pathname === '/instruction' ? 'active' : ''}`}>
-          Instruction Module
-        </Link>
-        <Link to="/scheduling" className={`nav-link ${location.pathname === '/scheduling' ? 'active' : ''}`}>
-          Scheduling Module
-        </Link>
-      </nav>
-
       <div className="module-container">
         <div className="module-sidebar">
           <h3>Instruction Module</h3>
@@ -226,19 +147,19 @@ function InstructionModule({ studentData, onLogout }) {
               className={`tab-btn ${activeTab === 'syllabus' ? 'active' : ''}`}
               onClick={() => setActiveTab('syllabus')}
             >
-              Syllabus
+              📚 Syllabus
             </button>
             <button
               className={`tab-btn ${activeTab === 'lessons' ? 'active' : ''}`}
               onClick={() => setActiveTab('lessons')}
             >
-              Lessons
+              📖 Lessons
             </button>
             <button
               className={`tab-btn ${activeTab === 'curriculum' ? 'active' : ''}`}
               onClick={() => setActiveTab('curriculum')}
             >
-              Curriculum
+              🎓 Curriculum
             </button>
           </div>
         </div>

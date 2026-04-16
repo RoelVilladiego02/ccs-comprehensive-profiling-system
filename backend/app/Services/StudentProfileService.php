@@ -123,7 +123,7 @@ class StudentProfileService
      */
     public function getStudentCurrentCourses(int $studentId): array
     {
-        $student = Student::with('classStatuses.class.course.faculty')->find($studentId);
+        $student = Student::with('classStatuses.class.course', 'classStatuses.class.faculty')->find($studentId);
 
         if (!$student) {
             return [];
