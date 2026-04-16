@@ -771,18 +771,17 @@ function AdminDashboard({ userData, onLogout }) {
         }}>
           <table style={{ 
             width: '100%', 
-            borderCollapse: 'collapse',
-            minWidth: '1400px'
+            borderCollapse: 'collapse'
           }}>
             <thead>
               <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
-                <th style={{ padding: '18px 20px', textAlign: 'left', fontWeight: '700', width: '9%', minWidth: '120px', fontSize: '1rem' }}>Code</th>
-                <th style={{ padding: '18px 20px', textAlign: 'left', fontWeight: '700', width: '26%', minWidth: '280px', fontSize: '1rem' }}>Title</th>
-                <th style={{ padding: '18px 20px', textAlign: 'left', fontWeight: '700', width: '16%', minWidth: '180px', fontSize: '1rem' }}>Department</th>
-                <th style={{ padding: '18px 20px', textAlign: 'center', fontWeight: '700', width: '10%', minWidth: '100px', fontSize: '1rem' }}>Lecture</th>
-                <th style={{ padding: '18px 20px', textAlign: 'center', fontWeight: '700', width: '10%', minWidth: '100px', fontSize: '1rem' }}>Lab</th>
-                <th style={{ padding: '18px 20px', textAlign: 'center', fontWeight: '700', width: '12%', minWidth: '130px', fontSize: '1rem' }}>Status</th>
-                <th style={{ padding: '18px 20px', textAlign: 'center', fontWeight: '700', width: '17%', minWidth: '200px', fontSize: '1rem' }}>Actions</th>
+                <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '700', width: '9%', fontSize: '0.92rem' }}>Code</th>
+                <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '700', width: '26%', fontSize: '0.92rem' }}>Title</th>
+                <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '700', width: '16%', fontSize: '0.92rem' }}>Department</th>
+                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '10%', fontSize: '0.92rem' }}>Lecture</th>
+                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '10%', fontSize: '0.92rem' }}>Lab</th>
+                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '12%', fontSize: '0.92rem' }}>Status</th>
+                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '17%', fontSize: '0.92rem' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -797,26 +796,26 @@ function AdminDashboard({ userData, onLogout }) {
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e7f3ff'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#fff' : '#f8f9fa'}
                 >
-                  <td style={{ padding: '16px 20px', fontWeight: '700', color: '#0056b3', fontSize: '1.02rem' }}>
+                  <td style={{ padding: '14px 12px', fontWeight: '700', color: '#0056b3', fontSize: '0.94rem' }}>
                     {course.course_code}
                   </td>
-                  <td style={{ padding: '16px 20px', fontSize: '0.98rem', color: '#333333' }}>
+                  <td style={{ padding: '14px 12px', fontSize: '0.94rem', color: '#333333' }}>
                     {course.course_title}
                   </td>
-                  <td style={{ padding: '16px 20px', fontSize: '0.98rem', color: '#666666' }}>
+                  <td style={{ padding: '14px 12px', fontSize: '0.94rem', color: '#666666' }}>
                     {course.department || '-'}
                   </td>
-                  <td style={{ padding: '16px 20px', textAlign: 'center', fontSize: '0.98rem', fontWeight: '500', color: '#333333' }}>
+                  <td style={{ padding: '14px 12px', textAlign: 'center', fontSize: '0.94rem', fontWeight: '500', color: '#333333' }}>
                     {course.units_lecture}
                   </td>
-                  <td style={{ padding: '16px 20px', textAlign: 'center', fontSize: '0.98rem', fontWeight: '500', color: '#333333' }}>
+                  <td style={{ padding: '14px 12px', textAlign: 'center', fontSize: '0.94rem', fontWeight: '500', color: '#333333' }}>
                     {course.units_lab}
                   </td>
-                  <td style={{ padding: '16px 20px', textAlign: 'center' }}>
+                  <td style={{ padding: '14px 12px', textAlign: 'center' }}>
                     <span style={{
-                      padding: '8px 16px',
+                      padding: '6px 11px',
                       borderRadius: '16px',
-                      fontSize: '0.88rem',
+                      fontSize: '0.80rem',
                       fontWeight: '600',
                       display: 'inline-block',
                       background: course.is_active ? '#d4edda' : '#f8d7da',
@@ -825,7 +824,7 @@ function AdminDashboard({ userData, onLogout }) {
                       {course.is_active ? '✓ Active' : '✕ Inactive'}
                     </span>
                   </td>
-                  <td style={{ padding: '16px 20px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                  <td style={{ padding: '14px 12px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                     <button
                       onClick={() => handleEditCourse(course)}
                       style={{
@@ -833,10 +832,10 @@ function AdminDashboard({ userData, onLogout }) {
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
-                        padding: '8px 14px',
+                        padding: '6px 10px',
                         cursor: 'pointer',
-                        marginRight: '8px',
-                        fontSize: '0.88rem',
+                        marginRight: '5px',
+                        fontSize: '0.80rem',
                         fontWeight: '500',
                         transition: 'all 0.15s ease'
                       }}
@@ -858,9 +857,9 @@ function AdminDashboard({ userData, onLogout }) {
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
-                        padding: '8px 14px',
+                        padding: '6px 10px',
                         cursor: 'pointer',
-                        fontSize: '0.88rem',
+                        fontSize: '0.80rem',
                         fontWeight: '500',
                         transition: 'all 0.15s ease'
                       }}
