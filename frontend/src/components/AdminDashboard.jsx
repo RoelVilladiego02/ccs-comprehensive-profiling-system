@@ -770,18 +770,20 @@ function AdminDashboard({ userData, onLogout }) {
           width: '100%'
         }}>
           <table style={{ 
-            width: '100%', 
-            borderCollapse: 'collapse'
+            width: 'auto',
+            minWidth: '100%',
+            borderCollapse: 'collapse',
+            tableLayout: 'fixed'
           }}>
             <thead>
               <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
-                <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '700', width: '9%', fontSize: '0.92rem' }}>Code</th>
-                <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '700', width: '26%', fontSize: '0.92rem' }}>Title</th>
-                <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '700', width: '16%', fontSize: '0.92rem' }}>Department</th>
-                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '10%', fontSize: '0.92rem' }}>Lecture</th>
-                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '10%', fontSize: '0.92rem' }}>Lab</th>
-                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '12%', fontSize: '0.92rem' }}>Status</th>
-                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '17%', fontSize: '0.92rem' }}>Actions</th>
+                <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '700', width: '100px', fontSize: '0.92rem' }}>Code</th>
+                <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '700', width: '250px', fontSize: '0.92rem' }}>Title</th>
+                <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '700', width: '180px', fontSize: '0.92rem' }}>Department</th>
+                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '110px', fontSize: '0.92rem' }}>Lecture</th>
+                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '100px', fontSize: '0.92rem' }}>Lab</th>
+                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '130px', fontSize: '0.92rem' }}>Status</th>
+                <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '700', width: '200px', fontSize: '0.92rem' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -796,22 +798,22 @@ function AdminDashboard({ userData, onLogout }) {
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e7f3ff'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#fff' : '#f8f9fa'}
                 >
-                  <td style={{ padding: '14px 12px', fontWeight: '700', color: '#0056b3', fontSize: '0.94rem' }}>
+                  <td style={{ padding: '14px 12px', fontWeight: '700', color: '#0056b3', fontSize: '0.94rem', width: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {course.course_code}
                   </td>
-                  <td style={{ padding: '14px 12px', fontSize: '0.94rem', color: '#333333' }}>
+                  <td style={{ padding: '14px 12px', fontSize: '0.94rem', color: '#333333', width: '250px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {course.course_title}
                   </td>
-                  <td style={{ padding: '14px 12px', fontSize: '0.94rem', color: '#666666' }}>
+                  <td style={{ padding: '14px 12px', fontSize: '0.94rem', color: '#666666', width: '180px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {course.department || '-'}
                   </td>
-                  <td style={{ padding: '14px 12px', textAlign: 'center', fontSize: '0.94rem', fontWeight: '500', color: '#333333' }}>
+                  <td style={{ padding: '14px 12px', textAlign: 'center', fontSize: '0.94rem', fontWeight: '500', color: '#333333', width: '110px' }}>
                     {course.units_lecture}
                   </td>
-                  <td style={{ padding: '14px 12px', textAlign: 'center', fontSize: '0.94rem', fontWeight: '500', color: '#333333' }}>
+                  <td style={{ padding: '14px 12px', textAlign: 'center', fontSize: '0.94rem', fontWeight: '500', color: '#333333', width: '100px' }}>
                     {course.units_lab}
                   </td>
-                  <td style={{ padding: '14px 12px', textAlign: 'center' }}>
+                  <td style={{ padding: '14px 12px', textAlign: 'center', width: '130px' }}>
                     <span style={{
                       padding: '6px 11px',
                       borderRadius: '16px',
@@ -819,61 +821,65 @@ function AdminDashboard({ userData, onLogout }) {
                       fontWeight: '600',
                       display: 'inline-block',
                       background: course.is_active ? '#d4edda' : '#f8d7da',
-                      color: course.is_active ? '#155724' : '#721c24'
+                      color: course.is_active ? '#155724' : '#721c24',
+                      whiteSpace: 'nowrap'
                     }}>
                       {course.is_active ? '✓ Active' : '✕ Inactive'}
                     </span>
                   </td>
-                  <td style={{ padding: '14px 12px', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    <button
-                      onClick={() => handleEditCourse(course)}
-                      style={{
-                        background: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        padding: '6px 10px',
-                        cursor: 'pointer',
-                        marginRight: '5px',
-                        fontSize: '0.80rem',
-                        fontWeight: '500',
-                        transition: 'all 0.15s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#0056b3'
-                        e.currentTarget.style.transform = 'translateY(-1px)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#007bff'
-                        e.currentTarget.style.transform = 'translateY(0)'
-                      }}
-                    >
-                      ✎ Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCourse(course)}
-                      style={{
-                        background: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        padding: '6px 10px',
-                        cursor: 'pointer',
-                        fontSize: '0.80rem',
-                        fontWeight: '500',
-                        transition: 'all 0.15s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#c82333'
-                        e.currentTarget.style.transform = 'translateY(-1px)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#dc3545'
-                        e.currentTarget.style.transform = 'translateY(0)'
-                      }}
-                    >
-                      🗑 Delete
-                    </button>
+                  <td style={{ padding: '14px 12px', textAlign: 'center', width: '200px' }}>
+                    <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                      <button
+                        onClick={() => handleEditCourse(course)}
+                        style={{
+                          background: '#007bff',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '6px 10px',
+                          cursor: 'pointer',
+                          fontSize: '0.80rem',
+                          fontWeight: '500',
+                          transition: 'all 0.15s ease',
+                          whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#0056b3'
+                          e.currentTarget.style.transform = 'translateY(-1px)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#007bff'
+                          e.currentTarget.style.transform = 'translateY(0)'
+                        }}
+                      >
+                        ✎ Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCourse(course)}
+                        style={{
+                          background: '#dc3545',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '6px 10px',
+                          cursor: 'pointer',
+                          fontSize: '0.80rem',
+                          fontWeight: '500',
+                          transition: 'all 0.15s ease',
+                          whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#c82333'
+                          e.currentTarget.style.transform = 'translateY(-1px)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#dc3545'
+                          e.currentTarget.style.transform = 'translateY(0)'
+                        }}
+                      >
+                        🗑 Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

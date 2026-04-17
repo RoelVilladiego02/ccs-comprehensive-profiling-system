@@ -94,6 +94,17 @@ export const facultyAPI = {
   getByDepartment: (department) => apiClient.get(`/faculty/department/${department}`)
 }
 
+// Class endpoints
+export const classAPI = {
+  getAll: (perPage = 15) => apiClient.get('/classes', { params: { per_page: perPage } }),
+  getById: (id) => apiClient.get(`/classes/${id}`),
+  getOpen: () => apiClient.get('/classes/open'),
+  getByFaculty: (facultyId) => apiClient.get(`/classes/faculty/${facultyId}`),
+  create: (data) => apiClient.post('/classes', data),
+  update: (id, data) => apiClient.put(`/classes/${id}`, data),
+  delete: (id) => apiClient.delete(`/classes/${id}`)
+}
+
 // Grade endpoints
 export const gradeAPI = {
   getStudentGrades: (studentId) => apiClient.get(`/grades/student/${studentId}`),

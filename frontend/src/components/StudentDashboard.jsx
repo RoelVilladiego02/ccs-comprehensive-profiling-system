@@ -148,36 +148,59 @@ function StudentDashboard({ userData, onLogout }) {
 
               {activeSection === 'courses' && (
                 <div className="profile-content">
-            {/* Current Courses */}
-            {currentCourses.length > 0 && (
-              <section className="profile-section">
-                <h2>Current Courses</h2>
-                <div className="courses-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Course Code</th>
-                        <th>Course Title</th>
-                        <th>Instructor</th>
-                        <th>Time</th>
-                        <th>Room</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentCourses.map(course => (
-                        <tr key={course.class_id}>
-                          <td>{course.course_code}</td>
-                          <td>{course.course_title}</td>
-                          <td>{course.faculty}</td>
-                          <td>{course.schedule_time || '-'}</td>
-                          <td>{course.room || '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            )}
+                  {/* Current Courses */}
+                  <section className="profile-section">
+                    <h2>My Courses</h2>
+                    {currentCourses && currentCourses.length > 0 ? (
+                      <div className="courses-table">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Course Code</th>
+                              <th>Course Title</th>
+                              <th>Instructor</th>
+                              <th>Schedule</th>
+                              <th>Room</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {currentCourses.map(course => (
+                              <tr key={course.class_id}>
+                                <td>{course.course_code}</td>
+                                <td>{course.course_title}</td>
+                                <td>{course.faculty || 'N/A'}</td>
+                                <td>
+                                  {course.schedule_day ? (
+                                    <>
+                                      {course.schedule_day}
+                                      {course.schedule_time && ` - ${course.schedule_time}`}
+                                    </>
+                                  ) : (
+                                    'TBA'
+                                  )}
+                                </td>
+                                <td>{course.room || 'TBA'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div style={{ 
+                        background: '#f5f5f5', 
+                        padding: '40px 20px', 
+                        borderRadius: '8px', 
+                        textAlign: 'center',
+                        color: '#666',
+                        border: '1px dashed #ddd'
+                      }}>
+                        <p>You are not currently enrolled in any courses.</p>
+                        <p style={{ fontSize: '0.9rem', color: '#999' }}>
+                          Contact your academic advisor to enroll in courses for this semester.
+                        </p>
+                      </div>
+                    )}
+                  </section>
                 </div>
               )}
 

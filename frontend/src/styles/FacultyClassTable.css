@@ -1,0 +1,207 @@
+.faculty-class-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: white;
+}
+
+.faculty-class-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.faculty-class-table colgroup {
+  display: none;
+}
+
+.col-course-code {
+  width: 12%;
+}
+
+.col-course-title {
+  width: 25%;
+}
+
+.col-section {
+  width: 8%;
+}
+
+.col-schedule {
+  width: 22%;
+}
+
+.col-room {
+  width: 10%;
+}
+
+.col-semester {
+  width: 8%;
+}
+
+.col-students {
+  width: 10%;
+}
+
+.col-status {
+  width: 10%;
+}
+
+.faculty-class-table thead {
+  background: #f5f5f5;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.faculty-class-table thead th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  user-select: none;
+}
+
+.faculty-class-table thead th.sortable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.faculty-class-table thead th.sortable:hover {
+  background-color: #eee;
+}
+
+.sort-icon {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 11px;
+  color: #666;
+}
+
+.faculty-class-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.faculty-class-table tbody tr:hover {
+  background-color: #fafafa;
+}
+
+.faculty-class-table tbody td {
+  padding: 12px;
+  color: #444;
+}
+
+.faculty-class-table .course-code {
+  font-weight: 600;
+  color: #1e88e5;
+}
+
+.faculty-class-table .course-title {
+  font-weight: 500;
+}
+
+.faculty-class-table .section {
+  text-align: center;
+  font-weight: 500;
+}
+
+.faculty-class-table .schedule {
+  font-size: 13px;
+}
+
+.faculty-class-table .time-info {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.faculty-class-table .room {
+  text-align: center;
+  background: #f9f9f9;
+}
+
+.faculty-class-table .semester {
+  text-align: center;
+  font-weight: 500;
+}
+
+.faculty-class-table .students {
+  text-align: center;
+  font-weight: 500;
+}
+
+.faculty-class-table .students.full {
+  color: #d32f2f;
+}
+
+.faculty-class-table .status {
+  text-align: center;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-open {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.status-closed {
+  background-color: #ffccbc;
+  color: #d84315;
+}
+
+.status-cancelled {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.faculty-class-empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: #999;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
+}
+
+@media (max-width: 768px) {
+  .faculty-class-table {
+    font-size: 12px;
+  }
+
+  .faculty-class-table thead th {
+    padding: 8px;
+  }
+
+  .faculty-class-table tbody td {
+    padding: 8px;
+  }
+
+  .col-course-title {
+    width: 20%;
+  }
+
+  .col-schedule {
+    width: 18%;
+  }
+
+  .col-room {
+    width: 8%;
+  }
+
+  .col-students {
+    width: 12%;
+  }
+
+  .status-badge {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+}

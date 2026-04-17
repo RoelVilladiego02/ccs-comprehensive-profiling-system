@@ -3,11 +3,11 @@ import '../styles/FilterPanel.css'
 
 function FilterPanel({ filters, onFilterChange, onReset, availableSkills = [], availableAffiliations = [], onFilterBySkill, onFilterByAffiliation }) {
   const [expandedSections, setExpandedSections] = useState({
-    gender: true,
-    identification: true,
-    yearLevel: true,
-    status: true,
-    academics: true,
+    gender: false,
+    identification: false,
+    yearLevel: false,
+    status: false,
+    academics: false,
     skills: false,
     affiliations: false
   })
