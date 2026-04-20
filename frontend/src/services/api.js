@@ -129,6 +129,16 @@ export const attendanceAPI = {
     apiClient.get(`/attendance/class/${classId}/date/${date}`)
 }
 
+// Enrollment endpoints
+export const enrollmentAPI = {
+  enrollStudent: (data) => apiClient.post('/enrollments', data),
+  getStudentEnrollments: (studentId) => apiClient.get(`/enrollments/student/${studentId}`),
+  getClassEnrollments: (classId) => apiClient.get(`/enrollments/class/${classId}`),
+  getActiveEnrollments: (studentId) => apiClient.get(`/enrollments/student/${studentId}/active`),
+  updateStatus: (enrollmentId, data) => apiClient.put(`/enrollments/${enrollmentId}/status`, data),
+  deleteEnrollment: (enrollmentId) => apiClient.delete(`/enrollments/${enrollmentId}`)
+}
+
 // Violation endpoints
 export const violationAPI = {
   getStudentViolations: (studentId) => apiClient.get(`/violations/student/${studentId}`),

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import '../styles/AdminDashboard.css'
 import { classAPI, facultyAPI, courseAPI } from '../services/api'
+import ClassEnrollmentModal from './ClassEnrollmentModal'
 
 function AdminClassManagement({ userData, onLogout }) {
   const [activeSection, setActiveSection] = useState('list')
@@ -10,6 +11,10 @@ function AdminClassManagement({ userData, onLogout }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  // Enrollment modal state
+  const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
+  const [selectedClass, setSelectedClass] = useState(null)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -139,6 +144,20 @@ function AdminClassManagement({ userData, onLogout }) {
     }
   }
 
+  const handleOpenEnrollment = (schoolClass) => {
+    setSelectedClass(schoolClass)
+    setShowEnrollmentModal(true)
+  }
+
+  const handleCloseEnrollment = () => {
+    setShowEnrollmentModal(false)
+    setSelectedClass(null)
+  }
+
+  const handleEnrollmentUpdated = () => {
+    fetchClasses()
+  }
+
   const handleEdit = (schoolClass) => {
     setFormData({
       course_id: schoolClass.course_id?.toString(),
@@ -202,7 +221,7 @@ function AdminClassManagement({ userData, onLogout }) {
 
       return (
         (course?.course_code?.toLowerCase().includes(searchLower) ||
-          course?.course_name?.toLowerCase().includes(searchLower) ||
+          course?.course_title?.toLowerCase().includes(searchLower) ||
           schoolClass.section?.toLowerCase().includes(searchLower) ||
           fac?.first_name?.toLowerCase().includes(searchLower) ||
           fac?.last_name?.toLowerCase().includes(searchLower)) ??
@@ -347,6 +366,13 @@ function AdminClassManagement({ userData, onLogout }) {
                           title="Edit class"
                         >
                           Edit
+                        </button>
+                        <button
+                          className="btn btn-small btn-info"
+                          onClick={() => handleOpenEnrollment(schoolClass)}
+                          title="Manage student enrollment"
+                        >
+                          Enroll
                         </button>
                         <button
                           className="btn btn-small btn-delete"
@@ -582,6 +608,17 @@ function AdminClassManagement({ userData, onLogout }) {
         {activeSection === 'list' && renderList()}
         {activeSection === 'form' && renderForm()}
       </div>
+
+      {showEnrollmentModal && selectedClass && (
+        <ClassEnrollmentModal
+          classId={selectedClass.class_id}
+          courseName={courses.find(c => c.course_id === selectedClass.course_id)?.course_name || 'Unknown Course'}
+          section={selectedClass.section}
+          maxStudents={selectedClass.max_students}
+          onClose={handleCloseEnrollment}
+          onEnrollmentUpdated={handleEnrollmentUpdated}
+        />
+      )}
     </div>
   )
 }

@@ -37,7 +37,7 @@ function SchedulingModule({ userData, onLogout }) {
     if (loading) {
       return (
         <div className="module-content">
-          <h2>{activeTab === 'course' ? 'Course Management' : activeTab === 'section' ? 'Section Management' : activeTab === 'rooms' ? 'Room Management' : activeTab === 'lab' ? 'Lab Management' : 'Faculty Management'}</h2>
+          <h2>{activeTab === 'course' ? 'Course Management' : activeTab === 'class' ? 'Class Management' : activeTab === 'rooms' ? 'Room Management' : activeTab === 'lab' ? 'Lab Management' : 'Faculty Management'}</h2>
           <p style={{ textAlign: 'center', color: '#999' }}>Loading...</p>
         </div>
       )
@@ -96,7 +96,7 @@ function SchedulingModule({ userData, onLogout }) {
           </div>
         )
 
-      case 'section':
+      case 'class':
         return <AdminClassManagement userData={userData} onLogout={onLogout} />
 
       case 'rooms':
@@ -169,10 +169,10 @@ function SchedulingModule({ userData, onLogout }) {
               📚 Courses
             </button>
             <button
-              className={`tab-btn ${activeTab === 'section' ? 'active' : ''}`}
-              onClick={() => setActiveTab('section')}
+              className={`tab-btn ${activeTab === 'class' ? 'active' : ''}`}
+              onClick={() => setActiveTab('class')}
             >
-              📋 Sections
+              📚 Classes
             </button>
             <button
               className={`tab-btn ${activeTab === 'rooms' ? 'active' : ''}`}

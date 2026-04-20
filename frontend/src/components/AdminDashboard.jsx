@@ -8,6 +8,7 @@ import StudentForm from './StudentForm'
 import DeleteConfirmModal from './DeleteConfirmModal'
 import Pagination from './Pagination'
 import SchedulingModule from './SchedulingModule'
+import AdminFacultyManagement from './AdminFacultyManagement'
 import { studentAPI, facultyAPI, courseAPI } from '../services/api'
 import Sidebar from './Sidebar'
 
@@ -699,10 +700,7 @@ function AdminDashboard({ userData, onLogout }) {
   )
 
   const renderFaculty = () => (
-    <div className="section-content">
-      <h2>Faculty Management</h2>
-      <p>Faculty management section coming soon...</p>
-    </div>
+    <AdminFacultyManagement />
   )
 
   const renderCourses = () => (

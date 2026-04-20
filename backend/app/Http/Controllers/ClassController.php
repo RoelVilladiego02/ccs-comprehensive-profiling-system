@@ -96,7 +96,7 @@ class ClassController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Class created successfully',
-            'data' => $class,
+            'data' => $this->classService->getClassById($class->class_id),
         ], 201);
     }
 
