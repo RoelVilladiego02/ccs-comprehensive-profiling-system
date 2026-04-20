@@ -28,6 +28,7 @@ function Sidebar({ userRole, userData, onLogout, activeSection, onSectionChange 
       { id: 'students', label: 'Students', icon: '👤' },
       { id: 'faculty', label: 'Faculty', icon: '🎓' },
       { id: 'courses', label: 'Courses', icon: '📚' },
+      { id: 'scheduling', label: 'Scheduling', icon: '📅' },
       { id: 'settings', label: 'System Settings', icon: '⚙️' },
     ],
     staff: [

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Student;
+use App\Models\Faculty;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -147,5 +148,112 @@ class StudentService
             ->distinct()
             ->pluck('organization_type')
             ->values();
+    }
+
+    /**
+     * Get students assigned to a specific faculty (by faculty_id)
+     * Faculty can only see students enrolled in their classes
+     */
+    public function getStudentsByFaculty(int $facultyId, int $perPage = 15): LengthAwarePaginator
+    {
+        return Student::whereHas('classStatuses', function ($query) use ($facultyId) {
+            $query->whereHas('class', function ($classQuery) use ($facultyId) {
+                $classQuery->where('faculty_id', $facultyId);
+            });
+        })->distinct()->paginate($perPage);
+    }
+
+    /**
+     * Search students by name/email/number assigned to a specific faculty
+     */
+    public function searchStudentsByFaculty(string $query, int $facultyId): Collection
+    {
+        return Student::whereHas('classStatuses', function ($q) use ($facultyId) {
+            $q->whereHas('class', function ($classQuery) use ($facultyId) {
+                $classQuery->where('faculty_id', $facultyId);
+            });
+        })
+        ->where(function ($q) use ($query) {
+            $q->where('first_name', 'like', "%{$query}%")
+                ->orWhere('last_name', 'like', "%{$query}%")
+                ->orWhere('email', 'like', "%{$query}%")
+                ->orWhere('student_number', 'like', "%{$query}%");
+        })
+        ->distinct()
+        ->get();
+    }
+
+    /**
+     * Get students by skill and faculty
+     */
+    public function getStudentsBySkillAndFaculty(string $skillName, int $facultyId): Collection
+    {
+        return Student::whereHas('classStatuses', function ($q) use ($facultyId) {
+            $q->whereHas('class', function ($classQuery) use ($facultyId) {
+                $classQuery->where('faculty_id', $facultyId);
+            });
+        })
+        ->whereHas('skills', function ($query) use ($skillName) {
+            $query->where('skill_name', 'like', "%{$skillName}%");
+        })
+        ->with('skills')
+        ->distinct()
+        ->get();
+    }
+
+    /**
+     * Get students by affiliation and faculty
+     */
+    public function getStudentsByAffiliationAndFaculty(string $affiliationType, int $facultyId): Collection
+    {
+        return Student::whereHas('classStatuses', function ($q) use ($facultyId) {
+            $q->whereHas('class', function ($classQuery) use ($facultyId) {
+                $classQuery->where('faculty_id', $facultyId);
+            });
+        })
+        ->whereHas('affiliations', function ($query) use ($affiliationType) {
+            $query->where('affiliation_type', 'like', "%{$affiliationType}%");
+        })
+        ->with('affiliations')
+        ->distinct()
+        ->get();
+    }
+
+    /**
+     * Get available skills for a specific faculty's students
+     */
+    public function getAvailableSkillsForFaculty(int $facultyId)
+    {
+        return Student::whereHas('classStatuses', function ($q) use ($facultyId) {
+            $q->whereHas('class', function ($classQuery) use ($facultyId) {
+                $classQuery->where('faculty_id', $facultyId);
+            });
+        })
+        ->whereHas('skills')
+        ->with('skills')
+        ->get()
+        ->flatMap(fn($student) => $student->skills)
+        ->pluck('skill_category')
+        ->unique()
+        ->values();
+    }
+
+    /**
+     * Get available affiliation types for a specific faculty's students
+     */
+    public function getAvailableAffiliationTypesForFaculty(int $facultyId)
+    {
+        return Student::whereHas('classStatuses', function ($q) use ($facultyId) {
+            $q->whereHas('class', function ($classQuery) use ($facultyId) {
+                $classQuery->where('faculty_id', $facultyId);
+            });
+        })
+        ->whereHas('affiliations')
+        ->with('affiliations')
+        ->get()
+        ->flatMap(fn($student) => $student->affiliations)
+        ->pluck('organization_type')
+        ->unique()
+        ->values();
     }
 }

@@ -16,13 +16,36 @@ class StudentController extends Controller
     }
 
     /**
+     * Get faculty_id if user is faculty, null otherwise
+     */
+    private function getFacultyIdIfFaculty(Request $request): ?int
+    {
+        $user = $request->user();
+        
+        if (!$user || !$user->hasRole('Faculty')) {
+            return null;
+        }
+
+        $faculty = $user->faculty;
+        return $faculty?->faculty_id;
+    }
+
+    /**
      * GET /api/students
      * Get all students with pagination
+     * If user is faculty, only shows students in their classes
      */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->query('per_page', 15);
-        $students = $this->studentService->getAllStudents($perPage);
+        
+        $facultyId = $this->getFacultyIdIfFaculty($request);
+        
+        if ($facultyId) {
+            $students = $this->studentService->getStudentsByFaculty($facultyId, $perPage);
+        } else {
+            $students = $this->studentService->getAllStudents($perPage);
+        }
 
         return response()->json([
             'success' => true,
@@ -39,6 +62,7 @@ class StudentController extends Controller
     /**
      * GET /api/students/search
      * Search students
+     * If user is faculty, only searches within their students
      */
     public function search(Request $request): JsonResponse
     {
@@ -51,7 +75,13 @@ class StudentController extends Controller
             ], 400);
         }
 
-        $students = $this->studentService->searchStudents($query);
+        $facultyId = $this->getFacultyIdIfFaculty($request);
+        
+        if ($facultyId) {
+            $students = $this->studentService->searchStudentsByFaculty($query, $facultyId);
+        } else {
+            $students = $this->studentService->searchStudents($query);
+        }
 
         return response()->json([
             'success' => true,
@@ -62,8 +92,9 @@ class StudentController extends Controller
     /**
      * GET /api/students/{id}
      * Get student by ID
+     * If user is faculty, checks if student is in their classes
      */
-    public function show(int $id): JsonResponse
+    public function show(int $id, Request $request): JsonResponse
     {
         $student = $this->studentService->getStudentById($id);
 
@@ -72,6 +103,24 @@ class StudentController extends Controller
                 'success' => false,
                 'message' => 'Student not found',
             ], 404);
+        }
+
+        // Check if faculty can view this student
+        $facultyId = $this->getFacultyIdIfFaculty($request);
+        if ($facultyId) {
+            // Verify this student is in one of the faculty's classes
+            $isStudentOfFaculty = $student->classStatuses()
+                ->whereHas('class', function ($q) use ($facultyId) {
+                    $q->where('faculty_id', $facultyId);
+                })
+                ->exists();
+
+            if (!$isStudentOfFaculty) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You do not have permission to view this student',
+                ], 403);
+            }
         }
 
         return response()->json([
@@ -190,6 +239,7 @@ class StudentController extends Controller
     /**
      * GET /api/students/filter/skills
      * Get students by skill
+     * If user is faculty, only filters from their students
      */
     public function getBySkill(Request $request): JsonResponse
     {
@@ -202,7 +252,13 @@ class StudentController extends Controller
             ], 400);
         }
 
-        $students = $this->studentService->getStudentsBySkill($skillName);
+        $facultyId = $this->getFacultyIdIfFaculty($request);
+        
+        if ($facultyId) {
+            $students = $this->studentService->getStudentsBySkillAndFaculty($skillName, $facultyId);
+        } else {
+            $students = $this->studentService->getStudentsBySkill($skillName);
+        }
 
         return response()->json([
             'success' => true,
@@ -214,6 +270,7 @@ class StudentController extends Controller
     /**
      * GET /api/students/filter/affiliations
      * Get students by affiliation type
+     * If user is faculty, only filters from their students
      */
     public function getByAffiliation(Request $request): JsonResponse
     {
@@ -226,7 +283,13 @@ class StudentController extends Controller
             ], 400);
         }
 
-        $students = $this->studentService->getStudentsByAffiliation($affiliationType);
+        $facultyId = $this->getFacultyIdIfFaculty($request);
+        
+        if ($facultyId) {
+            $students = $this->studentService->getStudentsByAffiliationAndFaculty($affiliationType, $facultyId);
+        } else {
+            $students = $this->studentService->getStudentsByAffiliation($affiliationType);
+        }
 
         return response()->json([
             'success' => true,
@@ -238,10 +301,17 @@ class StudentController extends Controller
     /**
      * GET /api/students/filter/skills-list
      * Get available skills for filtering
+     * If user is faculty, only returns skills from their students
      */
-    public function getAvailableSkills(): JsonResponse
+    public function getAvailableSkills(Request $request): JsonResponse
     {
-        $skills = $this->studentService->getAvailableSkills();
+        $facultyId = $this->getFacultyIdIfFaculty($request);
+        
+        if ($facultyId) {
+            $skills = $this->studentService->getAvailableSkillsForFaculty($facultyId);
+        } else {
+            $skills = $this->studentService->getAvailableSkills();
+        }
 
         return response()->json([
             'success' => true,
@@ -252,10 +322,17 @@ class StudentController extends Controller
     /**
      * GET /api/students/filter/affiliations-list
      * Get available affiliation types for filtering
+     * If user is faculty, only returns affiliations from their students
      */
-    public function getAvailableAffiliationTypes(): JsonResponse
+    public function getAvailableAffiliationTypes(Request $request): JsonResponse
     {
-        $affiliationTypes = $this->studentService->getAvailableAffiliationTypes();
+        $facultyId = $this->getFacultyIdIfFaculty($request);
+        
+        if ($facultyId) {
+            $affiliationTypes = $this->studentService->getAvailableAffiliationTypesForFaculty($facultyId);
+        } else {
+            $affiliationTypes = $this->studentService->getAvailableAffiliationTypes();
+        }
 
         return response()->json([
             'success' => true,

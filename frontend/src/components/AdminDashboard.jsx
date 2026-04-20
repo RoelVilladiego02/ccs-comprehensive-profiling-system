@@ -6,6 +6,8 @@ import FilterPanel from './FilterPanel'
 import SearchBar from './SearchBar'
 import StudentForm from './StudentForm'
 import DeleteConfirmModal from './DeleteConfirmModal'
+import Pagination from './Pagination'
+import SchedulingModule from './SchedulingModule'
 import { studentAPI, facultyAPI, courseAPI } from '../services/api'
 import Sidebar from './Sidebar'
 
@@ -49,6 +51,10 @@ function AdminDashboard({ userData, onLogout }) {
 
   const [viewMode, setViewMode] = useState('table')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(15)
 
   // Modal state for add/edit/delete operations
   const [showFormModal, setShowFormModal] = useState(false)
@@ -304,7 +310,17 @@ function AdminDashboard({ userData, onLogout }) {
       affiliations: []
     })
     setSearchTerm('')
+    setCurrentPage(1)
     fetchStudents()
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1)
   }
 
   // Add/Edit/Delete handlers
@@ -365,6 +381,7 @@ function AdminDashboard({ userData, onLogout }) {
       
       setShowFormModal(false)
       setSelectedStudent(null)
+      setCurrentPage(1)
       fetchStudents()
       
       // Clear success message after 3 seconds
@@ -631,21 +648,37 @@ function AdminDashboard({ userData, onLogout }) {
             <p>Loading students...</p>
           </div>
         ) : filteredAndSortedStudents.length > 0 ? (
-          viewMode === 'table' ? (
-            <AdminStudentTable 
-              students={filteredAndSortedStudents}
-              sortConfig={sortConfig}
-              onSort={handleSort}
-              onViewStudent={handleViewStudent}
-              onEditStudent={handleEditStudent}
-              onDeleteStudent={handleDeleteStudent}
+          <>
+            {viewMode === 'table' ? (
+              <AdminStudentTable 
+                students={filteredAndSortedStudents.slice(
+                  (currentPage - 1) * itemsPerPage,
+                  currentPage * itemsPerPage
+                )}
+                sortConfig={sortConfig}
+                onSort={handleSort}
+                onViewStudent={handleViewStudent}
+                onEditStudent={handleEditStudent}
+                onDeleteStudent={handleDeleteStudent}
+              />
+            ) : (
+              <StudentGrid 
+                students={filteredAndSortedStudents.slice(
+                  (currentPage - 1) * itemsPerPage,
+                  currentPage * itemsPerPage
+                )}
+                onViewStudent={handleViewStudent}
+              />
+            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(filteredAndSortedStudents.length / itemsPerPage)}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              totalItems={filteredAndSortedStudents.length}
             />
-          ) : (
-            <StudentGrid 
-              students={filteredAndSortedStudents}
-              onViewStudent={handleViewStudent}
-            />
-          )
+          </>
         ) : (
           <div className="empty-state">
             <p>No students found matching your criteria</p>
@@ -1146,6 +1179,10 @@ function AdminDashboard({ userData, onLogout }) {
     </div>
   )
 
+  const renderScheduling = () => (
+    <SchedulingModule userData={userData} onLogout={onLogout} />
+  )
+
   const getSectionContent = () => {
     switch (activeSection) {
       case 'dashboard':
@@ -1158,6 +1195,8 @@ function AdminDashboard({ userData, onLogout }) {
         return renderFaculty()
       case 'courses':
         return renderCourses()
+      case 'scheduling':
+        return renderScheduling()
       case 'settings':
         return renderSettings()
       default:

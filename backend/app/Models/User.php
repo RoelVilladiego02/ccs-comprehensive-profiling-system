@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -59,6 +60,22 @@ class User extends Authenticatable
             'user_id',
             'role_id'
         )->withTimestamps();
+    }
+
+    /**
+     * Get the faculty record associated with this user (via email)
+     */
+    public function faculty(): HasOne
+    {
+        return $this->hasOne(Faculty::class, 'email', 'email');
+    }
+
+    /**
+     * Get the student record associated with this user (via email)
+     */
+    public function student(): HasOne
+    {
+        return $this->hasOne(Student::class, 'email', 'email');
     }
 
     /**

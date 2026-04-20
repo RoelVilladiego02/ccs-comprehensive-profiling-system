@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import '../styles/Module.css'
 import { courseAPI } from '../services/api'
+import AdminClassManagement from './AdminClassManagement'
 
 function SchedulingModule({ userData, onLogout }) {
   const [activeTab, setActiveTab] = useState('course')
@@ -96,14 +97,7 @@ function SchedulingModule({ userData, onLogout }) {
         )
 
       case 'section':
-        return (
-          <div className="module-content">
-            <h2>Section Management</h2>
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-              <p style={{ color: '#999' }}>Section management coming soon. Backend API available at /api/classes</p>
-            </div>
-          </div>
-        )
+        return <AdminClassManagement userData={userData} onLogout={onLogout} />
 
       case 'rooms':
         return (
