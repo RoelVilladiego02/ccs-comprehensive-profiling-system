@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import '../styles/FacultyDashboard.css'
 import Sidebar from './Sidebar'
 import FacultyClassTable from './FacultyClassTable'
+import FacultyStudentsView from './FacultyStudentsView'
 import { classAPI } from '../services/api'
 
 function FacultyDashboard({ userData, onLogout }) {
@@ -128,6 +129,16 @@ function FacultyDashboard({ userData, onLogout }) {
                 />
               </div>
             )}
+          </div>
+        )}
+
+        {activeSection === 'students' && (
+          <div className="section-content">
+            <div className="section-header">
+              <h2>View Students</h2>
+              <p className="section-subtitle">View enrolled students in each of your classes</p>
+            </div>
+            <FacultyStudentsView classes={classes} />
           </div>
         )}
 
