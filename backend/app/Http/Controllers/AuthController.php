@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Student;
+use App\Models\Faculty;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -74,6 +75,13 @@ class AuthController extends Controller
             $userData['student_id'] = $student->student_id;
             $userData['student_number'] = $student->student_number;
         }
+        
+        // Try to find associated faculty record by email
+        $faculty = Faculty::where('email', $user->email)->first();
+        if ($faculty) {
+            $userData['faculty_id'] = $faculty->faculty_id;
+            $userData['faculty_number'] = $faculty->faculty_number;
+        }
 
         return response()->json([
             'success' => true,
@@ -99,6 +107,13 @@ class AuthController extends Controller
         if ($student) {
             $userData['student_id'] = $student->student_id;
             $userData['student_number'] = $student->student_number;
+        }
+        
+        // Try to find associated faculty record by email
+        $faculty = Faculty::where('email', $user->email)->first();
+        if ($faculty) {
+            $userData['faculty_id'] = $faculty->faculty_id;
+            $userData['faculty_number'] = $faculty->faculty_number;
         }
         
         return response()->json([

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { authAPI } from './services/api'
 import StudentDashboard from './components/StudentDashboard'
+import FacultyDashboard from './components/FacultyDashboard'
 import FacultyStudentDashboard from './components/FacultyStudentDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import StaffDashboard from './components/StaffDashboard'
@@ -144,7 +145,7 @@ function App() {
         {/* Faculty Dashboard */}
         <Route path="/faculty" element={
           isAuthenticated && getUserRole(userData) === 'faculty' 
-            ? <FacultyStudentDashboard userData={userData} onLogout={handleLogout} /> 
+            ? <FacultyDashboard userData={userData} onLogout={handleLogout} /> 
             : isAuthenticated ? <Navigate to={getDashboardRoute()} /> : <Navigate to="/login" />
         } />
         

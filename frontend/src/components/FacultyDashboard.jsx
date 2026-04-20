@@ -19,11 +19,11 @@ function FacultyDashboard({ userData, onLogout }) {
   // Fetch classes data on component mount
   useEffect(() => {
     fetchClasses()
-  }, [userData?.id])
+  }, [userData?.faculty_id])
 
   const fetchClasses = async () => {
-    if (!userData?.id) {
-      setError('User information not available')
+    if (!userData?.faculty_id) {
+      setError('Faculty information not available')
       setLoading(false)
       return
     }
@@ -31,7 +31,7 @@ function FacultyDashboard({ userData, onLogout }) {
     try {
       setClassesLoading(true)
       setClassesError('')
-      const response = await classAPI.getByFaculty(userData.id)
+      const response = await classAPI.getByFaculty(userData.faculty_id)
       if (response.data.success) {
         setClasses(response.data.data || [])
       } else {
