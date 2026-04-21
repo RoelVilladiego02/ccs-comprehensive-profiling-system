@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
 /* Student Grid Styles - Card-based layout */
 .grid-wrapper {
   padding: 16px 0;
@@ -8,35 +10,37 @@
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
   width: 100%;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .student-card {
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-200);
+  background: #ffffff;
+  border: 1.5px solid #e2e0db;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.18s ease;
   display: flex;
   flex-direction: column;
 }
 
 .student-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-gray-300);
+  box-shadow: 0 8px 24px rgba(255, 100, 20, 0.12);
+  border-color: #ff6414;
 }
 
 .card-header {
-  background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+  background: linear-gradient(135deg, #f7f6f3 0%, #eeebe5 100%);
   padding: 16px;
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1.5px solid #e2e0db;
 }
 
 .student-name {
   margin: 0 0 8px 0;
+  font-family: 'Syne', sans-serif;
   font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-gray-900);
+  font-weight: 700;
+  color: #0d0d0d;
 }
 
 .card-meta {
@@ -47,12 +51,13 @@
 
 .student-number {
   display: inline-block;
-  background: var(--color-gray-200);
+  background: rgba(255, 100, 20, 0.1);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-gray-700);
+  font-weight: 600;
+  color: #ff6414;
+  border: 1px solid rgba(255, 100, 20, 0.2);
 }
 
 .card-body {
@@ -65,7 +70,7 @@
 .info-block {
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--color-gray-100);
+  border-bottom: 1px solid #e2e0db;
 }
 
 .info-block:last-of-type {
@@ -76,8 +81,9 @@
 
 .info-block label {
   display: block;
+  font-family: 'Syne', sans-serif;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-gray-600);
   text-transform: uppercase;
   letter-spacing: 0.5px;
