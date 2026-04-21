@@ -14,6 +14,7 @@ function Sidebar({ userRole, userData, onLogout, activeSection, onSectionChange 
       { id: 'violations', label: 'Violations', icon: '⚠️' },
       { id: 'skills', label: 'Skills', icon: '✨' },
       { id: 'affiliations', label: 'Affiliations', icon: '🏛️' },
+      { id: 'medical-records', label: 'Medical Records', icon: '🏥' },
     ],
     faculty: [
       { id: 'dashboard', label: 'Dashboard', icon: '📱' },

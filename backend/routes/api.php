@@ -13,6 +13,11 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ViolationController;
 use App\Http\Controllers\StudentProfileController;
+use App\Http\Controllers\MedicalRecordsController;
+use App\Http\Controllers\AffiliationController;
+use App\Http\Controllers\AcademicHistoryController;
+use App\Http\Controllers\NonAcademicHistoryController;
+use App\Http\Controllers\SkillsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +77,40 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::get('/{studentId}/profile', [StudentProfileController::class, 'getProfile'])->middleware('permission:students.view_profile');
         Route::get('/{studentId}/academic-performance', [StudentProfileController::class, 'getAcademicPerformance'])->middleware('permission:students.view_profile');
         Route::get('/{studentId}/current-courses', [StudentProfileController::class, 'getCurrentCourses'])->middleware('permission:students.view_profile');
+
+        // ====== Medical Records Routes (Nested under Students) ======
+        Route::post('/{studentId}/medical-records', [MedicalRecordsController::class, 'store'])->middleware('permission:students.create');
+        Route::get('/{studentId}/medical-records', [MedicalRecordsController::class, 'show'])->middleware('permission:students.view_profile');
+        Route::put('/{studentId}/medical-records', [MedicalRecordsController::class, 'update'])->middleware('permission:students.edit');
+        Route::delete('/{studentId}/medical-records', [MedicalRecordsController::class, 'destroy'])->middleware('permission:students.delete');
+
+        // ====== Affiliations Routes (Nested under Students) ======
+        Route::get('/{studentId}/affiliations', [AffiliationController::class, 'index'])->middleware('permission:students.view_profile');
+        Route::post('/{studentId}/affiliations', [AffiliationController::class, 'store'])->middleware('permission:students.create');
+        Route::get('/{studentId}/affiliations/{affiliationId}', [AffiliationController::class, 'show'])->middleware('permission:students.view_profile');
+        Route::put('/{studentId}/affiliations/{affiliationId}', [AffiliationController::class, 'update'])->middleware('permission:students.edit');
+        Route::delete('/{studentId}/affiliations/{affiliationId}', [AffiliationController::class, 'destroy'])->middleware('permission:students.delete');
+
+        // ====== Academic History Routes (Nested under Students) ======
+        Route::get('/{studentId}/academic-history', [AcademicHistoryController::class, 'index'])->middleware('permission:students.view_profile');
+        Route::post('/{studentId}/academic-history', [AcademicHistoryController::class, 'store'])->middleware('permission:students.create');
+        Route::get('/{studentId}/academic-history/{historyId}', [AcademicHistoryController::class, 'show'])->middleware('permission:students.view_profile');
+        Route::put('/{studentId}/academic-history/{historyId}', [AcademicHistoryController::class, 'update'])->middleware('permission:students.edit');
+        Route::delete('/{studentId}/academic-history/{historyId}', [AcademicHistoryController::class, 'destroy'])->middleware('permission:students.delete');
+
+        // ====== Non-Academic History Routes (Nested under Students) ======
+        Route::get('/{studentId}/non-academic-history', [NonAcademicHistoryController::class, 'index'])->middleware('permission:students.view_profile');
+        Route::post('/{studentId}/non-academic-history', [NonAcademicHistoryController::class, 'store'])->middleware('permission:students.create');
+        Route::get('/{studentId}/non-academic-history/{historyId}', [NonAcademicHistoryController::class, 'show'])->middleware('permission:students.view_profile');
+        Route::put('/{studentId}/non-academic-history/{historyId}', [NonAcademicHistoryController::class, 'update'])->middleware('permission:students.edit');
+        Route::delete('/{studentId}/non-academic-history/{historyId}', [NonAcademicHistoryController::class, 'destroy'])->middleware('permission:students.delete');
+
+        // ====== Skills Routes (Nested under Students) ======
+        Route::get('/{studentId}/skills', [SkillsController::class, 'index'])->middleware('permission:students.view_profile');
+        Route::post('/{studentId}/skills', [SkillsController::class, 'store'])->middleware('permission:students.create');
+        Route::get('/{studentId}/skills/{skillId}', [SkillsController::class, 'show'])->middleware('permission:students.view_profile');
+        Route::put('/{studentId}/skills/{skillId}', [SkillsController::class, 'update'])->middleware('permission:students.edit');
+        Route::delete('/{studentId}/skills/{skillId}', [SkillsController::class, 'destroy'])->middleware('permission:students.delete');
     });
 
     // ====== Course Routes (Require Permission) ======

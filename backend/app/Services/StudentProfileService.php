@@ -35,6 +35,7 @@ class StudentProfileService
             'affiliations' => $student->affiliations->toArray(),
             'academic_history' => $student->academicHistory->toArray(),
             'non_academic_history' => $student->nonAcademicHistory->toArray(),
+            'medical_records' => $student->medicalRecords ? $student->medicalRecords->toArray() : [],
             'academic_summary' => [
                 'total_courses' => $student->classStatuses->count(),
                 'completed_courses' => $student->classStatuses->where('enrollment_status', 'Completed')->count(),

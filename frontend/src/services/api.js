@@ -152,4 +152,48 @@ export const violationAPI = {
   deleteViolation: (violationId) => apiClient.delete(`/violations/${violationId}`)
 }
 
+// Medical Records endpoints
+export const medicalRecordsAPI = {
+  getStudentMedicalRecords: (studentId) => apiClient.get(`/students/${studentId}/medical-records`),
+  createMedicalRecords: (studentId, data) => apiClient.post(`/students/${studentId}/medical-records`, data),
+  updateMedicalRecords: (studentId, data) => apiClient.put(`/students/${studentId}/medical-records`, data),
+  deleteMedicalRecords: (studentId) => apiClient.delete(`/students/${studentId}/medical-records`)
+}
+
+// Affiliations endpoints
+export const affiliationsAPI = {
+  getStudentAffiliations: (studentId) => apiClient.get(`/students/${studentId}/affiliations`),
+  createAffiliation: (studentId, data) => apiClient.post(`/students/${studentId}/affiliations`, data),
+  getAffiliation: (studentId, affiliationId) => apiClient.get(`/students/${studentId}/affiliations/${affiliationId}`),
+  updateAffiliation: (studentId, affiliationId, data) => apiClient.put(`/students/${studentId}/affiliations/${affiliationId}`, data),
+  deleteAffiliation: (studentId, affiliationId) => apiClient.delete(`/students/${studentId}/affiliations/${affiliationId}`)
+}
+
+// Academic History endpoints
+export const academicHistoryAPI = {
+  getStudentAcademicHistory: (studentId) => apiClient.get(`/students/${studentId}/academic-history`),
+  createAcademicHistory: (studentId, data) => apiClient.post(`/students/${studentId}/academic-history`, data),
+  getAcademicHistory: (studentId, historyId) => apiClient.get(`/students/${studentId}/academic-history/${historyId}`),
+  updateAcademicHistory: (studentId, historyId, data) => apiClient.put(`/students/${studentId}/academic-history/${historyId}`, data),
+  deleteAcademicHistory: (studentId, historyId) => apiClient.delete(`/students/${studentId}/academic-history/${historyId}`)
+}
+
+// Non-Academic History endpoints
+export const nonAcademicHistoryAPI = {
+  getStudentNonAcademicHistory: (studentId) => apiClient.get(`/students/${studentId}/non-academic-history`),
+  createNonAcademicHistory: (studentId, data) => apiClient.post(`/students/${studentId}/non-academic-history`, data),
+  getNonAcademicHistory: (studentId, historyId) => apiClient.get(`/students/${studentId}/non-academic-history/${historyId}`),
+  updateNonAcademicHistory: (studentId, historyId, data) => apiClient.put(`/students/${studentId}/non-academic-history/${historyId}`, data),
+  deleteNonAcademicHistory: (studentId, historyId) => apiClient.delete(`/students/${studentId}/non-academic-history/${historyId}`)
+}
+
+// Skills endpoints
+export const skillsAPI = {
+  getStudentSkills: (studentId) => apiClient.get(`/students/${studentId}/skills`),
+  createSkill: (studentId, data) => apiClient.post(`/students/${studentId}/skills`, data),
+  getSkill: (studentId, skillId) => apiClient.get(`/students/${studentId}/skills/${skillId}`),
+  updateSkill: (studentId, skillId, data) => apiClient.put(`/students/${studentId}/skills/${skillId}`, data),
+  deleteSkill: (studentId, skillId) => apiClient.delete(`/students/${studentId}/skills/${skillId}`)
+}
+
 export default apiClient
