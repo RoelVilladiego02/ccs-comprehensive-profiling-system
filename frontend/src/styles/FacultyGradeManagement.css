@@ -1,0 +1,353 @@
+.faculty-grade-management {
+  width: 100%;
+}
+
+.grades-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+  height: 100%;
+}
+
+/* Class Selector */
+.class-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.class-selector h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.no-classes {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.classes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.class-card {
+  padding: 15px;
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.class-card:hover {
+  border-color: #1f2937;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.class-card.active {
+  border-color: #1f2937;
+  background: #1f2937;
+  color: white;
+}
+
+.class-info {
+  margin: 0;
+}
+
+.course-code {
+  margin: 0 0 5px 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.course-title {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.section-info {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* Grades Section */
+.grades-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.class-header {
+  padding: 20px;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.class-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+}
+
+.section-label {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Error & Success Messages */
+.error-message {
+  padding: 15px;
+  background: #fee;
+  border-left: 4px solid #c33;
+  border-radius: 4px;
+  color: #c33;
+  font-size: 0.95rem;
+}
+
+.success-message {
+  padding: 15px;
+  background: #efe;
+  border-left: 4px solid #3c3;
+  border-radius: 4px;
+  color: #3c3;
+  font-size: 0.95rem;
+}
+
+/* Loading & Empty States */
+.loading,
+.no-students {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+/* Grades Table */
+.grades-table-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.grades-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.grades-table thead {
+  background: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.grades-table th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.9rem;
+}
+
+.grades-table th.grade-column {
+  text-align: center;
+}
+
+.grades-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+.grades-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.grades-table td {
+  padding: 15px;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.student-number {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.student-name {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.student-email {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.grade-column {
+  text-align: center;
+}
+
+.grade-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.grade-input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.grade-input:not(:disabled) {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.grade-input:focus {
+  outline: none;
+  border-color: #1f2937;
+  box-shadow: 0 0 0 2px rgba(31, 41, 55, 0.1);
+}
+
+.average-grade {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.actions-cell {
+  text-align: center;
+}
+
+.action-buttons,
+.edit-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-save,
+.btn-cancel,
+.btn-edit-midterm,
+.btn-edit-final {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-save {
+  background: #10b981;
+  color: white;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #059669;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.btn-save:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn-cancel {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #dc2626;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.btn-edit-midterm {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-edit-midterm:hover {
+  background: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.btn-edit-final {
+  background: #8b5cf6;
+  color: white;
+}
+
+.btn-edit-final:hover {
+  background: #7c3aed;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .grades-container {
+    grid-template-columns: 1fr;
+  }
+
+  .classes-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .grades-table th,
+  .grades-table td {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .grade-input {
+    padding: 6px 8px;
+    font-size: 0.85rem;
+  }
+
+  .btn-save,
+  .btn-cancel,
+  .btn-edit-midterm,
+  .btn-edit-final {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+
+  .class-card {
+    padding: 10px;
+  }
+
+  .course-code {
+    font-size: 0.85rem;
+  }
+
+  .course-title {
+    font-size: 0.8rem;
+  }
+
+  .section-info {
+    font-size: 0.75rem;
+  }
+}

@@ -3,6 +3,8 @@ import '../styles/FacultyDashboard.css'
 import Sidebar from './Sidebar'
 import FacultyClassTable from './FacultyClassTable'
 import FacultyStudentsView from './FacultyStudentsView'
+import FacultyGradeManagement from './FacultyGradeManagement'
+import FacultyAttendanceManagement from './FacultyAttendanceManagement'
 import { classAPI } from '../services/api'
 
 function FacultyDashboard({ userData, onLogout }) {
@@ -144,23 +146,21 @@ function FacultyDashboard({ userData, onLogout }) {
 
         {activeSection === 'grades' && (
           <div className="section-content">
-            <h2>Grades Management</h2>
-            <p>View and manage student grades.</p>
-            {/* Placeholder for grades */}
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-              <p style={{ color: '#999' }}>No grades to display</p>
+            <div className="section-header">
+              <h2>Grades Management</h2>
+              <p className="section-subtitle">Record and manage student grades</p>
             </div>
+            <FacultyGradeManagement classes={classes} />
           </div>
         )}
 
         {activeSection === 'attendance' && (
           <div className="section-content">
-            <h2>Attendance Tracking</h2>
-            <p>Track and manage student attendance records.</p>
-            {/* Placeholder for attendance */}
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-              <p style={{ color: '#999' }}>No attendance records</p>
+            <div className="section-header">
+              <h2>Attendance Tracking</h2>
+              <p className="section-subtitle">Track and record student attendance</p>
             </div>
+            <FacultyAttendanceManagement classes={classes} />
           </div>
         )}
       </div>
