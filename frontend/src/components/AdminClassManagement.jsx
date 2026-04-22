@@ -586,24 +586,6 @@ function AdminClassManagement({ userData, onLogout }) {
 
   return (
     <div className="admin-dashboard">
-      <div className="dashboard-header">
-        <div className="header-left">
-          <h1>Class Management</h1>
-          <p className="subtitle">Manage classes and assign faculty to sections</p>
-        </div>
-        <div className="header-right">
-          {userData && (
-            <div className="user-info">
-              <span className="user-label">Logged in as:</span>
-              <span className="user-id">{userData.name}</span>
-              <button className="logout-btn" onClick={onLogout} title="Logout">
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="admin-container">
         {activeSection === 'list' && renderList()}
         {activeSection === 'form' && renderForm()}

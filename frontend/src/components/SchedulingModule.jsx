@@ -38,7 +38,7 @@ function SchedulingModule({ userData, onLogout }) {
     if (loading) {
       return (
         <div className="module-content">
-          <h2>{activeTab === 'course' ? 'Course Management' : activeTab === 'class' ? 'Class Management' : activeTab === 'rooms' ? 'Room Management' : activeTab === 'lab' ? 'Lab Management' : 'Faculty Management'}</h2>
+          <h2>{activeTab === 'course' ? 'Course Management' : activeTab === 'class' ? 'Class Management' : 'Faculty Management'}</h2>
           <p style={{ textAlign: 'center', color: '#999' }}>Loading...</p>
         </div>
       )
@@ -100,28 +100,6 @@ function SchedulingModule({ userData, onLogout }) {
       case 'class':
         return <AdminClassManagement userData={userData} onLogout={onLogout} />
 
-      case 'rooms':
-        return (
-          <div className="module-content">
-            <h2>Room Management</h2>
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
-              <p style={{ color: '#999', marginBottom: '15px' }}>Room management system</p>
-              <p style={{ color: '#666', fontSize: '0.9rem' }}>Track and assign classroom resources for scheduled courses.</p>
-            </div>
-          </div>
-        )
-
-      case 'lab':
-        return (
-          <div className="module-content">
-            <h2>Laboratory Management</h2>
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
-              <p style={{ color: '#999', marginBottom: '15px' }}>Laboratory management system</p>
-              <p style={{ color: '#666', fontSize: '0.9rem' }}>Manage laboratory resources and lab session scheduling.</p>
-            </div>
-          </div>
-        )
-
       case 'faculty':
         return <AdminFacultyManagement />
 
@@ -132,28 +110,6 @@ function SchedulingModule({ userData, onLogout }) {
 
   return (
     <div className="student-dashboard">
-      <div className="dashboard-header">
-        <div className="header-left">
-          <h1>Scheduling Module</h1>
-          <p className="subtitle">Course, section, and resource scheduling</p>
-        </div>
-        <div className="header-right">
-          {userData && (
-            <div className="user-info">
-              <span className="user-label">Logged in as:</span>
-              <span className="user-id">{userData.name}</span>
-              <button
-                className="logout-btn"
-                onClick={onLogout}
-                title="Logout from dashboard"
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="module-container">
         <div className="module-sidebar">
           <h3>Scheduling Module</h3>
@@ -169,18 +125,6 @@ function SchedulingModule({ userData, onLogout }) {
               onClick={() => setActiveTab('class')}
             >
               📚 Classes
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'rooms' ? 'active' : ''}`}
-              onClick={() => setActiveTab('rooms')}
-            >
-              🏛️ Rooms
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'lab' ? 'active' : ''}`}
-              onClick={() => setActiveTab('lab')}
-            >
-              🔬 Labs
             </button>
             <button
               className={`tab-btn ${activeTab === 'faculty' ? 'active' : ''}`}

@@ -37,6 +37,26 @@ function StaffDashboard({ userData, onLogout }) {
 
   const [viewMode, setViewMode] = useState('table')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  
+  // Dashboard stats state
+  const [dashboardStats, setDashboardStats] = useState({
+    totalStudents: 0,
+    atRiskStudents: 0,
+    averageAttendance: 0,
+    loadingStats: true
+  })
+
+  // Fetch data based on active section
+  useEffect(() => {
+    if (activeSection === 'dashboard') {
+      fetchDashboardStats()
+    } else if (activeSection === 'students') {
+      fetchStudents()
+      fetchFilterOptions()
+    } else if (activeSection === 'attendance' || activeSection === 'reports') {
+      fetchStudents()
+    }
+  }, [activeSection])
 
   // Fetch students on component mount
   useEffect(() => {
@@ -208,6 +228,217 @@ function StaffDashboard({ userData, onLogout }) {
     fetchStudents()
   }
 
+  const fetchDashboardStats = async () => {
+    try {
+      setDashboardStats(prev => ({ ...prev, loadingStats: true }))
+      const response = await studentAPI.getAll(1000)
+      const allStudents = response.data.data || []
+      
+      const atRiskCount = allStudents.filter(s => s.gpa < 2.0).length
+      const avgAttendance = allStudents.length > 0 
+        ? (allStudents.reduce((sum, s) => sum + (s.attendance_rate || 0), 0) / allStudents.length).toFixed(1)
+        : 0
+      
+      setDashboardStats({
+        totalStudents: allStudents.length,
+        atRiskStudents: atRiskCount,
+        averageAttendance: avgAttendance,
+        loadingStats: false
+      })
+    } catch (err) {
+      console.error('Failed to load dashboard stats', err)
+      setDashboardStats(prev => ({ ...prev, loadingStats: false }))
+    }
+  }
+
+  // Render functions for each section
+  const renderDashboard = () => (
+    <div className="section-content">
+      <h2>Dashboard Overview</h2>
+      <div className="stats-grid">
+        <div className="stat-card">
+          <span className="stat-icon">👥</span>
+          <h3>Total Students</h3>
+          <p className="stat-value">{dashboardStats.totalStudents}</p>
+        </div>
+        <div className="stat-card">
+          <span className="stat-icon">⚠️</span>
+          <h3>At-Risk Students</h3>
+          <p className="stat-value" style={{ color: dashboardStats.atRiskStudents > 0 ? '#dc3545' : '#28a745' }}>
+            {dashboardStats.atRiskStudents}
+          </p>
+        </div>
+        <div className="stat-card">
+          <span className="stat-icon">✓</span>
+          <h3>Average Attendance</h3>
+          <p className="stat-value">{dashboardStats.averageAttendance}%</p>
+        </div>
+      </div>
+      {dashboardStats.loadingStats && (
+        <p style={{ textAlign: 'center', color: '#999', marginTop: '20px' }}>Loading statistics...</p>
+      )}
+    </div>
+  )
+
+  const renderStudents = () => (
+    <>
+      <aside className={`filters-sidebar ${isFilterOpen ? 'open' : ''}`}>
+        <div className="filters-header">
+          <h3>Filters</h3>
+          <button
+            className="close-filters"
+            onClick={() => setIsFilterOpen(false)}
+            aria-label="Close filters"
+          >
+            ✕
+          </button>
+        </div>
+        <FilterPanel 
+          filters={filters} 
+          onFilterChange={handleFilterChange}
+          onReset={handleResetFilters}
+          availableSkills={availableSkills}
+          availableAffiliations={availableAffiliations}
+          onFilterBySkill={handleFilterBySkill}
+          onFilterByAffiliation={handleFilterByAffiliation}
+        />
+      </aside>
+
+      <main className="dashboard-content">
+        <div className="content-header">
+          <button
+            className="filter-toggle"
+            onClick={() => setIsFilterOpen(prev => !prev)}
+            aria-label="Toggle filters"
+          >
+            ☰ Filters
+          </button>
+
+          <SearchBar 
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder="Search by student number, name, or email..."
+          />
+          
+          <div className="view-controls">
+            <button 
+              className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
+              onClick={() => setViewMode('table')}
+              title="Table view"
+            >
+              ≡ Table
+            </button>
+            <button 
+              className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+              title="Grid view"
+            >
+              ⊞ Grid
+            </button>
+          </div>
+        </div>
+
+        <div className="results-info">
+          <span className="result-count">
+            Showing <strong>{filteredAndSortedStudents.length}</strong> students
+          </span>
+        </div>
+
+        {error && (
+          <div className="error-message" style={{ margin: '20px 0', padding: '12px', background: '#fee', border: '1px solid #fcc', borderRadius: '4px', color: '#c00' }}>
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+            <p>Loading students...</p>
+          </div>
+        ) : filteredAndSortedStudents.length > 0 ? (
+          <StudentTable 
+            students={filteredAndSortedStudents}
+            sortConfig={sortConfig}
+            onSort={handleSort}
+          />
+        ) : (
+          <div className="empty-state">
+            <p>No students found matching your criteria</p>
+            <button className="reset-btn" onClick={handleResetFilters}>
+              Reset Filters
+            </button>
+          </div>
+        )}
+      </main>
+    </>
+  )
+
+  const renderAttendance = () => (
+    <div className="section-content">
+      <h2>Attendance Tracking</h2>
+      <div style={{ background: '#f5f5f5', padding: '30px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
+        <p style={{ color: '#999', marginBottom: '15px', fontSize: '1.1rem' }}>📊 Attendance Analytics</p>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <p style={{ color: '#666', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '20px' }}>
+            Monitor student attendance rates, identify patterns, and track attendance trends across different classes and time periods.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginTop: '20px' }}>
+            <div style={{ background: 'white', padding: '15px', borderRadius: '6px', border: '1px solid #ddd' }}>
+              <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '5px' }}>Average Attendance</p>
+              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#007bff' }}>{dashboardStats.averageAttendance}%</p>
+            </div>
+            <div style={{ background: 'white', padding: '15px', borderRadius: '6px', border: '1px solid #ddd' }}>
+              <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '5px' }}>Total Students Tracked</p>
+              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>{dashboardStats.totalStudents}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderReports = () => (
+    <div className="section-content">
+      <h2>Reports & Analytics</h2>
+      <div style={{ background: '#f5f5f5', padding: '30px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
+        <p style={{ color: '#999', marginBottom: '15px', fontSize: '1.1rem' }}>📋 Report Generation</p>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <p style={{ color: '#666', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '20px' }}>
+            Generate comprehensive reports on student performance, attendance, violations, and academic progress. Export data for further analysis.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginTop: '20px' }}>
+            <div style={{ background: 'white', padding: '15px', borderRadius: '6px', border: '1px solid #ddd', textAlign: 'left' }}>
+              <p style={{ fontSize: '0.9rem', fontWeight: '600', color: '#333', marginBottom: '8px' }}>📊 Performance Report</p>
+              <p style={{ fontSize: '0.85rem', color: '#666' }}>GPA trends and academic performance analysis</p>
+            </div>
+            <div style={{ background: 'white', padding: '15px', borderRadius: '6px', border: '1px solid #ddd', textAlign: 'left' }}>
+              <p style={{ fontSize: '0.9rem', fontWeight: '600', color: '#333', marginBottom: '8px' }}>✓ Attendance Report</p>
+              <p style={{ fontSize: '0.85rem', color: '#666' }}>Attendance patterns and trends</p>
+            </div>
+            <div style={{ background: 'white', padding: '15px', borderRadius: '6px', border: '1px solid #ddd', textAlign: 'left' }}>
+              <p style={{ fontSize: '0.9rem', fontWeight: '600', color: '#333', marginBottom: '8px' }}>⚠️ Violations Report</p>
+              <p style={{ fontSize: '0.85rem', color: '#666' }}>Student conduct and violations summary</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const getSectionContent = () => {
+    switch(activeSection) {
+      case 'dashboard':
+        return renderDashboard()
+      case 'students':
+        return renderStudents()
+      case 'attendance':
+        return renderAttendance()
+      case 'reports':
+        return renderReports()
+      default:
+        return renderStudents()
+    }
+  }
+
   return (
     <div className="dashboard-layout">
       <Sidebar 
@@ -219,93 +450,30 @@ function StaffDashboard({ userData, onLogout }) {
       />
       <div className="dashboard-content">
         <div className="staff-container">
-          <aside className={`filters-sidebar ${isFilterOpen ? 'open' : ''}`}>
-          <div className="filters-header">
-            <h3>Filters</h3>
-            <button
-              className="close-filters"
-              onClick={() => setIsFilterOpen(false)}
-              aria-label="Close filters"
-            >
-              ✕
-            </button>
-          </div>
-          <FilterPanel 
-            filters={filters} 
-            onFilterChange={handleFilterChange}
-            onReset={handleResetFilters}
-            availableSkills={availableSkills}
-            availableAffiliations={availableAffiliations}
-            onFilterBySkill={handleFilterBySkill}
-            onFilterByAffiliation={handleFilterByAffiliation}
-          />
-        </aside>
-
-        <main className="dashboard-content">
-          <div className="content-header">
-            <button
-              className="filter-toggle"
-              onClick={() => setIsFilterOpen(prev => !prev)}
-              aria-label="Toggle filters"
-            >
-              ☰ Filters
-            </button>
-
-            <SearchBar 
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              placeholder="Search by student number, name, or email..."
-            />
-            
-            <div className="view-controls">
-              <button 
-                className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
-                onClick={() => setViewMode('table')}
-                title="Table view"
-              >
-                ≡ Table
-              </button>
-              <button 
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-                title="Grid view"
-              >
-                ⊞ Grid
-              </button>
-            </div>
-          </div>
-
-          <div className="results-info">
-            <span className="result-count">
-              Showing <strong>{filteredAndSortedStudents.length}</strong> students
-            </span>
-          </div>
-
-          {error && (
-            <div className="error-message" style={{ margin: '20px 0', padding: '12px', background: '#fee', border: '1px solid #fcc', borderRadius: '4px', color: '#c00' }}>
-              {error}
-            </div>
+          {activeSection === 'students' && (
+            <aside className={`filters-sidebar ${isFilterOpen ? 'open' : ''}`}>
+              <div className="filters-header">
+                <h3>Filters</h3>
+                <button
+                  className="close-filters"
+                  onClick={() => setIsFilterOpen(false)}
+                  aria-label="Close filters"
+                >
+                  ✕
+                </button>
+              </div>
+              <FilterPanel 
+                filters={filters} 
+                onFilterChange={handleFilterChange}
+                onReset={handleResetFilters}
+                availableSkills={availableSkills}
+                availableAffiliations={availableAffiliations}
+                onFilterBySkill={handleFilterBySkill}
+                onFilterByAffiliation={handleFilterByAffiliation}
+              />
+            </aside>
           )}
-
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-              <p>Loading students...</p>
-            </div>
-          ) : filteredAndSortedStudents.length > 0 ? (
-            <StudentTable 
-              students={filteredAndSortedStudents}
-              sortConfig={sortConfig}
-              onSort={handleSort}
-            />
-          ) : (
-            <div className="empty-state">
-              <p>No students found matching your criteria</p>
-              <button className="reset-btn" onClick={handleResetFilters}>
-                Reset Filters
-              </button>
-            </div>
-          )}
-        </main>
+          {getSectionContent()}
         </div>
       </div>
     </div>
