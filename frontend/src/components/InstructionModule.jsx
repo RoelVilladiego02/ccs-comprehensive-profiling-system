@@ -96,8 +96,9 @@ function InstructionModule({ userData, onLogout }) {
         return (
           <div className="module-content">
             <h2>Lesson Management</h2>
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-              <p style={{ color: '#999' }}>Lesson management coming soon. Backend API available at /api/courses/curriculum</p>
+            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
+              <p style={{ color: '#999', marginBottom: '15px' }}>Lesson planning and management</p>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>Create, organize, and manage lesson plans for your courses.</p>
             </div>
           </div>
         )
@@ -105,8 +106,9 @@ function InstructionModule({ userData, onLogout }) {
         return (
           <div className="module-content">
             <h2>Curriculum Management</h2>
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-              <p style={{ color: '#999' }}>Curriculum management coming soon. Backend API available at /api/students/curricula</p>
+            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
+              <p style={{ color: '#999', marginBottom: '15px' }}>Curriculum planning and organization</p>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>Manage curriculum requirements and program structures.</p>
             </div>
           </div>
         )

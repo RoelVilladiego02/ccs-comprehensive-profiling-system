@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import '../styles/Module.css'
-import { courseAPI } from '../services/api'
+import { courseAPI, facultyAPI } from '../services/api'
 import AdminClassManagement from './AdminClassManagement'
+import AdminFacultyManagement from './AdminFacultyManagement'
 
 function SchedulingModule({ userData, onLogout }) {
   const [activeTab, setActiveTab] = useState('course')
@@ -103,8 +104,9 @@ function SchedulingModule({ userData, onLogout }) {
         return (
           <div className="module-content">
             <h2>Room Management</h2>
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-              <p style={{ color: '#999' }}>Room management coming soon</p>
+            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
+              <p style={{ color: '#999', marginBottom: '15px' }}>Room management system</p>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>Track and assign classroom resources for scheduled courses.</p>
             </div>
           </div>
         )
@@ -113,21 +115,15 @@ function SchedulingModule({ userData, onLogout }) {
         return (
           <div className="module-content">
             <h2>Laboratory Management</h2>
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-              <p style={{ color: '#999' }}>Laboratory management coming soon</p>
+            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
+              <p style={{ color: '#999', marginBottom: '15px' }}>Laboratory management system</p>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>Manage laboratory resources and lab session scheduling.</p>
             </div>
           </div>
         )
 
       case 'faculty':
-        return (
-          <div className="module-content">
-            <h2>Faculty Management</h2>
-            <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-              <p style={{ color: '#999' }}>Faculty management coming soon. Backend API available at /api/faculty</p>
-            </div>
-          </div>
-        )
+        return <AdminFacultyManagement />
 
       default:
         return <div className="module-content"><p>Select a tab</p></div>

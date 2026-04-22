@@ -695,7 +695,13 @@ function AdminDashboard({ userData, onLogout }) {
   const renderUsers = () => (
     <div className="section-content">
       <h2>Users Management</h2>
-      <p>User management section coming soon...</p>
+      <div style={{ background: '#f5f5f5', padding: '30px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
+        <p style={{ color: '#999', marginBottom: '15px', fontSize: '1.1rem' }}>👥 User Management System</p>
+        <p style={{ color: '#666', fontSize: '0.9rem', lineHeight: '1.6' }}>
+          Manage system users, assign roles, and control permissions.<br />
+          Coming in a future release.
+        </p>
+      </div>
     </div>
   )
 
@@ -1173,7 +1179,13 @@ function AdminDashboard({ userData, onLogout }) {
   const renderSettings = () => (
     <div className="section-content">
       <h2>System Settings</h2>
-      <p>System settings section coming soon...</p>
+      <div style={{ background: '#f5f5f5', padding: '30px', borderRadius: '8px', marginTop: '20px', textAlign: 'center' }}>
+        <p style={{ color: '#999', marginBottom: '15px', fontSize: '1.1rem' }}>⚙️ System Configuration</p>
+        <p style={{ color: '#666', fontSize: '0.9rem', lineHeight: '1.6' }}>
+          Configure system settings, manage authentication, and set policies.<br />
+          Coming in a future release.
+        </p>
+      </div>
     </div>
   )
 
