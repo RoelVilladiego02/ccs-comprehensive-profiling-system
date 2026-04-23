@@ -103,16 +103,25 @@ function AdminClassManagement({ userData, onLogout }) {
       setLoading(true)
       let response
 
+      // Clean form data: convert empty time strings to null
+      const cleanedData = {
+        ...formData,
+        schedule_time: formData.schedule_time ? formData.schedule_time : null,
+        schedule_end_time: formData.schedule_end_time ? formData.schedule_end_time : null,
+        schedule_day: formData.schedule_day ? formData.schedule_day : null,
+        room: formData.room ? formData.room : null,
+      }
+
       if (editingId) {
         // Update existing class
-        response = await classAPI.update(editingId, formData)
+        response = await classAPI.update(editingId, cleanedData)
         if (response.data.success) {
           setSuccess('Class updated successfully!')
           setEditingId(null)
         }
       } else {
         // Create new class
-        response = await classAPI.create(formData)
+        response = await classAPI.create(cleanedData)
         if (response.data.success) {
           setSuccess('Class created successfully!')
         }
