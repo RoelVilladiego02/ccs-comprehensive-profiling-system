@@ -339,7 +339,7 @@ function AdminClassManagement({ userData, onLogout }) {
                 return (
                   <tr key={schoolClass.class_id}>
                     <td>{course?.course_code || 'N/A'}</td>
-                    <td>{course?.course_name || 'Unknown'}</td>
+                    <td>{course?.course_title || 'Unknown'}</td>
                     <td>{schoolClass.section}</td>
                     <td>
                       {fac
@@ -418,7 +418,7 @@ function AdminClassManagement({ userData, onLogout }) {
               <option value="">Select a course</option>
               {courses.map(course => (
                 <option key={course.course_id} value={course.course_id}>
-                  {course.course_code} - {course.course_name}
+                  {course.course_code} - {course.course_title}
                 </option>
               ))}
             </select>
@@ -594,7 +594,7 @@ function AdminClassManagement({ userData, onLogout }) {
       {showEnrollmentModal && selectedClass && (
         <ClassEnrollmentModal
           classId={selectedClass.class_id}
-          courseName={courses.find(c => c.course_id === selectedClass.course_id)?.course_name || 'Unknown Course'}
+          courseName={courses.find(c => c.course_id === selectedClass.course_id)?.course_title || 'Unknown Course'}
           section={selectedClass.section}
           maxStudents={selectedClass.max_students}
           onClose={handleCloseEnrollment}

@@ -66,10 +66,10 @@ function InstructionModule({ userData, onLogout }) {
                   <thead>
                     <tr>
                       <th>Course Code</th>
-                      <th>Course Name</th>
+                      <th>Course Title</th>
                       <th>Department</th>
-                      <th>Credits</th>
-                      <th>Units</th>
+                      <th>Units (Lecture)</th>
+                      <th>Units (Lab)</th>
                       <th>Status</th>
                     </tr>
                   </thead>
@@ -77,12 +77,12 @@ function InstructionModule({ userData, onLogout }) {
                     {courses.map(course => (
                       <tr key={course.id || course.course_id}>
                         <td>{course.course_code}</td>
-                        <td>{course.course_name}</td>
+                        <td>{course.course_title}</td>
                         <td>{course.department || 'N/A'}</td>
-                        <td>{course.credits || '-'}</td>
-                        <td>{course.units || '-'}</td>
+                        <td>{course.units_lecture || '-'}</td>
+                        <td>{course.units_lab || '-'}</td>
                         <td>
-                          <span className="status-badge status-active">Active</span>
+                          <span className="status-badge status-active">{course.is_active ? 'Active' : 'Inactive'}</span>
                         </td>
                       </tr>
                     ))}
