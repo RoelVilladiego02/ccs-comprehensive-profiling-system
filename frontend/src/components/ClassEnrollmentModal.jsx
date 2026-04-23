@@ -67,20 +67,38 @@ function ClassEnrollmentModal({ classId, courseName, section, maxStudents, onClo
 
   const handleSelectStudent = (studentId) => {
     const newSelected = new Set(selectedStudents)
+    const availableSlots = maxStudents - enrolledStudents.length
+    
     if (newSelected.has(studentId)) {
       newSelected.delete(studentId)
     } else {
+      // Check if adding this student would exceed the limit
+      if (newSelected.size >= availableSlots) {
+        setError(`Cannot select more than ${availableSlots} student${availableSlots !== 1 ? 's' : ''}. Class has only ${availableSlots} available slot${availableSlots !== 1 ? 's' : ''}.`)
+        return
+      }
       newSelected.add(studentId)
+      setError('')
     }
     setSelectedStudents(newSelected)
   }
 
   const handleSelectAll = () => {
+    const availableSlots = maxStudents - enrolledStudents.length
+    
     if (selectedStudents.size === filteredStudents.length && filteredStudents.length > 0) {
       setSelectedStudents(new Set())
     } else {
-      const allIds = new Set(filteredStudents.map(s => s.student_id))
+      // Only select up to the available slots
+      const studentsToSelect = filteredStudents.slice(0, availableSlots)
+      const allIds = new Set(studentsToSelect.map(s => s.student_id))
       setSelectedStudents(allIds)
+      
+      if (studentsToSelect.length < filteredStudents.length) {
+        setError(`Only ${availableSlots} slot${availableSlots !== 1 ? 's' : ''} available. Selected ${studentsToSelect.length} out of ${filteredStudents.length} students.`)
+      } else {
+        setError('')
+      }
     }
   }
 
