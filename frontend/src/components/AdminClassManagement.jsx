@@ -103,11 +103,18 @@ function AdminClassManagement({ userData, onLogout }) {
       setLoading(true)
       let response
 
-      // Clean form data: convert empty time strings to null
+      // Clean form data: convert empty time strings to null and format times to H:i
+      const formatTimeToHi = (timeStr) => {
+        if (!timeStr) return null
+        // Convert HH:mm to H:i (remove leading zero from hour)
+        const [hour, minute] = timeStr.split(':')
+        return `${parseInt(hour)}:${minute}`
+      }
+
       const cleanedData = {
         ...formData,
-        schedule_time: formData.schedule_time ? formData.schedule_time : null,
-        schedule_end_time: formData.schedule_end_time ? formData.schedule_end_time : null,
+        schedule_time: formatTimeToHi(formData.schedule_time),
+        schedule_end_time: formatTimeToHi(formData.schedule_end_time),
         schedule_day: formData.schedule_day ? formData.schedule_day : null,
         room: formData.room ? formData.room : null,
       }
@@ -168,6 +175,13 @@ function AdminClassManagement({ userData, onLogout }) {
   }
 
   const handleEdit = (schoolClass) => {
+    // Helper to format time to HH:mm (remove seconds if present)
+    const formatTime = (timeStr) => {
+      if (!timeStr) return ''
+      // If time includes seconds (HH:mm:ss), extract just HH:mm
+      return timeStr.substring(0, 5)
+    }
+
     setFormData({
       course_id: schoolClass.course_id?.toString(),
       faculty_id: schoolClass.faculty_id?.toString(),
@@ -175,8 +189,8 @@ function AdminClassManagement({ userData, onLogout }) {
       academic_year: schoolClass.academic_year,
       semester: schoolClass.semester?.toString(),
       schedule_day: schoolClass.schedule_day || '',
-      schedule_time: schoolClass.schedule_time || '',
-      schedule_end_time: schoolClass.schedule_end_time || '',
+      schedule_time: formatTime(schoolClass.schedule_time),
+      schedule_end_time: formatTime(schoolClass.schedule_end_time),
       room: schoolClass.room || '',
       max_students: schoolClass.max_students?.toString(),
       class_status: schoolClass.class_status
