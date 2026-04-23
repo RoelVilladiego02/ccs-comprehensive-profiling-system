@@ -21,8 +21,8 @@ class HandleCors
             'http://localhost:5173',
             'http://127.0.0.1:3000',
             'http://127.0.0.1:5173',
-            // Vercel frontend (add your actual domain)
-            'https://your-frontend.vercel.app',
+            // Vercel production
+            'https://ccs-comprehensive-profiling-system.vercel.app',
             // Allow from environment if set
             env('FRONTEND_URL', ''),
         ];
