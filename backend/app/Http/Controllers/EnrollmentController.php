@@ -27,23 +27,23 @@ class EnrollmentController extends Controller
             'enrollment_date' => 'nullable|date_format:Y-m-d',
         ]);
 
-        $enrollment = $this->enrollmentService->enrollStudentInClass(
+        $result = $this->enrollmentService->enrollStudentInClass(
             $validated['student_id'],
             $validated['class_id'],
             $validated['enrollment_date'] ?? null
         );
 
-        if (!$enrollment) {
+        if (!$result['success']) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unable to enroll student. Class may be full or student already enrolled.',
+                'message' => $result['message'],
             ], 400);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Student enrolled successfully',
-            'data' => $enrollment,
+            'message' => $result['message'],
+            'data' => $result['data'],
         ], 201);
     }
 

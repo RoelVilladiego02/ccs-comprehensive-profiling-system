@@ -10,33 +10,64 @@ class EnrollmentService
 {
     /**
      * Enroll student in class
+     * Returns array with status, message, and data
      */
-    public function enrollStudentInClass(int $studentId, int $classId, string $enrollmentDate = null): ?StudentClassStatus
+    public function enrollStudentInClass(int $studentId, int $classId, string $enrollmentDate = null): array
     {
-        // Check if already enrolled
+        // Check if class exists
+        $class = SchoolClass::find($classId);
+        if (!$class) {
+            return [
+                'success' => false,
+                'message' => 'Class not found',
+                'data' => null
+            ];
+        }
+
+        // Check if already enrolled (prevents duplicate students)
         $existing = StudentClassStatus::where('student_id', $studentId)
             ->where('class_id', $classId)
+            ->where('enrollment_status', '!=', 'Dropped')
             ->first();
 
         if ($existing) {
-            return null; // Already enrolled
+            return [
+                'success' => false,
+                'message' => 'Student is already enrolled in this class',
+                'data' => null
+            ];
         }
 
-        // Check class availability
-        $class = SchoolClass::find($classId);
-        if (!$class || $class->enrolled_students >= $class->max_students) {
-            return null; // Class full or not found
+        // Check class capacity (respects max_students limit)
+        if ($class->enrolled_students >= $class->max_students) {
+            return [
+                'success' => false,
+                'message' => "Class is at full capacity ({$class->max_students} students)",
+                'data' => null
+            ];
         }
 
-        // Create enrollment
-        $enrollment = StudentClassStatus::create([
-            'student_id' => $studentId,
-            'class_id' => $classId,
-            'enrollment_status' => 'Enrolled',
-            'enrollment_date' => $enrollmentDate ?? now()->toDateString(),
-        ]);
+        try {
+            // Create enrollment
+            $enrollment = StudentClassStatus::create([
+                'student_id' => $studentId,
+                'class_id' => $classId,
+                'enrollment_status' => 'Enrolled',
+                'enrollment_date' => $enrollmentDate ?? now()->toDateString(),
+            ]);
 
-        return $enrollment;
+            return [
+                'success' => true,
+                'message' => 'Student enrolled successfully',
+                'data' => $enrollment
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to enroll student: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
     }
 
     /**
