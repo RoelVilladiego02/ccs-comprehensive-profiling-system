@@ -9,50 +9,66 @@ use Symfony\Component\HttpFoundation\Response;
 class HandleCors
 {
     /**
+     * Allowed origins. Add any preview/staging URLs here or via FRONTEND_URL.
+     */
+    private function getAllowedOrigins(): array
+    {
+        $origins = [
+            'http://localhost:3000',
+            'http://localhost:5173',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:5173',
+            'https://ccs-comprehensive-profiling-system.vercel.app',
+        ];
+
+        $envUrl = env('FRONTEND_URL', '');
+        if ($envUrl !== '') {
+            $origins[] = rtrim($envUrl, '/');
+        }
+
+        return array_values(array_filter(array_unique($origins)));
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $allowedOrigins = [
-            // Local development
-            'http://localhost:3000',
-            'http://localhost:5173',
-            'http://127.0.0.1:3000',
-            'http://127.0.0.1:5173',
-            // Vercel production
-            'https://ccs-comprehensive-profiling-system.vercel.app',
-            // Allow from environment if set
-            env('FRONTEND_URL', ''),
+        $allowedOrigins = $this->getAllowedOrigins();
+        $origin         = $request->header('Origin', '');
+        $originAllowed  = $origin !== '' && in_array($origin, $allowedOrigins, true);
+
+        // Resolve the value to send for Access-Control-Allow-Origin.
+        // We never use '*' because we always send credentials.
+        $allowOriginValue = $originAllowed ? $origin : 'null';
+
+        // Common CORS headers shared by preflight and actual responses.
+        $corsHeaders = [
+            'Access-Control-Allow-Methods'  => 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers'  => 'Content-Type, Accept, Authorization, X-Requested-With, X-CSRF-TOKEN, X-XSRF-TOKEN',
+            'Access-Control-Allow-Credentials' => 'true',
         ];
 
-        // Filter out empty strings
-        $allowedOrigins = array_filter($allowedOrigins);
-
-        $origin = $request->header('Origin');
-        $originAllowed = in_array($origin, $allowedOrigins);
-
-        // Handle preflight requests
+        // Handle preflight (OPTIONS) — respond immediately with 204, no body.
         if ($request->isMethod('OPTIONS')) {
-            return response()->json('OK', 204)
-                ->header('Access-Control-Allow-Origin', $originAllowed ? $origin : 'null')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-TOKEN, X-XSRF-TOKEN')
-                ->header('Access-Control-Allow-Credentials', 'true')
-                ->header('Access-Control-Max-Age', '86400');
+            return response('', 204)
+                ->withHeaders(array_merge($corsHeaders, [
+                    'Access-Control-Allow-Origin' => $allowOriginValue,
+                    'Access-Control-Max-Age'      => '86400', // cache preflight 24 h
+                ]));
         }
 
-        // Handle actual requests
+        // Pass request through the rest of the middleware stack.
         $response = $next($request);
 
-        if ($originAllowed) {
-            $response->header('Access-Control-Allow-Origin', $origin)
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-TOKEN, X-XSRF-TOKEN')
-                ->header('Access-Control-Allow-Credentials', 'true')
-                ->header('Access-Control-Expose-Headers', 'Content-Length, X-CSRF-TOKEN');
+        // Attach CORS headers to every actual response.
+        $response->headers->set('Access-Control-Allow-Origin', $allowOriginValue);
+        foreach ($corsHeaders as $header => $value) {
+            $response->headers->set($header, $value);
         }
+        $response->headers->set('Access-Control-Expose-Headers', 'Content-Length, X-RateLimit-Limit, X-RateLimit-Remaining');
 
         return $response;
     }

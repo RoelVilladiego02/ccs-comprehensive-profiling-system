@@ -12,17 +12,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Add CORS middleware BEFORE everything else for all requests
+        // CORS must run FIRST — before any other middleware including Sanctum
         $middleware->prepend(\App\Http\Middleware\HandleCors::class);
 
-        // Add Sanctum middleware for API routes
-        $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        ]);
+        // NOTE: EnsureFrontendRequestsAreStateful is intentionally REMOVED.
+        // That middleware enforces cookie/session-based CSRF which cannot work
+        // cross-domain (Vercel → Railway). We use Sanctum token auth instead,
+        // which requires only the Authorization: Bearer header — no CSRF cookie.
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
-            'permission' => \App\Http\Middleware\CheckPermission::class,
+            'role'        => \App\Http\Middleware\CheckRole::class,
+            'permission'  => \App\Http\Middleware\CheckPermission::class,
             'active.user' => \App\Http\Middleware\EnsureUserIsActive::class,
         ]);
     })
