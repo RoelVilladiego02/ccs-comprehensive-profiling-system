@@ -50,12 +50,17 @@ apiClient.interceptors.response.use(
 // Get CSRF token for SPA authentication
 export const getCsrfToken = async () => {
   try {
-    // Note: This endpoint is NOT under /api/ path
-    await axios.get(`${API_URL}/sanctum/csrf-cookie`, {
-      withCredentials: true
+    // Use axios directly with withCredentials for the CSRF endpoint
+    await axios.post(`${API_URL}/sanctum/csrf-cookie`, {}, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
     })
   } catch (error) {
-    console.error('Failed to get CSRF token:', error)
+    console.warn('CSRF token fetch warning:', error.message)
+    // Don't throw - continue anyway as token might be in cookies already
   }
 }
 

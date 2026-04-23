@@ -31,25 +31,29 @@ class HandleCors
         $allowedOrigins = array_filter($allowedOrigins);
 
         $origin = $request->header('Origin');
+        $originAllowed = in_array($origin, $allowedOrigins);
 
-        if (in_array($origin, $allowedOrigins)) {
-            return $next($request)
-                ->header('Access-Control-Allow-Origin', $origin)
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-TOKEN, X-XSRF-TOKEN')
-                ->header('Access-Control-Allow-Credentials', 'true')
-                ->header('Access-Control-Expose-Headers', 'Content-Length, X-CSRF-TOKEN');
-        }
-
+        // Handle preflight requests
         if ($request->isMethod('OPTIONS')) {
-            return response()->json('OK', 200)
-                ->header('Access-Control-Allow-Origin', $origin)
+            return response()->json('OK', 204)
+                ->header('Access-Control-Allow-Origin', $originAllowed ? $origin : 'null')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-TOKEN, X-XSRF-TOKEN')
+                ->header('Access-Control-Allow-Credentials', 'true')
+                ->header('Access-Control-Max-Age', '86400');
+        }
+
+        // Handle actual requests
+        $response = $next($request);
+
+        if ($originAllowed) {
+            $response->header('Access-Control-Allow-Origin', $origin)
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
                 ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-TOKEN, X-XSRF-TOKEN')
                 ->header('Access-Control-Allow-Credentials', 'true')
                 ->header('Access-Control-Expose-Headers', 'Content-Length, X-CSRF-TOKEN');
         }
 
-        return $next($request);
+        return $response;
     }
 }

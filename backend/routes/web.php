@@ -8,5 +8,9 @@ Route::get('/', function () {
 
 // CSRF Cookie endpoint for SPA authentication
 Route::post('/sanctum/csrf-cookie', function () {
-    return response()->json(['message' => 'CSRF cookie sent']);
+    return response()->json(['message' => 'CSRF cookie set'], 204);
+});
+
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->json(['message' => 'CSRF cookie set'], 204);
 });

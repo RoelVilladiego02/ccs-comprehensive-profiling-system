@@ -12,8 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Add CORS middleware for all requests
-        $middleware->append(\App\Http\Middleware\HandleCors::class);
+        // Add CORS middleware BEFORE everything else for all requests
+        $middleware->prepend(\App\Http\Middleware\HandleCors::class);
 
         // Add Sanctum middleware for API routes
         $middleware->api(prepend: [
