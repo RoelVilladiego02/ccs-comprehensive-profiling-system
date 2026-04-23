@@ -1,0 +1,33 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#000000" stroke="#ffffff" stroke-width="2"/>
+  
+  <!-- Outer accent ring -->
+  <circle cx="100" cy="100" r="85" fill="none" stroke="#ff8c00" stroke-width="1.5" opacity="0.8"/>
+  
+  <!-- Profile/Person silhouette (representing profiling) -->
+  <circle cx="100" cy="55" r="18" fill="#ffffff" opacity="0.95"/>
+  <path d="M 75 85 Q 75 72 100 72 Q 125 72 125 85 L 125 95 Q 125 105 100 105 Q 75 105 75 95 Z" fill="#ffffff" opacity="0.95"/>
+  
+  <!-- Analytics bars/chart (representing data/analytics) -->
+  <g transform="translate(60, 120)">
+    <!-- Bar 1 -->
+    <rect x="5" y="18" width="8" height="18" fill="#ff8c00" opacity="0.9"/>
+    <!-- Bar 2 -->
+    <rect x="18" y="10" width="8" height="26" fill="#ffffff" opacity="0.9"/>
+    <!-- Bar 3 -->
+    <rect x="31" y="15" width="8" height="21" fill="#ff8c00" opacity="0.9"/>
+  </g>
+  
+  <!-- Center accent element (represents system/network) -->
+  <circle cx="100" cy="100" r="4" fill="#ff8c00" opacity="0.95"/>
+  
+  <!-- Small connecting dots for tech aspect -->
+  <circle cx="75" cy="100" r="2.5" fill="#ff8c00" opacity="0.7"/>
+  <circle cx="125" cy="100" r="2.5" fill="#ff8c00" opacity="0.7"/>
+  <circle cx="100" cy="75" r="2.5" fill="#ff8c00" opacity="0.7"/>
+  <circle cx="100" cy="125" r="2.5" fill="#ff8c00" opacity="0.7"/>
+  
+  <!-- Border highlight -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#ff8c00" stroke-width="0.5" opacity="0.5"/>
+</svg>
