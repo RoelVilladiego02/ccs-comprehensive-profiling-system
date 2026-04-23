@@ -6,18 +6,26 @@ const API_BASE_PATH = import.meta.env.VITE_API_BASE_PATH || '/api'
 // Create axios instance
 const apiClient = axios.create({
   baseURL: `${API_URL}${API_BASE_PATH}`,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   }
 })
 
-// Add token to requests
+// Add token to requests and CSRF token
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+    // Add CSRF token from meta tag or cookies
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+                      document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN='))?.split('=')[1]
+    if (csrfToken) {
+      config.headers['X-CSRF-TOKEN'] = csrfToken
+      config.headers['X-XSRF-TOKEN'] = csrfToken
     }
     return config
   },
@@ -39,9 +47,24 @@ apiClient.interceptors.response.use(
   }
 )
 
+// Get CSRF token for SPA authentication
+export const getCsrfToken = async () => {
+  try {
+    // Note: This endpoint is NOT under /api/ path
+    await axios.get(`${API_URL}/sanctum/csrf-cookie`, {
+      withCredentials: true
+    })
+  } catch (error) {
+    console.error('Failed to get CSRF token:', error)
+  }
+}
+
 // Authentication endpoints
 export const authAPI = {
-  login: (email, password) => apiClient.post('/auth/login', { email, password }),
+  login: async (email, password) => {
+    await getCsrfToken()
+    return apiClient.post('/auth/login', { email, password })
+  },
   register: (data) => apiClient.post('/auth/register', data),
   logout: () => apiClient.post('/auth/logout'),
   getMe: () => apiClient.get('/auth/me'),
