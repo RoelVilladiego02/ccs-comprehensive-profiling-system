@@ -10,6 +10,7 @@ import StaffDashboard from './components/StaffDashboard'
 import Login from './components/Login'
 import InstructionModule from './components/InstructionModule'
 import SchedulingModule from './components/SchedulingModule'
+import EligibilityReports from './components/EligibilityReports'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -173,6 +174,11 @@ function App() {
           isAuthenticated 
             ? <SchedulingModule userData={userData} onLogout={handleLogout} /> 
             : <Navigate to="/login" />
+        } />
+        <Route path="/eligibility-reports" element={
+          isAuthenticated && (getUserRole(userData) === 'admin' || getUserRole(userData) === 'staff')
+            ? <EligibilityReports userData={userData} onLogout={handleLogout} /> 
+            : isAuthenticated ? <Navigate to={getDashboardRoute()} /> : <Navigate to="/login" />
         } />
         
         {/* Legacy dashboard route - redirect to role-appropriate dashboard */}

@@ -18,6 +18,7 @@ use App\Http\Controllers\AffiliationController;
 use App\Http\Controllers\AcademicHistoryController;
 use App\Http\Controllers\NonAcademicHistoryController;
 use App\Http\Controllers\SkillsController;
+use App\Http\Controllers\EventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -189,6 +190,32 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::get('/recent', [ViolationController::class, 'getRecent']);
         Route::put('/{violationId}/resolve', [ViolationController::class, 'resolve'])->middleware('permission:violations.edit');
         Route::delete('/{violationId}', [ViolationController::class, 'destroy'])->middleware('permission:violations.delete');
+    });
+
+    // ====== Events Routes (Require Permission) ======
+    Route::prefix('events')->middleware('permission:events.view')->group(function () {
+        Route::get('/', [EventController::class, 'index']);
+        Route::get('/search', [EventController::class, 'search']);
+        Route::get('/upcoming', [EventController::class, 'getUpcoming']);
+        Route::get('/past', [EventController::class, 'getPast']);
+        Route::get('/type/{type}', [EventController::class, 'getByType']);
+        Route::get('/status/{status}', [EventController::class, 'getByStatus']);
+        Route::post('/', [EventController::class, 'store'])->middleware('permission:events.create');
+        Route::get('/{eventId}', [EventController::class, 'show']);
+        Route::put('/{eventId}', [EventController::class, 'update'])->middleware('permission:events.edit');
+        Route::delete('/{eventId}', [EventController::class, 'destroy'])->middleware('permission:events.delete');
+        
+        // Event Student Management
+        Route::get('/{eventId}/students', [EventController::class, 'getEventStudents']);
+        Route::get('/{eventId}/students/{status}', [EventController::class, 'getStudentsByStatus']);
+        Route::post('/{eventId}/register/{studentId}', [EventController::class, 'registerStudent'])->middleware('permission:events.manage_students');
+        Route::delete('/{eventId}/unregister/{studentId}', [EventController::class, 'unregisterStudent'])->middleware('permission:events.manage_students');
+        Route::put('/{eventId}/students/{studentId}/participation-status', [EventController::class, 'updateParticipationStatus'])->middleware('permission:events.manage_students');
+        Route::put('/{eventId}/students/{studentId}/points', [EventController::class, 'recordPoints'])->middleware('permission:events.manage_students');
+        
+        // Event Statistics
+        Route::get('/{eventId}/statistics', [EventController::class, 'getStatistics']);
+        Route::get('/{eventId}/top-performers', [EventController::class, 'getTopPerformers']);
     });
 });
 

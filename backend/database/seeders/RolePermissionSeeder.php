@@ -86,6 +86,13 @@ class RolePermissionSeeder extends Seeder
             ['permission_name' => 'violations.edit', 'permission_description' => 'Edit violations', 'module' => 'violations'],
             ['permission_name' => 'violations.delete', 'permission_description' => 'Delete violations', 'module' => 'violations'],
 
+            // Events Management
+            ['permission_name' => 'events.view', 'permission_description' => 'View events', 'module' => 'events'],
+            ['permission_name' => 'events.create', 'permission_description' => 'Create events', 'module' => 'events'],
+            ['permission_name' => 'events.edit', 'permission_description' => 'Edit events', 'module' => 'events'],
+            ['permission_name' => 'events.delete', 'permission_description' => 'Delete events', 'module' => 'events'],
+            ['permission_name' => 'events.manage_students', 'permission_description' => 'Manage student enrollment in events', 'module' => 'events'],
+
             // System Management
             ['permission_name' => 'roles.manage', 'permission_description' => 'Manage roles', 'module' => 'system'],
             ['permission_name' => 'permissions.manage', 'permission_description' => 'Manage permissions', 'module' => 'system'],
@@ -108,7 +115,8 @@ class RolePermissionSeeder extends Seeder
             'enrollments.view',
             'grades.view', 'grades.create', 'grades.edit',
             'attendance.view', 'attendance.create', 'attendance.edit',
-            'violations.view', 'violations.create'
+            'violations.view', 'violations.create',
+            'events.view', 'events.create', 'events.manage_students'
         ];
         foreach ($facultyPermissions as $permName) {
             $permission = Permission::where('permission_name', $permName)->first();
@@ -120,7 +128,7 @@ class RolePermissionSeeder extends Seeder
         // Assign relevant permissions to Student
         $studentPermissions = [
             'students.view', 'students.view_profile', 'courses.view', 'classes.view',
-            'grades.view', 'attendance.view'
+            'grades.view', 'attendance.view', 'events.view'
         ];
         foreach ($studentPermissions as $permName) {
             $permission = Permission::where('permission_name', $permName)->first();
@@ -134,7 +142,8 @@ class RolePermissionSeeder extends Seeder
             'students.view', 'students.create', 'students.edit',
             'courses.view', 'faculty.view', 'classes.view',
             'enrollments.view', 'enrollments.create',
-            'violations.view', 'violations.create'
+            'violations.view', 'violations.create',
+            'events.view', 'events.create', 'events.edit', 'events.manage_students'
         ];
         foreach ($staffPermissions as $permName) {
             $permission = Permission::where('permission_name', $permName)->first();

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Student extends Model
 {
@@ -77,6 +78,20 @@ class Student extends Model
     public function skills(): HasMany
     {
         return $this->hasMany(Skills::class, 'student_id', 'student_id');
+    }
+
+    public function events(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Event::class,
+            'student_event',
+            'student_id',
+            'event_id',
+            'student_id',
+            'event_id'
+        )
+        ->withPivot('participation_status', 'points_earned', 'notes', 'created_at', 'updated_at')
+        ->withTimestamps();
     }
 
     public function getFullNameAttribute(): string
