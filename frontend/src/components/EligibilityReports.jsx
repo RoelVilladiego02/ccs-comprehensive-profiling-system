@@ -11,7 +11,7 @@ function EligibilityReports() {
   const [selectedAffiliation, setSelectedAffiliation] = useState('')
   const [minGPA, setMinGPA] = useState(0)
   const [enrollmentStatus, setEnrollmentStatus] = useState('Regular')
-  const [maxViolations, setMaxViolations] = useState(999)
+  const [maxViolations, setMaxViolations] = useState(10)
 
   const [availableSkills, setAvailableSkills] = useState([])
   const [availableAffiliations, setAvailableAffiliations] = useState([])
