@@ -10,7 +10,7 @@ function EligibilityReports() {
   const [selectedSkill, setSelectedSkill] = useState('')
   const [selectedAffiliation, setSelectedAffiliation] = useState('')
   const [minGPA, setMinGPA] = useState(0)
-  const [enrollmentStatus, setEnrollmentStatus] = useState('Enrolled')
+  const [enrollmentStatus, setEnrollmentStatus] = useState('Regular')
   const [maxViolations, setMaxViolations] = useState(999)
 
   const [availableSkills, setAvailableSkills] = useState([])
@@ -306,14 +306,13 @@ function EligibilityReports() {
             {/* Enrollment Status */}
             {reportType === 'academic' && (
               <div className="filter-group">
-                <label htmlFor="enrollment-status">Enrollment Status</label>
+                <label htmlFor="enrollment-status">Student Identification Status</label>
                 <select
                   id="enrollment-status"
                   value={enrollmentStatus}
                   onChange={(e) => setEnrollmentStatus(e.target.value)}
                   className="filter-select"
                 >
-                  <option value="Enrolled">Enrolled</option>
                   <option value="Regular">Regular</option>
                   <option value="Irregular">Irregular</option>
                   <option value="Graduated">Graduated</option>
@@ -363,7 +362,7 @@ function EligibilityReports() {
                   setReportType('academic')
                   setMinGPA(3.5)
                   setMaxViolations(0)
-                  setEnrollmentStatus('Enrolled')
+                  setEnrollmentStatus('Regular')
                 }}
               >
                 Dean's List
