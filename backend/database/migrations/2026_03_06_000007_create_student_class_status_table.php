@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('student_class_status', function (Blueprint $table) {
-            $table->id('status_id');
+            $table->id('enrollment_id');
             $table->unsignedBigInteger('student_id');
             $table->unsignedBigInteger('class_id');
             $table->date('enrollment_date');
             $table->enum('enrollment_status', ['Enrolled', 'Dropped', 'Completed'])->default('Enrolled');
             $table->date('completion_date')->nullable();
+            $table->decimal('final_grade', 5, 2)->nullable();
             $table->text('remarks')->nullable();
 
             $table->foreign('student_id')

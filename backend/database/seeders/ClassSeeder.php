@@ -22,10 +22,9 @@ class ClassSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get all courses, faculty, and students
+        // Get all courses and faculty
         $courses = Course::all();
         $faculty = Faculty::all();
-        $students = Student::all();
 
         if ($courses->isEmpty() || $faculty->isEmpty()) {
             $this->command->warn('No courses or faculty found. Skipping class seeding.');
@@ -39,7 +38,7 @@ class ClassSeeder extends Seeder
         $totalClasses = $faculty->count() * $classesPerFaculty;
         
         // Calculate max students per class for fair distribution
-        $totalStudents = $students->count();
+        $totalStudents = Student::count();
         $baseMaxStudents = (int) ceil($totalStudents / $totalClasses);
         
         if ($totalStudents === 0) {
@@ -94,50 +93,68 @@ class ClassSeeder extends Seeder
 
         $this->command->info("Created {$totalClasses} classes.\n");
 
-        // Enroll students fairly across all classes
-        if (!$students->isEmpty()) {
-            $this->command->info("Enrolling students across {$totalClasses} classes...");
-
-            $studentIndex = 0;
-            $enrolledCount = 0;
-
-            // Distribute students sequentially to ensure fair load
-            foreach ($allClasses as $class) {
-                $enrollmentsForClass = min(
-                    $class->max_students,
-                    $students->count() - $studentIndex
-                );
-
-                if ($enrollmentsForClass <= 0) {
-                    break;
-                }
-
-                // Enroll students for this class
-                for ($i = 0; $i < $enrollmentsForClass; $i++) {
-                    $student = $students[$studentIndex];
-
-                    StudentClassStatus::create([
-                        'student_id' => $student->student_id,
-                        'class_id' => $class->class_id,
-                        'enrollment_status' => 'Enrolled',
-                        'enrollment_date' => now(),
-                    ]);
-
-                    $studentIndex++;
-                    $enrolledCount++;
-                }
-
-                // Update enrolled_students count
-                $class->update(['enrolled_students' => $enrollmentsForClass]);
-            }
-
-            $this->command->info("Successfully enrolled {$enrolledCount} students across {$totalClasses} classes!");
+        // Enroll students fairly across all classes using chunked queries
+        $verifyCount = Student::count();
+        if ($verifyCount === 0) {
+            $this->command->error('❌ No students found in database! Run StudentSeeder first.');
+            return;
         }
 
-        $this->command->info("\n✓ Classes and student enrollments seeded successfully!");
-        $this->command->info("  - Faculty: " . $faculty->count());
-        $this->command->info("  - Classes: " . $totalClasses);
-        $this->command->info("  - Total Students: " . $totalStudents);
+        $this->command->info("Found {$verifyCount} students to enroll.");
+        $this->command->info("Enrolling students using bulk insert...");
+
+        $studentOffset = 0;
+        $totalEnrolled = 0;
+
+        foreach ($allClasses as $class) {
+            $spotsAvailable = min(
+                $class->max_students,
+                $verifyCount - $studentOffset
+            );
+
+            if ($spotsAvailable <= 0) {
+                $this->command->warn("  No more students to enroll. Stopping.");
+                break;
+            }
+
+            // Fetch only the students needed for THIS class (memory efficient)
+            $studentsForClass = Student::skip($studentOffset)
+                ->take($spotsAvailable)
+                ->get(['student_id']);
+
+            if ($studentsForClass->isEmpty()) {
+                $this->command->warn("  Class {$class->class_id}: No students fetched at offset {$studentOffset}.");
+                break;
+            }
+
+            // Build bulk insert array
+            $enrollmentRecords = $studentsForClass->map(fn($s) => [
+                'student_id'        => $s->student_id,
+                'class_id'          => $class->class_id,
+                'enrollment_status' => 'Enrolled',
+                'enrollment_date'   => now()->toDateString(),
+            ])->toArray();
+
+            // Bulk insert (much faster than individual ::create() calls)
+            StudentClassStatus::insert($enrollmentRecords);
+
+            $actualCount = count($enrollmentRecords);
+
+            // Update enrolled count to match actual insertions
+            $class->update(['enrolled_students' => $actualCount]);
+
+            $studentOffset += $actualCount;
+            $totalEnrolled += $actualCount;
+
+            $this->command->info(
+                "  Class {$class->class_id} (section {$class->section}): {$actualCount} students enrolled."
+            );
+        }
+
+        $this->command->info("\n✓ Enrollment complete!");
+        $this->command->info("  Classes created : {$totalClasses}");
+        $this->command->info("  Students enrolled: {$totalEnrolled}");
+        $this->command->info("  DB verify: " . StudentClassStatus::count() . " records in student_class_status");
     }
 
     private function getSectionLetter(int $index): string
