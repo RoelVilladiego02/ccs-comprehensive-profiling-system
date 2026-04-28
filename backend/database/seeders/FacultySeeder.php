@@ -52,9 +52,9 @@ class FacultySeeder extends Seeder
             ]
         );
 
-        // Generate 20 additional faculty using factory
-        $this->command->info('Generating 20 sample faculty...');
-        Faculty::factory(20)->create();
-        $this->command->info('Successfully created 23 faculty members!');
+        // Generate 12 additional faculty using factory to have exactly 15 total
+        $this->command->info('Generating 12 sample faculty...');
+        Faculty::factory(12)->create();
+        $this->command->info('Successfully created 15 faculty members!');
     }
 }

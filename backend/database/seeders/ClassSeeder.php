@@ -13,6 +13,12 @@ class ClassSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * 
+     * Strategy:
+     * - Create 2 classes per faculty (30 classes total for 15 faculty)
+     * - Rotate courses evenly across classes
+     * - Calculate max_students to fairly distribute 1000 students
+     * - Enroll students sequentially for fair distribution
      */
     public function run(): void
     {
@@ -26,65 +32,109 @@ class ClassSeeder extends Seeder
             return;
         }
 
-        if ($students->isEmpty()) {
-            $this->command->warn('No students found. Classes will be created but not enrolled.');
-        }
+        $this->command->info('Starting class seeding with 15 faculty members...');
 
-        // Create classes for each course, distributed among faculty
-        $facultyIndex = 0;
-        $sectionLetters = ['A', 'B', 'C', 'D'];
-        $sectionIndex = 0;
+        // Create 2 classes per faculty = 30 classes total
+        $classesPerFaculty = 2;
+        $totalClasses = $faculty->count() * $classesPerFaculty;
+        
+        // Calculate max students per class for fair distribution
+        $totalStudents = $students->count();
+        $baseMaxStudents = (int) ceil($totalStudents / $totalClasses);
+        
+        $this->command->info("Creating {$totalClasses} classes to enroll ~{$totalStudents} students.");
+        $this->command->info("Target: ~{$baseMaxStudents} students per class.\n");
 
-        foreach ($courses as $course) {
-            // Create 2-3 sections per course
-            $sections = rand(2, 3);
-            
-            for ($i = 0; $i < $sections; $i++) {
-                $section = $sectionLetters[$sectionIndex % count($sectionLetters)];
-                $sectionIndex++;
+        $allClasses = [];
+        $courseIndex = 0;
+        $classIndex = 0;
 
-                // Assign to faculty in round-robin
-                $assignedFaculty = $faculty[$facultyIndex % $faculty->count()];
-                $facultyIndex++;
+        // Create classes: 2 per faculty, rotating through courses
+        foreach ($faculty as $facultyMember) {
+            for ($i = 0; $i < $classesPerFaculty; $i++) {
+                // Rotate through courses
+                $course = $courses[$courseIndex % $courses->count()];
+                $courseIndex++;
 
-                $maxStudents = rand(30, 50);
+                // Generate section letter
+                $section = $this->getSectionLetter($classIndex);
+
+                // Vary max_students slightly (±5 from base)
+                $maxStudents = $baseMaxStudents + rand(-5, 5);
+                $maxStudents = max(25, $maxStudents); // Ensure at least 25
 
                 $class = SchoolClass::create([
                     'course_id' => $course->course_id,
-                    'faculty_id' => $assignedFaculty->faculty_id,
+                    'faculty_id' => $facultyMember->faculty_id,
                     'section' => $section,
                     'academic_year' => '2025-2026',
-                    'semester' => rand(1, 3),
+                    'semester' => (($classIndex % 3) + 1), // Distribute across 3 semesters
                     'schedule_day' => $this->getRandomScheduleDay(),
                     'schedule_time' => $this->getRandomTime(),
                     'schedule_end_time' => $this->getRandomEndTime(),
-                    'room' => 'Room ' . rand(101, 320),
+                    'room' => 'Room ' . (101 + ($classIndex % 20)),
                     'max_students' => $maxStudents,
                     'enrolled_students' => 0,
                     'class_status' => 'Open',
                 ]);
 
-                // Enroll random existing students if available
-                if (!$students->isEmpty()) {
-                    $enrollmentCount = rand(10, min(40, $maxStudents, $students->count()));
-                    $selectedStudents = $students->random(min($enrollmentCount, $students->count()));
-
-                    foreach ($selectedStudents as $student) {
-                        StudentClassStatus::create([
-                            'student_id' => $student->student_id,
-                            'class_id' => $class->class_id,
-                            'enrollment_status' => 'Enrolled',
-                            'enrollment_date' => now(),
-                        ]);
-                    }
-
-                    // Update enrolled_students count
-                    $class->update(['enrolled_students' => $enrollmentCount]);
-                }
+                $allClasses[] = $class;
+                $classIndex++;
             }
         }
 
-        $this->command->info('Classes and student enrollments seeded successfully!');
+        $this->command->info("Created {$totalClasses} classes.\n");
+
+        // Enroll students fairly across all classes
+        if (!$students->isEmpty()) {
+            $this->command->info("Enrolling students across {$totalClasses} classes...");
+
+            $studentIndex = 0;
+            $enrolledCount = 0;
+
+            // Distribute students sequentially to ensure fair load
+            foreach ($allClasses as $class) {
+                $enrollmentsForClass = min(
+                    $class->max_students,
+                    $students->count() - $studentIndex
+                );
+
+                if ($enrollmentsForClass <= 0) {
+                    break;
+                }
+
+                // Enroll students for this class
+                for ($i = 0; $i < $enrollmentsForClass; $i++) {
+                    $student = $students[$studentIndex];
+
+                    StudentClassStatus::create([
+                        'student_id' => $student->student_id,
+                        'class_id' => $class->class_id,
+                        'enrollment_status' => 'Enrolled',
+                        'enrollment_date' => now(),
+                    ]);
+
+                    $studentIndex++;
+                    $enrolledCount++;
+                }
+
+                // Update enrolled_students count
+                $class->update(['enrolled_students' => $enrollmentsForClass]);
+            }
+
+            $this->command->info("Successfully enrolled {$enrolledCount} students across {$totalClasses} classes!");
+        }
+
+        $this->command->info("\n✓ Classes and student enrollments seeded successfully!");
+        $this->command->info("  - Faculty: " . $faculty->count());
+        $this->command->info("  - Classes: " . $totalClasses);
+        $this->command->info("  - Total Students: " . $totalStudents);
+    }
+
+    private function getSectionLetter(int $index): string
+    {
+        $sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        return $sections[$index % count($sections)];
     }
 
     private function getRandomScheduleDay(): string
