@@ -20,6 +20,14 @@ function EligibilityReports() {
   const [error, setError] = useState(null)
   const [reportGenerated, setReportGenerated] = useState(false)
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  // Modal state
+  const [showModal, setShowModal] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState(null)
+
   // ============================================================================
   // LOAD AVAILABLE SKILLS AND AFFILIATIONS
   // ============================================================================
@@ -69,6 +77,7 @@ function EligibilityReports() {
     setLoading(true)
     setError(null)
     setReportResults([])
+    setCurrentPage(1) // Reset to first page when generating new report
 
     try {
       let students = []
@@ -155,6 +164,35 @@ function EligibilityReports() {
       setReportGenerated(false)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // ============================================================================
+  // VIEW STUDENT PROFILE
+  // ============================================================================
+  const handleViewProfile = (student) => {
+    setSelectedStudent(student)
+    setShowModal(true)
+  }
+
+  const closeModal = () => {
+    setShowModal(false)
+    setSelectedStudent(null)
+  }
+
+  // ============================================================================
+  // PAGINATION LOGIC
+  // ============================================================================
+  const totalPages = Math.ceil(reportResults.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedResults = reportResults.slice(startIndex, endIndex)
+
+  const goToPage = (pageNum) => {
+    if (pageNum >= 1 && pageNum <= totalPages) {
+      setCurrentPage(pageNum)
+      // Scroll to table
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -389,6 +427,9 @@ function EligibilityReports() {
                   {reportType === 'combined' && `Skill/Affiliation + GPA ≥ ${minGPA}`}
                   {reportType === 'academic' && `Academic Status: ${enrollmentStatus} | GPA ≥ ${minGPA}`}
                 </p>
+                <p className="pagination-info">
+                  Showing {startIndex + 1} to {Math.min(endIndex, reportResults.length)} of {reportResults.length} students
+                </p>
               </div>
             )}
 
@@ -407,7 +448,7 @@ function EligibilityReports() {
                     </tr>
                   </thead>
                   <tbody>
-                    {reportResults.map((student, idx) => (
+                    {paginatedResults.map((student, idx) => (
                       <tr key={student.student_id} className={idx % 2 === 0 ? 'even' : 'odd'}>
                         <td className="student-number">
                           <span className="badge">{student.student_number}</span>
@@ -432,12 +473,50 @@ function EligibilityReports() {
                           </span>
                         </td>
                         <td className="action">
-                          <button className="btn-view">View Profile</button>
+                          <button
+                            className="btn-view"
+                            onClick={() => handleViewProfile(student)}
+                          >
+                            View Profile
+                          </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {reportGenerated && reportResults.length > 0 && totalPages > 1 && (
+              <div className="pagination-container">
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="pagination-btn"
+                >
+                  ← Previous
+                </button>
+
+                <div className="pagination-pages">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => goToPage(pageNum)}
+                      className={`pagination-page ${pageNum === currentPage ? 'active' : ''}`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="pagination-btn"
+                >
+                  Next →
+                </button>
               </div>
             )}
 
@@ -459,6 +538,98 @@ function EligibilityReports() {
             )}
           </div>
         </div>
+
+        {/* ===== PROFILE MODAL ===== */}
+        {showModal && selectedStudent && (
+          <div className="modal-overlay" onClick={closeModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Student Profile</h2>
+                <button className="modal-close-btn" onClick={closeModal}>
+                  ✕
+                </button>
+              </div>
+
+              <div className="modal-body">
+                {/* Personal Information */}
+                <div className="profile-section">
+                  <h3>👤 Personal Information</h3>
+                  <div className="profile-grid">
+                    <div className="profile-item">
+                      <label>Student Number:</label>
+                      <span>{selectedStudent.student_number}</span>
+                    </div>
+                    <div className="profile-item">
+                      <label>Full Name:</label>
+                      <span>
+                        {selectedStudent.first_name} {selectedStudent.middle_name ? `${selectedStudent.middle_name} ` : ''} {selectedStudent.last_name}
+                      </span>
+                    </div>
+                    <div className="profile-item">
+                      <label>Email:</label>
+                      <span>{selectedStudent.email}</span>
+                    </div>
+                    <div className="profile-item">
+                      <label>Status:</label>
+                      <span className="status-badge">{selectedStudent.student_identification || 'Active'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Academic Information */}
+                <div className="profile-section">
+                  <h3>🎓 Academic Information</h3>
+                  <div className="profile-grid">
+                    <div className="profile-item">
+                      <label>GPA:</label>
+                      <span className={`gpa-badge gpa-${Math.floor(selectedStudent.gpa)}`}>
+                        {selectedStudent.gpa.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="profile-item">
+                      <label>Violations:</label>
+                      <span className={`violations-badge ${selectedStudent.violationsCount > 0 ? 'has-violations' : 'clean'}`}>
+                        {selectedStudent.violationsCount} unresolved
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Skills */}
+                {selectedStudent.skills && selectedStudent.skills.length > 0 && (
+                  <div className="profile-section">
+                    <h3>🎯 Skills</h3>
+                    <div className="skills-list">
+                      {selectedStudent.skills.map((skill, idx) => (
+                        <span key={idx} className="skill-tag">{skill}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Affiliations */}
+                {selectedStudent.affiliations && selectedStudent.affiliations.length > 0 && (
+                  <div className="profile-section">
+                    <h3>🏢 Affiliations</h3>
+                    <div className="affiliations-list">
+                      {selectedStudent.affiliations.map((affiliation, idx) => (
+                        <div key={idx} className="affiliation-item">
+                          {affiliation}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="modal-footer">
+                <button className="modal-btn-close" onClick={closeModal}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
