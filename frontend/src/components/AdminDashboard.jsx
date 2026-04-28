@@ -57,6 +57,11 @@ function AdminDashboard({ userData, onLogout }) {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(15)
+  const [paginationMetadata, setPaginationMetadata] = useState({
+    total: 0,
+    lastPage: 1,
+    currentPage: 1
+  })
 
   // Modal state for add/edit/delete operations
   const [showFormModal, setShowFormModal] = useState(false)
@@ -83,7 +88,7 @@ function AdminDashboard({ userData, onLogout }) {
     is_active: true
   })
 
-  // Fetch students on component mount
+  // Fetch students on component mount or when pagination changes
   useEffect(() => {
     if (activeSection === 'dashboard') {
       fetchDashboardStats()
@@ -93,14 +98,20 @@ function AdminDashboard({ userData, onLogout }) {
     } else if (activeSection === 'courses') {
       fetchCourses()
     }
-  }, [activeSection])
+  }, [activeSection, currentPage, itemsPerPage])
 
   const fetchStudents = async () => {
     try {
       setLoading(true)
-      const response = await studentAPI.getAll(100)
+      const response = await studentAPI.getAll(itemsPerPage, currentPage)
       if (response.data.success) {
         setStudents(response.data.data || [])
+        // Store pagination metadata from backend
+        setPaginationMetadata({
+          total: response.data.pagination?.total || 0,
+          lastPage: response.data.pagination?.last_page || 1,
+          currentPage: response.data.pagination?.current_page || 1
+        })
       }
     } catch (err) {
       setError('Failed to load students')
@@ -321,8 +332,8 @@ function AdminDashboard({ userData, onLogout }) {
   }
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
+    setCurrentPage(1)  // Reset to first page before updating items per page
     setItemsPerPage(newItemsPerPage)
-    setCurrentPage(1)
   }
 
   // Add/Edit/Delete handlers
@@ -595,7 +606,7 @@ function AdminDashboard({ userData, onLogout }) {
 
         <div className="results-info">
           <span className="result-count">
-            Showing <strong>{filteredAndSortedStudents.length}</strong> students
+            Showing <strong>{paginationMetadata.total}</strong> students (Page {paginationMetadata.currentPage} of {paginationMetadata.lastPage})
           </span>
         </div>
 
@@ -653,10 +664,7 @@ function AdminDashboard({ userData, onLogout }) {
           <>
             {viewMode === 'table' ? (
               <AdminStudentTable 
-                students={filteredAndSortedStudents.slice(
-                  (currentPage - 1) * itemsPerPage,
-                  currentPage * itemsPerPage
-                )}
+                students={filteredAndSortedStudents}
                 sortConfig={sortConfig}
                 onSort={handleSort}
                 onViewStudent={handleViewStudent}
@@ -665,20 +673,17 @@ function AdminDashboard({ userData, onLogout }) {
               />
             ) : (
               <StudentGrid 
-                students={filteredAndSortedStudents.slice(
-                  (currentPage - 1) * itemsPerPage,
-                  currentPage * itemsPerPage
-                )}
+                students={filteredAndSortedStudents}
                 onViewStudent={handleViewStudent}
               />
             )}
             <Pagination
-              currentPage={currentPage}
-              totalPages={Math.ceil(filteredAndSortedStudents.length / itemsPerPage)}
+              currentPage={paginationMetadata.currentPage}
+              totalPages={paginationMetadata.lastPage}
               onPageChange={handlePageChange}
               itemsPerPage={itemsPerPage}
               onItemsPerPageChange={handleItemsPerPageChange}
-              totalItems={filteredAndSortedStudents.length}
+              totalItems={paginationMetadata.total}
             />
           </>
         ) : (

@@ -67,7 +67,7 @@ export const authAPI = {
 // Student endpoints
 // ---------------------------------------------------------------------------
 export const studentAPI = {
-  getAll:                  (perPage = 15) => apiClient.get('/students', { params: { per_page: perPage } }),
+  getAll:                  (perPage = 15, page = 1) => apiClient.get('/students', { params: { per_page: perPage, page } }),
   search:                  (query)        => apiClient.get('/students/search', { params: { q: query } }),
   getById:                 (id)           => apiClient.get(`/students/${id}`),
   create:                  (data)         => apiClient.post('/students', data),
