@@ -58,10 +58,12 @@ class ClassSeeder extends Seeder
             for ($i = 0; $i < $classesPerFaculty; $i++) {
                 // Rotate through courses
                 $course = $courses[$courseIndex % $courses->count()];
-                $courseIndex++;
 
-                // Generate section letter
-                $section = $this->getSectionLetter($classIndex);
+                // Generate section letter based on COURSE (not class order)
+                // This ensures no duplicate (course_id, section, semester, year) combinations
+                $section = $this->getSectionLetter($courseIndex);
+
+                $courseIndex++;
 
                 // Vary max_students slightly (±5 from base) for realistic diversity
                 $maxStudents = $baseMaxStudents + rand(-5, 5);
