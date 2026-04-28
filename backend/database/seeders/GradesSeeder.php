@@ -49,7 +49,7 @@ class GradesSeeder extends Seeder
                 'percentage' => $midtermPercentage,
                 'grade_date' => $enrollment->enrollment_date->addWeeks(8)->toDateString(),
                 'remarks' => $this->getRemarks($midtermScore),
-                'final_grade' => null, // Midterms don't have a final grade letter yet
+                'final_grade' => null, // No final grade for midterm
             ];
 
             // Final Grade (60% weight)
