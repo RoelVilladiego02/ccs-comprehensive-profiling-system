@@ -52,6 +52,7 @@ class ClassSeeder extends Seeder
         $allClasses = [];
         $courseIndex = 0;
         $classIndex = 0;
+        $facultyIndex = 0;
 
         // Create classes: 2 per faculty, rotating through courses
         foreach ($faculty as $facultyMember) {
@@ -59,9 +60,10 @@ class ClassSeeder extends Seeder
                 // Rotate through courses
                 $course = $courses[$courseIndex % $courses->count()];
 
-                // Generate section letter based on COURSE (not class order)
-                // This ensures no duplicate (course_id, section, semester, year) combinations
-                $section = $this->getSectionLetter($courseIndex);
+                // Generate section letter based on FACULTY + COURSE
+                // This ensures (course_id, section, semester, year) combinations never repeat
+                // Faculty 0-7 get sections A-H, Faculty 8-14 cycle back to A-G
+                $section = $this->getSectionLetter($facultyIndex + $courseIndex);
 
                 $courseIndex++;
 
@@ -91,6 +93,8 @@ class ClassSeeder extends Seeder
                 $allClasses[] = $class;
                 $classIndex++;
             }
+
+            $facultyIndex++;
         }
 
         $this->command->info("Created {$totalClasses} classes.\n");
