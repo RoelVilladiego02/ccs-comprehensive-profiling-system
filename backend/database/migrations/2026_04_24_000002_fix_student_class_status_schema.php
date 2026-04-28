@@ -8,21 +8,17 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * Fixes:
-     * 1. Rename status_id to enrollment_id (matches model primaryKey)
-     * 2. Add final_grade column (referenced in model fillable)
+     * 
+     * NOTE: This migration is now redundant. The fixes have been applied to the
+     * original migration 2026_03_06_000007_create_student_class_status_table.php:
+     * 1. Primary key is created as 'enrollment_id' (not 'status_id')
+     * 2. 'final_grade' column is included in the original table creation
+     * 
+     * This migration is kept as a no-op for safety (in case of rollbacks).
      */
     public function up(): void
     {
-        Schema::table('student_class_status', function (Blueprint $table) {
-            // Rename status_id to enrollment_id
-            $table->renameColumn('status_id', 'enrollment_id');
-            
-            // Add final_grade column if it doesn't exist
-            if (!Schema::hasColumn('student_class_status', 'final_grade')) {
-                $table->decimal('final_grade', 5, 2)->nullable()->after('completion_date');
-            }
-        });
+        // No-op: Fixes already applied to original migration
     }
 
     /**
@@ -30,14 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('student_class_status', function (Blueprint $table) {
-            // Rename back to status_id
-            $table->renameColumn('enrollment_id', 'status_id');
-            
-            // Drop final_grade column
-            if (Schema::hasColumn('student_class_status', 'final_grade')) {
-                $table->dropColumn('final_grade');
-            }
-        });
+        // No-op: Nothing to reverse
     }
 };
