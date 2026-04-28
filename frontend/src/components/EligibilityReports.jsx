@@ -171,7 +171,11 @@ function EligibilityReports() {
   // VIEW STUDENT PROFILE
   // ============================================================================
   const handleViewProfile = (student) => {
-    console.log('Student data:', student)
+    console.log('=== STUDENT PROFILE DATA ===')
+    console.log('Full student object:', student)
+    console.log('Skills:', student?.skills)
+    console.log('Affiliations:', student?.affiliations)
+    console.log('=========================')
     setSelectedStudent(student)
     setShowModal(true)
   }
@@ -602,7 +606,9 @@ function EligibilityReports() {
                     <h3>🎯 Skills</h3>
                     <div className="skills-list">
                       {selectedStudent.skills.map((skill, idx) => (
-                        <span key={idx} className="skill-tag">{skill || 'Unknown'}</span>
+                        <span key={idx} className="skill-tag">
+                          {typeof skill === 'string' ? skill : (skill?.skill_name || skill?.name || 'Unknown')}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -615,7 +621,7 @@ function EligibilityReports() {
                     <div className="affiliations-list">
                       {selectedStudent.affiliations.map((affiliation, idx) => (
                         <div key={idx} className="affiliation-item">
-                          {affiliation || 'Unknown'}
+                          {typeof affiliation === 'string' ? affiliation : (affiliation?.affiliation_name || affiliation?.name || 'Unknown')}
                         </div>
                       ))}
                     </div>
