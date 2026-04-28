@@ -20,9 +20,10 @@ class DatabaseSeeder extends Seeder
             TestUserSeeder::class,
             CourseSeeder::class,
             FacultySeeder::class,
-            StudentSeeder::class,   // Must run BEFORE ClassSeeder for enrollment
-            ClassSeeder::class,     // Now has students to enroll
-            GradesSeeder::class,    // Seeds midterm and final grades for all enrolled students
+            StudentSeeder::class,      // Must run BEFORE ClassSeeder for enrollment
+            ClassSeeder::class,        // Now has students to enroll
+            GradesSeeder::class,       // Seeds midterm and final grades
+            UserAccountSeeder::class,  // Creates login accounts for all faculty and students
         ]);
     }
 }
