@@ -42,6 +42,11 @@ class ClassSeeder extends Seeder
         $totalStudents = $students->count();
         $baseMaxStudents = (int) ceil($totalStudents / $totalClasses);
         
+        if ($totalStudents === 0) {
+            $this->command->warn('⚠️  No students found! Make sure StudentSeeder runs before ClassSeeder.');
+            $baseMaxStudents = 30; // Default for empty database
+        }
+        
         $this->command->info("Creating {$totalClasses} classes to enroll ~{$totalStudents} students.");
         $this->command->info("Target: ~{$baseMaxStudents} students per class.\n");
 
@@ -59,9 +64,13 @@ class ClassSeeder extends Seeder
                 // Generate section letter
                 $section = $this->getSectionLetter($classIndex);
 
-                // Vary max_students slightly (±5 from base)
+                // Vary max_students slightly (±5 from base) for realistic diversity
                 $maxStudents = $baseMaxStudents + rand(-5, 5);
-                $maxStudents = max(25, $maxStudents); // Ensure at least 25
+                $maxStudents = max(20, min(50, $maxStudents)); // Keep in range 20-50
+
+                // Generate valid schedule times (end must be after start)
+                $startTime = $this->getRandomTime();
+                $endTime = $this->getRandomEndTime($startTime);
 
                 $class = SchoolClass::create([
                     'course_id' => $course->course_id,
@@ -70,8 +79,8 @@ class ClassSeeder extends Seeder
                     'academic_year' => '2025-2026',
                     'semester' => (($classIndex % 3) + 1), // Distribute across 3 semesters
                     'schedule_day' => $this->getRandomScheduleDay(),
-                    'schedule_time' => $this->getRandomTime(),
-                    'schedule_end_time' => $this->getRandomEndTime(),
+                    'schedule_time' => $startTime,
+                    'schedule_end_time' => $endTime,
                     'room' => 'Room ' . (101 + ($classIndex % 20)),
                     'max_students' => $maxStudents,
                     'enrolled_students' => 0,
@@ -149,9 +158,19 @@ class ClassSeeder extends Seeder
         return $times[array_rand($times)];
     }
 
-    private function getRandomEndTime(): string
+    private function getRandomEndTime(?string $startTime = null): string
     {
-        $times = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
-        return $times[array_rand($times)];
+        $startHour = $startTime ? (int)substr($startTime, 0, 2) : 8;
+        
+        // Generate end time 1-4 hours after start time
+        $duration = rand(1, 4);
+        $endHour = $startHour + $duration;
+        
+        // Cap at 17:00 (5 PM)
+        if ($endHour > 17) {
+            $endHour = 17;
+        }
+        
+        return str_pad($endHour, 2, '0', STR_PAD_LEFT) . ':00';
     }
 }

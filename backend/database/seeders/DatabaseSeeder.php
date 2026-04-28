@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
             TestUserSeeder::class,
             CourseSeeder::class,
             FacultySeeder::class,
-            ClassSeeder::class,
-            StudentSeeder::class,
+            StudentSeeder::class,   // Must run BEFORE ClassSeeder for enrollment
+            ClassSeeder::class,     // Now has students to enroll
         ]);
     }
 }
