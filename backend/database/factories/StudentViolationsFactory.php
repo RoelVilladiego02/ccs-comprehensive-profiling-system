@@ -36,9 +36,9 @@ class StudentViolationsFactory extends Factory
             'violation_date' => $violationDate,
             'offense_level' => $this->faker->randomElement([
                 'Minor',
+                'Moderate',
                 'Major',
-                'Severe',
-                'Critical'
+                'Grave'
             ]),
             'reported_by' => $this->faker->name(),
             'action_taken' => $this->faker->randomElement([
@@ -59,7 +59,6 @@ class StudentViolationsFactory extends Factory
             ]),
             'status' => $this->faker->randomElement([
                 'Resolved',
-                'Under Investigation',
                 'Pending',
                 'Dismissed'
             ]),
