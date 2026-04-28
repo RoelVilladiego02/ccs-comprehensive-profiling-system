@@ -171,6 +171,7 @@ function EligibilityReports() {
   // VIEW STUDENT PROFILE
   // ============================================================================
   const handleViewProfile = (student) => {
+    console.log('Student data:', student)
     setSelectedStudent(student)
     setShowModal(true)
   }
@@ -557,21 +558,21 @@ function EligibilityReports() {
                   <div className="profile-grid">
                     <div className="profile-item">
                       <label>Student Number:</label>
-                      <span>{selectedStudent.student_number}</span>
+                      <span>{selectedStudent?.student_number || 'N/A'}</span>
                     </div>
                     <div className="profile-item">
                       <label>Full Name:</label>
                       <span>
-                        {selectedStudent.first_name} {selectedStudent.middle_name ? `${selectedStudent.middle_name} ` : ''} {selectedStudent.last_name}
+                        {selectedStudent?.first_name || ''} {selectedStudent?.middle_name ? `${selectedStudent.middle_name} ` : ''} {selectedStudent?.last_name || ''}
                       </span>
                     </div>
                     <div className="profile-item">
                       <label>Email:</label>
-                      <span>{selectedStudent.email}</span>
+                      <span>{selectedStudent?.email || 'N/A'}</span>
                     </div>
                     <div className="profile-item">
                       <label>Status:</label>
-                      <span className="status-badge">{selectedStudent.student_identification || 'Active'}</span>
+                      <span className="status-badge">{selectedStudent?.student_identification || 'Active'}</span>
                     </div>
                   </div>
                 </div>
@@ -582,39 +583,39 @@ function EligibilityReports() {
                   <div className="profile-grid">
                     <div className="profile-item">
                       <label>GPA:</label>
-                      <span className={`gpa-badge gpa-${Math.floor(selectedStudent.gpa)}`}>
-                        {selectedStudent.gpa.toFixed(2)}
+                      <span className={`gpa-badge gpa-${Math.floor((selectedStudent?.gpa ?? 0) * 10) / 10}`}>
+                        {((selectedStudent?.gpa ?? 0) * 100 / 100).toFixed(2)}
                       </span>
                     </div>
                     <div className="profile-item">
                       <label>Violations:</label>
-                      <span className={`violations-badge ${selectedStudent.violationsCount > 0 ? 'has-violations' : 'clean'}`}>
-                        {selectedStudent.violationsCount} unresolved
+                      <span className={`violations-badge ${((selectedStudent?.violationsCount ?? 0) > 0) ? 'has-violations' : 'clean'}`}>
+                        {(selectedStudent?.violationsCount ?? 0)} unresolved
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Skills */}
-                {selectedStudent.skills && selectedStudent.skills.length > 0 && (
+                {(selectedStudent?.skills?.length > 0) && (
                   <div className="profile-section">
                     <h3>🎯 Skills</h3>
                     <div className="skills-list">
                       {selectedStudent.skills.map((skill, idx) => (
-                        <span key={idx} className="skill-tag">{skill}</span>
+                        <span key={idx} className="skill-tag">{skill || 'Unknown'}</span>
                       ))}
                     </div>
                   </div>
                 )}
 
                 {/* Affiliations */}
-                {selectedStudent.affiliations && selectedStudent.affiliations.length > 0 && (
+                {(selectedStudent?.affiliations?.length > 0) && (
                   <div className="profile-section">
                     <h3>🏢 Affiliations</h3>
                     <div className="affiliations-list">
                       {selectedStudent.affiliations.map((affiliation, idx) => (
                         <div key={idx} className="affiliation-item">
-                          {affiliation}
+                          {affiliation || 'Unknown'}
                         </div>
                       ))}
                     </div>
