@@ -6,6 +6,12 @@ use App\Models\Student;
 
 class StudentProfileService
 {
+    protected GradeService $gradeService;
+
+    public function __construct(GradeService $gradeService)
+    {
+        $this->gradeService = $gradeService;
+    }
     /**
      * Get comprehensive student profile
      */
@@ -51,7 +57,7 @@ class StudentProfileService
     }
 
     /**
-     * Calculate GPA from grades
+     * Calculate GPA from grades (returns 0-4.0 scale)
      */
     private function calculateGPA(Student $student): float
     {
@@ -59,15 +65,8 @@ class StudentProfileService
             return 0;
         }
 
-        $total = 0;
-        $count = 0;
-
-        foreach ($student->grades as $grade) {
-            $total += $grade->final_grade ?? 0;
-            $count++;
-        }
-
-        return $count > 0 ? round($total / $count, 2) : 0;
+        // Use GradeService to calculate GPA in 4.0 scale
+        return $this->gradeService->calculateGPAFromGradesInScale($student->grades);
     }
 
     /**

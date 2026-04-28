@@ -9,12 +9,26 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class StudentService
 {
+    protected GradeService $gradeService;
+
+    public function __construct(GradeService $gradeService)
+    {
+        $this->gradeService = $gradeService;
+    }
     /**
-     * Get all students with pagination
+     * Get all students with pagination and GPA
      */
     public function getAllStudents(int $perPage = 15): LengthAwarePaginator
     {
-        return Student::paginate($perPage);
+        $students = Student::paginate($perPage);
+        
+        // Add GPA to each student
+        $students->getCollection()->transform(function ($student) {
+            $student->gpa = $this->gradeService->getStudentGPA($student->student_id);
+            return $student;
+        });
+        
+        return $students;
     }
 
     /**
@@ -45,15 +59,17 @@ class StudentService
     }
 
     /**
-     * Search students by name or email
+     * Search students by name or email with GPA
      */
     public function searchStudents(string $query): Collection
     {
-        return Student::where('first_name', 'like', "%{$query}%")
+        $students = Student::where('first_name', 'like', "%{$query}%")
             ->orWhere('last_name', 'like', "%{$query}%")
             ->orWhere('email', 'like', "%{$query}%")
             ->orWhere('student_number', 'like', "%{$query}%")
             ->get();
+        
+        return $this->attachGPAToStudents($students);
     }
 
     /**
@@ -151,16 +167,24 @@ class StudentService
     }
 
     /**
-     * Get students assigned to a specific faculty (by faculty_id)
+     * Get students assigned to a specific faculty (by faculty_id) with GPA
      * Faculty can only see students enrolled in their classes
      */
     public function getStudentsByFaculty(int $facultyId, int $perPage = 15): LengthAwarePaginator
     {
-        return Student::whereHas('classStatuses', function ($query) use ($facultyId) {
+        $students = Student::whereHas('classStatuses', function ($query) use ($facultyId) {
             $query->whereHas('class', function ($classQuery) use ($facultyId) {
                 $classQuery->where('faculty_id', $facultyId);
             });
         })->distinct()->paginate($perPage);
+
+        // Add GPA to each student
+        $students->getCollection()->transform(function ($student) {
+            $student->gpa = $this->gradeService->getStudentGPA($student->student_id);
+            return $student;
+        });
+
+        return $students;
     }
 
     /**
@@ -255,5 +279,16 @@ class StudentService
         ->pluck('organization_type')
         ->unique()
         ->values();
+    }
+
+    /**
+     * Attach GPA (0-4.0 scale) to a collection of students
+     */
+    protected function attachGPAToStudents(Collection $students): Collection
+    {
+        return $students->map(function ($student) {
+            $student->gpa = $this->gradeService->getStudentGPA($student->student_id);
+            return $student;
+        });
     }
 }

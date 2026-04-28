@@ -100,21 +100,36 @@ class GradeService
 
         return [
             'total_students' => $grades->count(),
-            'average_grade' => round($grades->avg('final_grade'), 2),
+            'average_grade' => round($grades->avg('final_grade_numeric'), 2),
             'passed_count' => $grades->where('is_passed', true)->count(),
             'failed_count' => $grades->where('is_passed', false)->count(),
-            'highest_grade' => $grades->max('final_grade'),
-            'lowest_grade' => $grades->min('final_grade'),
+            'highest_grade' => $grades->max('final_grade_numeric'),
+            'lowest_grade' => $grades->min('final_grade_numeric'),
         ];
     }
 
     /**
-     * Get student's average grade
+     * Get student's average grade (0-100 scale)
      */
     public function getStudentAverageGrade(int $studentId): float
     {
-        $average = Grades::where('student_id', $studentId)->avg('final_grade');
+        $average = Grades::where('student_id', $studentId)->avg('final_grade_numeric');
         return $average ? round($average, 2) : 0;
+    }
+
+    /**
+     * Get student's GPA in 4.0 scale (for API responses)
+     * Converts 0-100 scale to 0-4.0 scale
+     */
+    public function getStudentGPA(int $studentId): float
+    {
+        $average = Grades::where('student_id', $studentId)->avg('final_grade_numeric');
+        if (!$average) {
+            return 0;
+        }
+        // Convert 0-100 to 0-4.0: GPA = (average / 25)
+        // 100 = 4.0, 75 = 3.0, 50 = 2.0, 25 = 1.0, 0 = 0.0
+        return round($average / 25, 2);
     }
 
     /**
@@ -141,5 +156,34 @@ class GradeService
             ]);
 
         return $updated > 0;
+    }
+
+    /**
+     * Calculate GPA for a collection of grades (0-100 scale)
+     */
+    public function calculateGPAFromGrades($grades): float
+    {
+        if ($grades->isEmpty()) {
+            return 0;
+        }
+
+        $total = 0;
+        $count = 0;
+
+        foreach ($grades as $grade) {
+            $total += $grade->final_grade_numeric ?? 0;
+            $count++;
+        }
+
+        return $count > 0 ? round($total / $count, 2) : 0;
+    }
+
+    /**
+     * Calculate GPA in 4.0 scale from grades collection
+     */
+    public function calculateGPAFromGradesInScale($grades): float
+    {
+        $gpa_100 = $this->calculateGPAFromGrades($grades);
+        return round($gpa_100 / 25, 2);
     }
 }
