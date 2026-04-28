@@ -138,9 +138,17 @@ export const gradeAPI = {
   getStudentAverageGrade:(studentId)           => apiClient.get(`/grades/student/${studentId}/average`),
   createGrade:           (data)                => apiClient.post('/grades', data),
   updateMidtermGrade:    (studentId, classId, grade) =>
-    apiClient.put(`/grades/student/${studentId}/class/${classId}/midterm`, { grade }),
+    apiClient.put(`/grades/student/${studentId}/class/${classId}/midterm`, { midterm_grade: grade }),
   updateFinalGrade:      (studentId, classId, grade) =>
-    apiClient.put(`/grades/student/${studentId}/class/${classId}/final`, { grade }),
+    apiClient.put(`/grades/student/${studentId}/class/${classId}/final`, { final_grade: grade }),
+  updateGrade:           (studentId, classId, type, grade) => {
+    if (type === 'midterm') {
+      return gradeAPI.updateMidtermGrade(studentId, classId, grade)
+    } else if (type === 'final') {
+      return gradeAPI.updateFinalGrade(studentId, classId, grade)
+    }
+    return Promise.reject(new Error('Invalid grade type'))
+  },
 }
 
 // ---------------------------------------------------------------------------

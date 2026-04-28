@@ -50,23 +50,34 @@ function FacultyGradeManagement({ classes }) {
   }, [selectedClassId, fetchClassData])
 
   const handleGradeChange = (enrollmentId, studentId, type, value) => {
+    // Convert value to number, handling empty strings
+    let numValue = value === '' ? 0 : parseFloat(value)
+    
+    // If parseFloat fails (NaN), default to 0
+    if (isNaN(numValue)) {
+      numValue = 0
+    }
+    
     setEditingGrade({
       enrollmentId,
       studentId,
       type,
-      value: parseFloat(value) || 0
+      value: numValue
     })
   }
 
   const saveGrade = async () => {
     if (!editingGrade) return
 
+    // Validate grade value
+    if (!isValidGrade(editingGrade.value)) {
+      setError('Grade must be a number between 0 and 100')
+      return
+    }
+
     try {
       setError('')
       setSuccess('')
-
-      const data = {}
-      data[editingGrade.type + '_grade'] = editingGrade.value
 
       const response = await gradeAPI.updateGrade(
         editingGrade.studentId,
@@ -92,7 +103,7 @@ function FacultyGradeManagement({ classes }) {
       }
     } catch (err) {
       console.error('Failed to save grade:', err)
-      setError('Error saving grade')
+      setError(err.response?.data?.message || 'Error saving grade')
     }
   }
 
@@ -100,7 +111,7 @@ function FacultyGradeManagement({ classes }) {
 
   const getGrade = (studentId, type) => {
     const grade = grades[studentId]
-    return grade ? grade[type + '_grade'] || '-' : '-'
+    return grade ? grade[type + '_grade'] || '' : ''
   }
 
   const isValidGrade = (value) => {
@@ -111,9 +122,9 @@ function FacultyGradeManagement({ classes }) {
   const calculateAverageGrade = (studentId) => {
     const grade = grades[studentId]
     if (!grade) return '-'
-    const midterm = grade.midterm_grade
-    const final = grade.final_grade
-    if (midterm && final) {
+    const midterm = parseFloat(grade.midterm_grade)
+    const final = parseFloat(grade.final_grade)
+    if (!isNaN(midterm) && !isNaN(final)) {
       const avg = ((midterm + final) / 2).toFixed(2)
       return avg
     }
