@@ -41,7 +41,7 @@ class StudentProfileService
             'affiliations' => $student->affiliations->toArray(),
             'academic_history' => $student->academicHistory->toArray(),
             'non_academic_history' => $student->nonAcademicHistory->toArray(),
-            'medical_records' => $student->medicalRecords ? $student->medicalRecords->toArray() : [],
+            'medical_records' => $student->medicalRecords ? [$student->medicalRecords->toArray()] : [],
             'academic_summary' => [
                 'total_courses' => $student->classStatuses->count(),
                 'completed_courses' => $student->classStatuses->where('enrollment_status', 'Completed')->count(),
@@ -104,6 +104,7 @@ class StudentProfileService
         return [
             'total_courses' => $grades->count(),
             'average_grade' => $grades->avg('final_grade') ?? 0,
+            'gpa' => $this->calculateGPA($student),
             'passed_courses' => $grades->where('is_passed', true)->count(),
             'failed_courses' => $grades->where('is_passed', false)->count(),
             'courses' => $grades->map(function ($grade) {
