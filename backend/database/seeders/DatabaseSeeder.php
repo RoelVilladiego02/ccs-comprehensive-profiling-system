@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             FacultySeeder::class,
             StudentSeeder::class,   // Must run BEFORE ClassSeeder for enrollment
             ClassSeeder::class,     // Now has students to enroll
+            GradesSeeder::class,    // Seeds midterm and final grades for all enrolled students
         ]);
     }
 }
