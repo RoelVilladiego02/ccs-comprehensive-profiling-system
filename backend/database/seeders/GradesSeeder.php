@@ -35,46 +35,36 @@ class GradesSeeder extends Seeder
         $batch = [];
 
         foreach ($enrollments as $enrollment) {
-            // Midterm Grade (40% weight)
-            $midtermScore = $this->generateScore(50, 98); // Midterms typically have wider range
-            $midtermPercentage = $midtermScore / 100 * 100;
+            // Generate midterm grade
+            $midtermGrade = $this->generateScore(50, 98);
 
-            $batch[] = [
-                'student_id' => $enrollment->student_id,
-                'class_id' => $enrollment->class_id,
-                'assessment_type' => 'Midterm',
-                'assessment_name' => 'Midterm Exam',
-                'score' => $midtermScore,
-                'max_score' => 100,
-                'percentage' => $midtermPercentage,
-                'grade_date' => $enrollment->enrollment_date->addWeeks(8)->toDateString(),
-                'remarks' => $this->getRemarks($midtermScore),
-                'final_grade' => null, // No final grade for midterm
-            ];
-
-            // Final Grade (60% weight)
-            $finalScore = $this->generateScore(55, 100); // Final typically has tighter distribution
-            $finalPercentage = $finalScore / 100 * 100;
+            // Generate final grade
+            $finalGrade = $this->generateScore(55, 100);
 
             // Calculate overall grade: (midterm * 0.4) + (final * 0.6)
-            $overallGrade = ($midtermScore * 0.4) + ($finalScore * 0.6);
+            $overallGrade = ($midtermGrade * 0.4) + ($finalGrade * 0.6);
             $gradeLetter = $this->getGradeLetter($overallGrade);
             $isPassed = $overallGrade >= 60; // 60 is passing
 
             $batch[] = [
                 'student_id' => $enrollment->student_id,
                 'class_id' => $enrollment->class_id,
-                'assessment_type' => 'Final',
-                'assessment_name' => 'Final Exam',
-                'score' => $finalScore,
-                'max_score' => 100,
-                'percentage' => $finalPercentage,
-                'grade_date' => $enrollment->enrollment_date->addWeeks(18)->toDateString(),
-                'remarks' => $this->getRemarks($finalScore),
-                'final_grade' => $gradeLetter, // Store grade letter in final_grade column
+                'midterm_grade' => $midtermGrade,
+                'final_grade_numeric' => $finalGrade,
+                'grade_letter' => $gradeLetter,
+                'is_passed' => $isPassed,
+                'remarks' => $this->getRemarks($overallGrade),
+                // Legacy fields (optional, for backwards compatibility)
+                'assessment_type' => null,
+                'assessment_name' => null,
+                'score' => null,
+                'max_score' => null,
+                'percentage' => null,
+                'grade_date' => now()->toDateString(),
+                'final_grade' => $gradeLetter, // Store letter grade in legacy column
             ];
 
-            $totalGrades += 2;
+            $totalGrades++;
 
             // Bulk insert when batch reaches size limit
             if (count($batch) >= $batchSize) {

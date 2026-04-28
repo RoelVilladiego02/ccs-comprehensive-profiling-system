@@ -135,7 +135,7 @@ class GradeService
         $updated = Grades::where('student_id', $studentId)
             ->where('class_id', $classId)
             ->update([
-                'final_grade' => $grade,
+                'final_grade_numeric' => $grade,
                 'is_passed' => $this->calculatePassed($grade),
                 'grade_letter' => $this->calculateGradeLetter($grade),
             ]);
