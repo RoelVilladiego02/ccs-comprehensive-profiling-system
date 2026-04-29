@@ -18,112 +18,30 @@ class SkillsFactory extends Factory
      */
     public function definition(): array
     {
+        // Define proper skill-to-category mappings
+        $skillMapping = [
+            'Programming' => ['PHP', 'JavaScript', 'Python', 'Java', 'C++', 'C#', 'Ruby', 'Go', 'Kotlin', 'Swift'],
+            'Framework' => ['React', 'Vue.js', 'Angular', 'Laravel', 'Django', 'Spring Boot', 'Express.js', 'ASP.NET'],
+            'Database' => ['SQL', 'MongoDB', 'Firebase', 'PostgreSQL', 'MySQL'],
+            'DevOps' => ['Git', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'Google Cloud', 'CI/CD', 'Jenkins', 'GitHub Actions'],
+            'Sports' => ['Basketball', 'Volleyball', 'Football', 'Tennis', 'Badminton', 'Swimming', 'Table Tennis', 'Martial Arts', 'Gymnastics', 'Cricket', 'Baseball', 'Soccer', 'Handball', 'Track and Field', 'Archery'],
+            'Soft Skills' => ['Public Speaking', 'Problem Solving', 'Teamwork', 'Critical Thinking', 'Time Management', 'Presentation Skills', 'Project Management', 'Negotiation', 'Decision Making'],
+            'Leadership' => ['Leadership', 'Mentoring'],
+            'Communication' => ['Communication'],
+            'Technical' => ['Business Intelligence', 'Statistics', 'Data Analysis'],
+            'Data & Analytics' => ['Machine Learning', 'Data Science', 'Tableau', 'Power BI', 'Big Data'],
+            'Design' => ['UI/UX Design', 'Graphic Design', 'Animation'],
+            'Creative' => ['Video Production', 'Photography', 'Digital Marketing', 'Content Writing', 'Copywriting'],
+        ];
+
+        // Randomly select a category, then randomly select a skill from that category
+        $category = $this->faker->randomElement(array_keys($skillMapping));
+        $skillName = $this->faker->randomElement($skillMapping[$category]);
+
         return [
             'student_id' => Student::factory(),
-            'skill_name' => $this->faker->randomElement([
-                // Programming Languages
-                'PHP',
-                'JavaScript',
-                'Python',
-                'Java',
-                'C++',
-                'C#',
-                'Ruby',
-                'Go',
-                'Kotlin',
-                'Swift',
-                
-                // Web Frameworks
-                'React',
-                'Vue.js',
-                'Angular',
-                'Laravel',
-                'Django',
-                'Spring Boot',
-                'Express.js',
-                'ASP.NET',
-                
-                // Database & DevOps
-                'SQL',
-                'MongoDB',
-                'Firebase',
-                'PostgreSQL',
-                'MySQL',
-                'Git',
-                'Docker',
-                'Kubernetes',
-                'AWS',
-                'Azure',
-                'Google Cloud',
-                'CI/CD',
-                'Jenkins',
-                'GitHub Actions',
-                
-                // Sports & Physical Activities
-                'Basketball',
-                'Volleyball',
-                'Football',
-                'Tennis',
-                'Badminton',
-                'Swimming',
-                'Table Tennis',
-                'Martial Arts',
-                'Gymnastics',
-                'Cricket',
-                'Baseball',
-                'Soccer',
-                'Handball',
-                'Track and Field',
-                'Archery',
-                
-                // Soft Skills
-                'Public Speaking',
-                'Leadership',
-                'Problem Solving',
-                'Communication',
-                'Teamwork',
-                'Critical Thinking',
-                'Time Management',
-                'Presentation Skills',
-                'Project Management',
-                'Mentoring',
-                'Negotiation',
-                'Decision Making',
-                
-                // Creative & Design
-                'UI/UX Design',
-                'Graphic Design',
-                'Video Production',
-                'Photography',
-                'Digital Marketing',
-                'Content Writing',
-                'Copywriting',
-                'Animation',
-                
-                // Data & Analytics
-                'Data Analysis',
-                'Machine Learning',
-                'Data Science',
-                'Statistics',
-                'Business Intelligence',
-                'Tableau',
-                'Power BI',
-                'Big Data',
-            ]),
-            'skill_category' => $this->faker->randomElement([
-                'Technical',
-                'Programming',
-                'Framework',
-                'Database',
-                'DevOps',
-                'Soft Skills',
-                'Leadership',
-                'Communication',
-                'Sports',
-                'Design',
-                'Data & Analytics',
-                'Creative'
-            ]),
+            'skill_name' => $skillName,
+            'skill_category' => $category,
             'proficiency_level' => $this->faker->randomElement([
                 'Beginner',
                 'Intermediate',
