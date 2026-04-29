@@ -632,6 +632,77 @@
   border-color: #0d0d0d;
 }
 
+.pagination-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.pagination-stats {
+  color: #0d0d0d;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pagination-stats strong {
+  color: #0d0d0d;
+  font-weight: 700;
+  margin: 0 4px;
+}
+
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.items-per-page label {
+  color: #0d0d0d;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.items-select {
+  padding: 8px 12px;
+  border: 1.5px solid #e2e0db;
+  border-radius: 6px;
+  background: white;
+  color: #0d0d0d;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230d0d0d' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.items-select:hover {
+  border-color: #ff6414;
+}
+
+.items-select:focus {
+  outline: none;
+  border-color: #ff6414;
+  box-shadow: 0 0 0 3px rgba(255, 100, 20, 0.1);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
 /* ============================================================================
    MODAL STYLES
    ============================================================================ */
@@ -889,6 +960,26 @@
   }
 
   .pagination-pages {
+    width: 100%;
+  }
+
+  .pagination-info {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .pagination-stats {
+    width: 100%;
+    text-align: center;
+  }
+
+  .items-per-page {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pagination-controls {
     width: 100%;
   }
 

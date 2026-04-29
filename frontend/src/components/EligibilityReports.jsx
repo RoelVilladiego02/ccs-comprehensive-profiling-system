@@ -26,7 +26,7 @@ function EligibilityReports() {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   // Modal state
   const [showModal, setShowModal] = useState(false)
@@ -225,6 +225,11 @@ function EligibilityReports() {
       // Scroll to table
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setCurrentPage(1) // Reset to first page when changing items per page
+    setItemsPerPage(newItemsPerPage)
   }
 
   // ============================================================================
@@ -767,35 +772,61 @@ function EligibilityReports() {
             )}
 
             {/* Pagination Controls */}
-            {reportGenerated && reportResults.length > 0 && totalPages > 1 && (
+            {reportGenerated && reportResults.length > 0 && (
               <div className="pagination-container">
-                <button
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="pagination-btn"
-                >
-                  ← Previous
-                </button>
-
-                <div className="pagination-pages">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => goToPage(pageNum)}
-                      className={`pagination-page ${pageNum === currentPage ? 'active' : ''}`}
+                <div className="pagination-info">
+                  <span className="pagination-stats">
+                    Showing <strong>{Math.min((currentPage - 1) * itemsPerPage + 1, reportResults.length)}</strong> to <strong>{Math.min(currentPage * itemsPerPage, reportResults.length)}</strong> of <strong>{reportResults.length}</strong> results
+                  </span>
+                  
+                  <div className="items-per-page">
+                    <label htmlFor="items-per-page">Items per page:</label>
+                    <select
+                      id="items-per-page"
+                      value={itemsPerPage}
+                      onChange={(e) => handleItemsPerPageChange(parseInt(e.target.value))}
+                      className="items-select"
                     >
-                      {pageNum}
-                    </button>
-                  ))}
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={15}>15</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </div>
                 </div>
 
-                <button
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="pagination-btn"
-                >
-                  Next →
-                </button>
+                {totalPages > 1 && (
+                  <div className="pagination-controls">
+                    <button
+                      onClick={() => goToPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="pagination-btn"
+                    >
+                      ← Previous
+                    </button>
+
+                    <div className="pagination-pages">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                        <button
+                          key={pageNum}
+                          onClick={() => goToPage(pageNum)}
+                          className={`pagination-page ${pageNum === currentPage ? 'active' : ''}`}
+                        >
+                          {pageNum}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => goToPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="pagination-btn"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
