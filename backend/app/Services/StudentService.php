@@ -309,7 +309,7 @@ class StudentService
                     ->values()
                     ->toArray();
             })
-            ->toArray();
+            ->all();  // ✅ Use all() to preserve string keys like "Sports", "Programming"
 
         return $skills;
     }
@@ -342,7 +342,7 @@ class StudentService
                     ->values()
                     ->toArray();
             })
-            ->toArray();
+            ->all();  // ✅ Use all() to preserve string keys like "Professional", "Sports"
 
         return $affiliations;
     }

@@ -354,7 +354,8 @@ class StudentController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $skillsByCategory,
+            'data' => (object) $skillsByCategory,  // ✅ Cast to object to ensure JSON object format
+        ]);
         ]);
     }
 
@@ -372,7 +373,8 @@ class StudentController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $affiliationsByType,
+            'data' => (object) $affiliationsByType,  // ✅ Cast to object to ensure JSON object format
+        ]);
         ]);
     }
 }
