@@ -5,6 +5,7 @@ import FacultyClassTable from './FacultyClassTable'
 import FacultyStudentsView from './FacultyStudentsView'
 import FacultyGradeManagement from './FacultyGradeManagement'
 import FacultyAttendanceManagement from './FacultyAttendanceManagement'
+import InstructionModule from './InstructionModule'
 import { classAPI } from '../services/api'
 
 function FacultyDashboard({ userData, onLogout }) {
@@ -161,6 +162,12 @@ function FacultyDashboard({ userData, onLogout }) {
               <p className="section-subtitle">Track and record student attendance</p>
             </div>
             <FacultyAttendanceManagement classes={classes} />
+          </div>
+        )}
+
+        {activeSection === 'instruction' && (
+          <div style={{ padding: '0' }}>
+            <InstructionModule userData={userData} onLogout={onLogout} />
           </div>
         )}
       </div>

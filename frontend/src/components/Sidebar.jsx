@@ -20,6 +20,7 @@ function Sidebar({ userRole, userData, onLogout, activeSection, onSectionChange 
       { id: 'dashboard', label: 'Dashboard', icon: '📱' },
       { id: 'students', label: 'Students', icon: '👤', description: 'View & Filter Students' },
       { id: 'classes', label: 'My Classes', icon: '👥' },
+      { id: 'instruction', label: 'Instruction', icon: '📚' },
       { id: 'grades', label: 'Grades', icon: '✏️' },
       { id: 'attendance', label: 'Attendance', icon: '✓' },
     ],
