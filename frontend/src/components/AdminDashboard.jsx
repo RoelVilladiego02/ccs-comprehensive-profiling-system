@@ -14,7 +14,7 @@ import { studentAPI, facultyAPI, courseAPI } from '../services/api'
 import Sidebar from './Sidebar'
 
 function AdminDashboard({ userData, onLogout }) {
-  const [activeSection, setActiveSection] = useState('students')
+  const [activeSection, setActiveSection] = useState('dashboard')
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

@@ -19,8 +19,24 @@ function App() {
 
   // Get user role from userData
   const getUserRole = (data) => {
-    if (!data?.roles || data.roles.length === 0) return null
-    return data.roles[0]?.role_name?.toLowerCase() || null
+    if (!data) return null
+    
+    // Check if roles exist and have items
+    if (!data.roles || data.roles.length === 0) {
+      console.warn('No roles found in user data:', data)
+      return null
+    }
+    
+    // Extract role name from first role
+    const roleName = data.roles[0]?.role_name
+    if (!roleName) {
+      console.warn('No role_name found in first role:', data.roles[0])
+      return null
+    }
+    
+    const lowerCaseRole = roleName.toLowerCase()
+    console.log(`Detected user role: ${roleName} -> ${lowerCaseRole}`)
+    return lowerCaseRole
   }
 
   // Check if user is already logged in on mount - validate with backend
@@ -59,6 +75,8 @@ function App() {
   }, [])
 
   const handleLogin = (data) => {
+    console.log('handleLogin called with data:', data)
+    console.log('User roles:', data?.roles)
     setUserData(data)
     setIsAuthenticated(true)
   }
@@ -81,20 +99,29 @@ function App() {
 
   // Get role-appropriate dashboard route
   const getDashboardRoute = () => {
-    if (!isAuthenticated || !userData) return '/login'
+    if (!isAuthenticated || !userData) {
+      console.log('Cannot determine dashboard route: authenticated=', isAuthenticated, 'userData=', !!userData)
+      return '/login'
+    }
     
     const role = getUserRole(userData)
+    console.log('Determining route for role:', role)
     
     switch(role) {
       case 'admin':
+        console.log('Routing to admin dashboard')
         return '/admin'
       case 'faculty':
+        console.log('Routing to faculty dashboard')
         return '/faculty'
       case 'staff':
+        console.log('Routing to staff dashboard')
         return '/staff'
       case 'student':
+        console.log('Routing to student dashboard')
         return '/student'
       default:
+        console.warn('Unknown role:', role, '- defaulting to student dashboard')
         return '/student'
     }
   }

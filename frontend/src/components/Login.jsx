@@ -30,6 +30,8 @@ function Login({ onLogin }) {
 
       if (response.data.success) {
         const { user, token } = response.data.data
+        console.log('Login successful. User data:', user)
+        console.log('User roles:', user?.roles)
         localStorage.setItem('auth_token', token)
         onLogin({
           ...user,
@@ -64,6 +66,8 @@ function Login({ onLogin }) {
       const response = await authAPI.login(demoEmail, demoPassword)
       if (response.data.success) {
         const { user, token } = response.data.data
+        console.log('Demo login successful. User data:', user)
+        console.log('User roles:', user?.roles)
         localStorage.setItem('auth_token', token)
         onLogin({
           ...user,
