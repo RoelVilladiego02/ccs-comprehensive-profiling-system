@@ -550,6 +550,168 @@ function EligibilityReports() {
               </div>
             )}
 
+            {/* Statistics Dashboard */}
+            {reportGenerated && reportResults.length > 0 && (
+              <div className="statistics-dashboard">
+                {/* Key Metrics */}
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-icon">👥</div>
+                    <div className="stat-content">
+                      <span className="stat-label">Total Students</span>
+                      <span className="stat-value">{reportResults.length}</span>
+                    </div>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="stat-icon">📊</div>
+                    <div className="stat-content">
+                      <span className="stat-label">Average GPA</span>
+                      <span className="stat-value">
+                        {(reportResults.reduce((sum, s) => sum + (s.gpa || 0), 0) / reportResults.length).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="stat-icon">⚠️</div>
+                    <div className="stat-content">
+                      <span className="stat-label">Avg Violations</span>
+                      <span className="stat-value">
+                        {(reportResults.reduce((sum, s) => sum + (s.violationsCount || 0), 0) / reportResults.length).toFixed(1)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="stat-icon">✅</div>
+                    <div className="stat-content">
+                      <span className="stat-label">No Violations</span>
+                      <span className="stat-value">
+                        {reportResults.filter(s => (s.violationsCount || 0) === 0).length}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* GPA Distribution Chart */}
+                <div className="charts-row">
+                  <div className="chart-card">
+                    <h3 className="chart-title">📈 GPA Distribution</h3>
+                    <div className="distribution-chart">
+                      {(() => {
+                        const ranges = [
+                          { label: 'Excellent (3.5-4.0)', min: 3.5, max: 4.0, color: '#4caf50' },
+                          { label: 'Good (3.0-3.49)', min: 3.0, max: 3.49, color: '#8bc34a' },
+                          { label: 'Average (2.5-2.99)', min: 2.5, max: 2.99, color: '#ffc107' },
+                          { label: 'Below Average (2.0-2.49)', min: 2.0, max: 2.49, color: '#ff9800' },
+                          { label: 'At Risk (<2.0)', min: 0, max: 1.99, color: '#f44336' }
+                        ]
+
+                        return ranges.map((range) => {
+                          const count = reportResults.filter(s => s.gpa >= range.min && s.gpa <= range.max).length
+                          const percentage = Math.round((count / reportResults.length) * 100)
+                          return (
+                            <div key={range.label} className="bar-item">
+                              <div className="bar-label">
+                                <span>{range.label}</span>
+                                <span className="bar-count">{count} ({percentage}%)</span>
+                              </div>
+                              <div className="bar-container">
+                                <div
+                                  className="bar-fill"
+                                  style={{
+                                    width: `${percentage}%`,
+                                    backgroundColor: range.color
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )
+                        })
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Violations Distribution Chart */}
+                  <div className="chart-card">
+                    <h3 className="chart-title">⚠️ Violations Status</h3>
+                    <div className="pie-chart">
+                      {(() => {
+                        const noViolations = reportResults.filter(s => (s.violationsCount || 0) === 0).length
+                        const lowViolations = reportResults.filter(s => (s.violationsCount || 0) >= 1 && (s.violationsCount || 0) <= 2).length
+                        const highViolations = reportResults.filter(s => (s.violationsCount || 0) > 2).length
+
+                        const total = reportResults.length
+                        const noPercent = Math.round((noViolations / total) * 100)
+                        const lowPercent = Math.round((lowViolations / total) * 100)
+                        const highPercent = Math.round((highViolations / total) * 100)
+
+                        return (
+                          <div className="violation-items">
+                            <div className="violation-item">
+                              <div className="violation-bar" style={{ backgroundColor: '#4caf50', width: '100%' }}>
+                                <span className="violation-label">No Violations</span>
+                              </div>
+                              <span className="violation-stat">{noViolations} ({noPercent}%)</span>
+                            </div>
+                            <div className="violation-item">
+                              <div className="violation-bar" style={{ backgroundColor: '#ffc107', width: '100%' }}>
+                                <span className="violation-label">1-2 Violations</span>
+                              </div>
+                              <span className="violation-stat">{lowViolations} ({lowPercent}%)</span>
+                            </div>
+                            <div className="violation-item">
+                              <div className="violation-bar" style={{ backgroundColor: '#f44336', width: '100%' }}>
+                                <span className="violation-label">3+ Violations</span>
+                              </div>
+                              <span className="violation-stat">{highViolations} ({highPercent}%)</span>
+                            </div>
+                          </div>
+                        )
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Enrollment Status Distribution */}
+                  <div className="chart-card">
+                    <h3 className="chart-title">📚 Enrollment Status</h3>
+                    <div className="status-distribution">
+                      {(() => {
+                        const statuses = {}
+                        reportResults.forEach(s => {
+                          const status = s.student_identification || 'Active'
+                          statuses[status] = (statuses[status] || 0) + 1
+                        })
+
+                        const statusColors = {
+                          'Regular': '#2196f3',
+                          'Irregular': '#ff9800',
+                          'Graduated': '#9c27b0',
+                          'On Leave': '#ffc107',
+                          'Dropped': '#f44336',
+                          'Active': '#4caf50'
+                        }
+
+                        return Object.entries(statuses).map(([status, count]) => {
+                          const percentage = Math.round((count / reportResults.length) * 100)
+                          return (
+                            <div key={status} className="status-row">
+                              <div className="status-info">
+                                <div className="status-dot" style={{ backgroundColor: statusColors[status] || '#999' }} />
+                                <span className="status-text">{status}</span>
+                              </div>
+                              <span className="status-count">{count} ({percentage}%)</span>
+                            </div>
+                          )
+                        })
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {reportGenerated && reportResults.length > 0 && (
               <div className="results-table-wrapper">
                 <table className="results-table">
