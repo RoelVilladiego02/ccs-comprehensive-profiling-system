@@ -25,13 +25,11 @@ function Sidebar({ userRole, userData, onLogout, activeSection, onSectionChange 
     ],
     admin: [
       { id: 'dashboard', label: 'Dashboard', icon: '⚙️' },
-      { id: 'users', label: 'Users', icon: '👥' },
       { id: 'students', label: 'Students', icon: '👤' },
       { id: 'faculty', label: 'Faculty', icon: '🎓' },
       { id: 'courses', label: 'Courses', icon: '📚' },
       { id: 'scheduling', label: 'Scheduling', icon: '📅' },
       { id: 'eligibility-reports', label: 'Eligibility Reports', icon: '📊' },
-      { id: 'settings', label: 'System Settings', icon: '⚙️' },
     ],
     staff: [
       { id: 'dashboard', label: 'Dashboard', icon: '📱' },
