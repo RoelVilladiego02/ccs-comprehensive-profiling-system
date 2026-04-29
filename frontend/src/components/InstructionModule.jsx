@@ -119,28 +119,6 @@ function InstructionModule({ userData, onLogout }) {
 
   return (
     <div className="student-dashboard">
-      <div className="dashboard-header">
-        <div className="header-left">
-          <h1>Instruction Module</h1>
-          <p className="subtitle">Course syllabus and curriculum management</p>
-        </div>
-        <div className="header-right">
-          {userData && (
-            <div className="user-info">
-              <span className="user-label">Logged in as:</span>
-              <span className="user-id">{userData.name}</span>
-              <button
-                className="logout-btn"
-                onClick={onLogout}
-                title="Logout from dashboard"
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="module-container">
         <div className="module-sidebar">
           <h3>Instruction Module</h3>
