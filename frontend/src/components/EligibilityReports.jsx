@@ -45,11 +45,23 @@ function EligibilityReports() {
           studentAPI.getAffiliationsByType(),
         ])
         
-        const skillsByCtg = skillsByCategoryRes.data?.data || {}
-        const affiliationsByTp = affiliationsByTypeRes.data?.data || {}
+        let skillsByCtg = skillsByCategoryRes.data?.data || {}
+        let affiliationsByTp = affiliationsByTypeRes.data?.data || {}
         
-        console.log('Skills by Category:', skillsByCtg)
-        console.log('Affiliations by Type:', affiliationsByTp)
+        // Ensure data is an object, not an array
+        if (Array.isArray(skillsByCtg)) {
+          console.warn('Skills by Category is an array, converting to object:', skillsByCtg)
+          skillsByCtg = {}
+        }
+        if (Array.isArray(affiliationsByTp)) {
+          console.warn('Affiliations by Type is an array, converting to object:', affiliationsByTp)
+          affiliationsByTp = {}
+        }
+        
+        console.log('Final Skills by Category (object):', skillsByCtg)
+        console.log('Skills keys:', Object.keys(skillsByCtg))
+        console.log('Final Affiliations by Type (object):', affiliationsByTp)
+        console.log('Affiliations keys:', Object.keys(affiliationsByTp))
         
         setAvailableSkills(skillsRes.data?.data || [])
         setAvailableAffiliations(affiliationsRes.data?.data || [])
@@ -314,17 +326,29 @@ function EligibilityReports() {
                     <select
                       id="skill-select"
                       value={selectedSkill}
-                      onChange={(e) => setSelectedSkill(e.target.value)}
+                      onChange={(e) => {
+                        console.log('Selected skill:', e.target.value)
+                        setSelectedSkill(e.target.value)
+                      }}
                       disabled={!selectedSkillCategory}
                       className="filter-select"
                     >
                       <option value="">-- Choose a skill --</option>
-                      {selectedSkillCategory && Array.isArray(skillsByCategory[selectedSkillCategory]) ? (
-                        skillsByCategory[selectedSkillCategory].map((skill) => (
-                          <option key={skill} value={skill}>
-                            {skill}
-                          </option>
-                        ))
+                      {selectedSkillCategory ? (
+                        (() => {
+                          const skillsForCategory = skillsByCategory[selectedSkillCategory]
+                          console.log(`Skills for category "${selectedSkillCategory}":`, skillsForCategory)
+                          
+                          if (!Array.isArray(skillsForCategory) || skillsForCategory.length === 0) {
+                            return <option disabled>No skills available</option>
+                          }
+                          
+                          return skillsForCategory.map((skill) => (
+                            <option key={skill} value={skill}>
+                              {skill}
+                            </option>
+                          ))
+                        })()
                       ) : null}
                     </select>
                   </div>
@@ -365,17 +389,29 @@ function EligibilityReports() {
                     <select
                       id="affiliation-select"
                       value={selectedAffiliation}
-                      onChange={(e) => setSelectedAffiliation(e.target.value)}
+                      onChange={(e) => {
+                        console.log('Selected affiliation:', e.target.value)
+                        setSelectedAffiliation(e.target.value)
+                      }}
                       disabled={!selectedAffiliationType}
                       className="filter-select"
                     >
                       <option value="">-- Choose an affiliation --</option>
-                      {selectedAffiliationType && Array.isArray(affiliationsByType[selectedAffiliationType]) ? (
-                        affiliationsByType[selectedAffiliationType].map((affiliation) => (
-                          <option key={affiliation} value={affiliation}>
-                            {affiliation}
-                          </option>
-                        ))
+                      {selectedAffiliationType ? (
+                        (() => {
+                          const affiliationsForType = affiliationsByType[selectedAffiliationType]
+                          console.log(`Affiliations for type "${selectedAffiliationType}":`, affiliationsForType)
+                          
+                          if (!Array.isArray(affiliationsForType) || affiliationsForType.length === 0) {
+                            return <option disabled>No affiliations available</option>
+                          }
+                          
+                          return affiliationsForType.map((affiliation) => (
+                            <option key={affiliation} value={affiliation}>
+                              {affiliation}
+                            </option>
+                          ))
+                        })()
                       ) : null}
                     </select>
                   </div>
