@@ -455,6 +455,7 @@ function EligibilityReports() {
                 className="example-btn"
                 onClick={() => {
                   setReportType('skill')
+                  setSelectedSkillCategory('Sports')
                   setSelectedSkill('Basketball')
                   setMinGPA(0)
                   setMaxViolations(10)
@@ -466,7 +467,8 @@ function EligibilityReports() {
                 className="example-btn"
                 onClick={() => {
                   setReportType('skill')
-                  setSelectedSkill('Programming')
+                  setSelectedSkillCategory('Programming')
+                  setSelectedSkill('JavaScript')
                   setMinGPA(2.5)
                   setMaxViolations(2)
                 }}
