@@ -339,4 +339,40 @@ class StudentController extends Controller
             'data' => $affiliationTypes,
         ]);
     }
+
+    /**
+     * GET /api/students/filter/skills-by-category
+     * Get skills grouped by category for cascading dropdown
+     * Returns: { "Communication": ["Basketball", "Leadership"], "Technical": ["Programming", ...] }
+     * If user is faculty, only returns skills from their students
+     */
+    public function getSkillsByCategory(Request $request): JsonResponse
+    {
+        $facultyId = $this->getFacultyIdIfFaculty($request);
+        
+        $skillsByCategory = $this->studentService->getSkillsByCategory($facultyId);
+
+        return response()->json([
+            'success' => true,
+            'data' => $skillsByCategory,
+        ]);
+    }
+
+    /**
+     * GET /api/students/filter/affiliations-by-type
+     * Get affiliations grouped by organization type for cascading dropdown
+     * Returns: { "Professional": ["Org A", "Org B"], "Sports": ["Club X", ...] }
+     * If user is faculty, only returns affiliations from their students
+     */
+    public function getAffiliationsByType(Request $request): JsonResponse
+    {
+        $facultyId = $this->getFacultyIdIfFaculty($request);
+        
+        $affiliationsByType = $this->studentService->getAffiliationsByType($facultyId);
+
+        return response()->json([
+            'success' => true,
+            'data' => $affiliationsByType,
+        ]);
+    }
 }

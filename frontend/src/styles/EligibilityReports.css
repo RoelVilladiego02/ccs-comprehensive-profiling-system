@@ -923,3 +923,55 @@
     font-size: 1.2rem;
   }
 }
+
+/* ============================================================================
+   CASCADING DROPDOWNS STYLES
+   ============================================================================ */
+
+.cascading-dropdowns {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dropdown-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dropdown-pair label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #0d0d0d;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dropdown-pair label .text-muted {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: #999;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.filter-select:disabled {
+  background-color: #e2e0db;
+  color: #999;
+  cursor: not-allowed;
+  border-color: #d0cec8;
+}
+
+.filter-select:disabled:focus {
+  border-color: #d0cec8;
+  box-shadow: none;
+}
+
+/* Visual indicator for cascading relationship */
+.cascading-dropdowns::before {
+  content: '→';
+  display: none;
+}
+

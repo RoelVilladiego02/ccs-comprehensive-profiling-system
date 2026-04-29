@@ -7,12 +7,16 @@ function EligibilityReports() {
   // STATE MANAGEMENT
   // ============================================================================
   const [reportType, setReportType] = useState('skill') // 'skill', 'affiliation', 'combined', 'academic'
+  const [selectedSkillCategory, setSelectedSkillCategory] = useState('')
   const [selectedSkill, setSelectedSkill] = useState('')
+  const [selectedAffiliationType, setSelectedAffiliationType] = useState('')
   const [selectedAffiliation, setSelectedAffiliation] = useState('')
   const [minGPA, setMinGPA] = useState(0)
   const [enrollmentStatus, setEnrollmentStatus] = useState('Regular')
   const [maxViolations, setMaxViolations] = useState(10)
 
+  const [skillsByCategory, setSkillsByCategory] = useState({}) // Grouped skills: { "Communication": ["Basketball", ...], ...}
+  const [affiliationsByType, setAffiliationsByType] = useState({}) // Grouped affiliations: { "Professional": ["Org A", ...], ...}
   const [availableSkills, setAvailableSkills] = useState([])
   const [availableAffiliations, setAvailableAffiliations] = useState([])
   const [reportResults, setReportResults] = useState([])
@@ -29,18 +33,22 @@ function EligibilityReports() {
   const [selectedStudent, setSelectedStudent] = useState(null)
 
   // ============================================================================
-  // LOAD AVAILABLE SKILLS AND AFFILIATIONS
+  // LOAD AVAILABLE SKILLS AND AFFILIATIONS (BOTH FORMATS)
   // ============================================================================
   useEffect(() => {
     const loadFiltersData = async () => {
       try {
-        const [skillsRes, affiliationsRes] = await Promise.all([
+        const [skillsRes, affiliationsRes, skillsByCategoryRes, affiliationsByTypeRes] = await Promise.all([
           studentAPI.getAvailableSkills(),
           studentAPI.getAvailableAffiliations(),
+          studentAPI.getSkillsByCategory(),
+          studentAPI.getAffiliationsByType(),
         ])
         
         setAvailableSkills(skillsRes.data?.data || [])
         setAvailableAffiliations(affiliationsRes.data?.data || [])
+        setSkillsByCategory(skillsByCategoryRes.data?.data || {})
+        setAffiliationsByType(affiliationsByTypeRes.data?.data || {})
       } catch (err) {
         console.error('Error loading filter data:', err)
         setError('Failed to load filter options')
@@ -268,45 +276,101 @@ function EligibilityReports() {
               </div>
             </div>
 
-            {/* Skill Selection */}
+            {/* Skill Selection - Cascading Dropdowns */}
             {(reportType === 'skill' || reportType === 'combined') && (
               <div className="filter-group">
-                <label htmlFor="skill-select">Select Skill</label>
-                <select
-                  id="skill-select"
-                  value={selectedSkill}
-                  onChange={(e) => setSelectedSkill(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">-- Choose a skill --</option>
-                  {availableSkills.map((skill) => (
-                    <option key={skill} value={skill}>
-                      {skill}
-                    </option>
-                  ))}
-                </select>
-                <small>Example skills: Basketball, Programming, Leadership</small>
+                <div className="cascading-dropdowns">
+                  <div className="dropdown-pair">
+                    <label htmlFor="skill-category-select">Skill Category</label>
+                    <select
+                      id="skill-category-select"
+                      value={selectedSkillCategory}
+                      onChange={(e) => {
+                        setSelectedSkillCategory(e.target.value)
+                        setSelectedSkill('') // Reset skill when category changes
+                      }}
+                      className="filter-select"
+                    >
+                      <option value="">-- Choose a category --</option>
+                      {Object.keys(skillsByCategory).map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="dropdown-pair">
+                    <label htmlFor="skill-select">
+                      Skill Name
+                      {!selectedSkillCategory && <span className="text-muted"> (Select category first)</span>}
+                    </label>
+                    <select
+                      id="skill-select"
+                      value={selectedSkill}
+                      onChange={(e) => setSelectedSkill(e.target.value)}
+                      disabled={!selectedSkillCategory}
+                      className="filter-select"
+                    >
+                      <option value="">-- Choose a skill --</option>
+                      {selectedSkillCategory && skillsByCategory[selectedSkillCategory]?.map((skill) => (
+                        <option key={skill} value={skill}>
+                          {skill}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <small>Example: Category: "Sports" → Skill: "Basketball"</small>
               </div>
             )}
 
-            {/* Affiliation Selection */}
+            {/* Affiliation Selection - Cascading Dropdowns */}
             {(reportType === 'affiliation' || reportType === 'combined') && (
               <div className="filter-group">
-                <label htmlFor="affiliation-select">Select Affiliation</label>
-                <select
-                  id="affiliation-select"
-                  value={selectedAffiliation}
-                  onChange={(e) => setSelectedAffiliation(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">-- Choose an affiliation --</option>
-                  {availableAffiliations.map((affiliation) => (
-                    <option key={affiliation} value={affiliation}>
-                      {affiliation}
-                    </option>
-                  ))}
-                </select>
-                <small>Example affiliations: Basketball Club, Programming Club</small>
+                <div className="cascading-dropdowns">
+                  <div className="dropdown-pair">
+                    <label htmlFor="affiliation-type-select">Affiliation Type</label>
+                    <select
+                      id="affiliation-type-select"
+                      value={selectedAffiliationType}
+                      onChange={(e) => {
+                        setSelectedAffiliationType(e.target.value)
+                        setSelectedAffiliation('') // Reset affiliation when type changes
+                      }}
+                      className="filter-select"
+                    >
+                      <option value="">-- Choose a type --</option>
+                      {Object.keys(affiliationsByType).map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="dropdown-pair">
+                    <label htmlFor="affiliation-select">
+                      Organization Name
+                      {!selectedAffiliationType && <span className="text-muted"> (Select type first)</span>}
+                    </label>
+                    <select
+                      id="affiliation-select"
+                      value={selectedAffiliation}
+                      onChange={(e) => setSelectedAffiliation(e.target.value)}
+                      disabled={!selectedAffiliationType}
+                      className="filter-select"
+                    >
+                      <option value="">-- Choose an affiliation --</option>
+                      {selectedAffiliationType && affiliationsByType[selectedAffiliationType]?.map((affiliation) => (
+                        <option key={affiliation} value={affiliation}>
+                          {affiliation}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <small>Example: Type: "Professional" → Org: "Stamm, O'Conner and Gottlieb Group"</small>
               </div>
             )}
 
@@ -383,7 +447,7 @@ function EligibilityReports() {
                   setReportType('skill')
                   setSelectedSkill('Basketball')
                   setMinGPA(0)
-                  setMaxViolations(999)
+                  setMaxViolations(10)
                 }}
               >
                 Basketball Try-outs

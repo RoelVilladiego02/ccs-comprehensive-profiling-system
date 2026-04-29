@@ -78,6 +78,8 @@ export const studentAPI = {
   getByAffiliation:        (affiliation)  => apiClient.get('/students/filter/affiliations', { params: { affiliation } }),
   getAvailableSkills:      ()             => apiClient.get('/students/filter/skills-list'),
   getAvailableAffiliations:()             => apiClient.get('/students/filter/affiliations-list'),
+  getSkillsByCategory:     ()             => apiClient.get('/students/filter/skills-by-category'),
+  getAffiliationsByType:   ()             => apiClient.get('/students/filter/affiliations-by-type'),
 }
 
 // ---------------------------------------------------------------------------

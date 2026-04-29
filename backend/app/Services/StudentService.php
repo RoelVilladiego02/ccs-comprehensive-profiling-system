@@ -282,6 +282,62 @@ class StudentService
     }
 
     /**
+     * Get skills grouped by category with all skill names
+     * Format: { "Communication": ["Basketball", "Leadership"], "Technical": ["Programming", ...] }
+     */
+    public function getSkillsByCategory(int $facultyId = null): array
+    {
+        $query = \App\Models\Skills::query();
+
+        if ($facultyId) {
+            $query->whereHas('student', function ($q) use ($facultyId) {
+                $q->whereHas('classStatuses', function ($classQ) use ($facultyId) {
+                    $classQ->whereHas('class', function ($cQ) use ($facultyId) {
+                        $cQ->where('faculty_id', $facultyId);
+                    });
+                });
+            });
+        }
+
+        $skills = $query->select('skill_category', 'skill_name')
+            ->distinct()
+            ->get()
+            ->groupBy('skill_category')
+            ->map(fn($group) => $group->pluck('skill_name')->unique()->values()->toArray())
+            ->toArray();
+
+        return $skills;
+    }
+
+    /**
+     * Get affiliations grouped by organization type with all organization names
+     * Format: { "Professional": ["Org A", "Org B"], "Sports": ["Club X", ...] }
+     */
+    public function getAffiliationsByType(int $facultyId = null): array
+    {
+        $query = \App\Models\Affiliation::query();
+
+        if ($facultyId) {
+            $query->whereHas('student', function ($q) use ($facultyId) {
+                $q->whereHas('classStatuses', function ($classQ) use ($facultyId) {
+                    $classQ->whereHas('class', function ($cQ) use ($facultyId) {
+                        $cQ->where('faculty_id', $facultyId);
+                    });
+                });
+            });
+        }
+
+        $affiliations = $query->select('organization_type', 'organization_name')
+            ->distinct()
+            ->get()
+            ->groupBy('organization_type')
+            ->map(fn($group) => $group->pluck('organization_name')->unique()->values()->toArray())
+            ->toArray();
+
+        return $affiliations;
+    }
+
+    /**
      * Attach GPA (0-4.0 scale) to a collection of students
      */
     protected function attachGPAToStudents(Collection $students): Collection

@@ -68,6 +68,8 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::get('/filter/affiliations', [StudentController::class, 'getByAffiliation']);
         Route::get('/filter/skills-list', [StudentController::class, 'getAvailableSkills']);
         Route::get('/filter/affiliations-list', [StudentController::class, 'getAvailableAffiliationTypes']);
+        Route::get('/filter/skills-by-category', [StudentController::class, 'getSkillsByCategory']);
+        Route::get('/filter/affiliations-by-type', [StudentController::class, 'getAffiliationsByType']);
         Route::post('/', [StudentController::class, 'store'])->middleware('permission:students.create');
         Route::get('/{id}', [StudentController::class, 'show']);
         Route::put('/{id}', [StudentController::class, 'update'])->middleware('permission:students.edit');
