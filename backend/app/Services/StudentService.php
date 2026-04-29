@@ -299,11 +299,16 @@ class StudentService
             });
         }
 
+        // Get all skills and group them by category
         $skills = $query->select('skill_category', 'skill_name')
-            ->distinct()
             ->get()
             ->groupBy('skill_category')
-            ->map(fn($group) => $group->pluck('skill_name')->unique()->values()->toArray())
+            ->map(function($group) {
+                return $group->pluck('skill_name')
+                    ->unique()
+                    ->values()
+                    ->toArray();
+            })
             ->toArray();
 
         return $skills;
@@ -327,11 +332,16 @@ class StudentService
             });
         }
 
+        // Get all affiliations and group them by organization type
         $affiliations = $query->select('organization_type', 'organization_name')
-            ->distinct()
             ->get()
             ->groupBy('organization_type')
-            ->map(fn($group) => $group->pluck('organization_name')->unique()->values()->toArray())
+            ->map(function($group) {
+                return $group->pluck('organization_name')
+                    ->unique()
+                    ->values()
+                    ->toArray();
+            })
             ->toArray();
 
         return $affiliations;

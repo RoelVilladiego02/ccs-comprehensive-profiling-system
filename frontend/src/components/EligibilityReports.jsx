@@ -45,10 +45,16 @@ function EligibilityReports() {
           studentAPI.getAffiliationsByType(),
         ])
         
+        const skillsByCtg = skillsByCategoryRes.data?.data || {}
+        const affiliationsByTp = affiliationsByTypeRes.data?.data || {}
+        
+        console.log('Skills by Category:', skillsByCtg)
+        console.log('Affiliations by Type:', affiliationsByTp)
+        
         setAvailableSkills(skillsRes.data?.data || [])
         setAvailableAffiliations(affiliationsRes.data?.data || [])
-        setSkillsByCategory(skillsByCategoryRes.data?.data || {})
-        setAffiliationsByType(affiliationsByTypeRes.data?.data || {})
+        setSkillsByCategory(skillsByCtg)
+        setAffiliationsByType(affiliationsByTp)
       } catch (err) {
         console.error('Error loading filter data:', err)
         setError('Failed to load filter options')
@@ -313,11 +319,13 @@ function EligibilityReports() {
                       className="filter-select"
                     >
                       <option value="">-- Choose a skill --</option>
-                      {selectedSkillCategory && skillsByCategory[selectedSkillCategory]?.map((skill) => (
-                        <option key={skill} value={skill}>
-                          {skill}
-                        </option>
-                      ))}
+                      {selectedSkillCategory && Array.isArray(skillsByCategory[selectedSkillCategory]) ? (
+                        skillsByCategory[selectedSkillCategory].map((skill) => (
+                          <option key={skill} value={skill}>
+                            {skill}
+                          </option>
+                        ))
+                      ) : null}
                     </select>
                   </div>
                 </div>
@@ -362,11 +370,13 @@ function EligibilityReports() {
                       className="filter-select"
                     >
                       <option value="">-- Choose an affiliation --</option>
-                      {selectedAffiliationType && affiliationsByType[selectedAffiliationType]?.map((affiliation) => (
-                        <option key={affiliation} value={affiliation}>
-                          {affiliation}
-                        </option>
-                      ))}
+                      {selectedAffiliationType && Array.isArray(affiliationsByType[selectedAffiliationType]) ? (
+                        affiliationsByType[selectedAffiliationType].map((affiliation) => (
+                          <option key={affiliation} value={affiliation}>
+                            {affiliation}
+                          </option>
+                        ))
+                      ) : null}
                     </select>
                   </div>
                 </div>

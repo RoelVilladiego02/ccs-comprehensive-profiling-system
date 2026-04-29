@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
 
     // ====== Student Routes (Require Permission) ======
     Route::prefix('students')->middleware('permission:students.view')->group(function () {
-        Route::get('/', [StudentController::class, 'index']);
+        // Specific filter and search routes MUST come before the catch-all /{id} route
         Route::get('/search', [StudentController::class, 'search']);
         Route::get('/filter/skills', [StudentController::class, 'getBySkill']);
         Route::get('/filter/affiliations', [StudentController::class, 'getByAffiliation']);
@@ -70,11 +70,14 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::get('/filter/affiliations-list', [StudentController::class, 'getAvailableAffiliationTypes']);
         Route::get('/filter/skills-by-category', [StudentController::class, 'getSkillsByCategory']);
         Route::get('/filter/affiliations-by-type', [StudentController::class, 'getAffiliationsByType']);
+        Route::get('/status/{status}', [StudentController::class, 'getByStatus']);
+        
+        // General routes
+        Route::get('/', [StudentController::class, 'index']);
         Route::post('/', [StudentController::class, 'store'])->middleware('permission:students.create');
         Route::get('/{id}', [StudentController::class, 'show']);
         Route::put('/{id}', [StudentController::class, 'update'])->middleware('permission:students.edit');
         Route::delete('/{id}', [StudentController::class, 'destroy'])->middleware('permission:students.delete');
-        Route::get('/status/{status}', [StudentController::class, 'getByStatus']);
 
         // Student Profile Routes
         Route::get('/{studentId}/profile', [StudentProfileController::class, 'getProfile'])->middleware('permission:students.view_profile');
