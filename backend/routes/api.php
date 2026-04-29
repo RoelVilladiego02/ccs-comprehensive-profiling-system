@@ -19,6 +19,8 @@ use App\Http\Controllers\AcademicHistoryController;
 use App\Http\Controllers\NonAcademicHistoryController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\LessonController;
+use App\Http\Controllers\CurriculumController;
 
 /*
 |--------------------------------------------------------------------------
@@ -221,6 +223,30 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         // Event Statistics
         Route::get('/{eventId}/statistics', [EventController::class, 'getStatistics']);
         Route::get('/{eventId}/top-performers', [EventController::class, 'getTopPerformers']);
+    });
+
+    // ====== Lessons Routes (Require Permission) ======
+    Route::prefix('lessons')->middleware('permission:courses.view')->group(function () {
+        Route::get('/', [LessonController::class, 'index']);
+        Route::get('/search', [LessonController::class, 'search']);
+        Route::get('/active', [LessonController::class, 'getActive']);
+        Route::post('/', [LessonController::class, 'store'])->middleware('permission:courses.create');
+        Route::get('/{id}', [LessonController::class, 'show']);
+        Route::put('/{id}', [LessonController::class, 'update'])->middleware('permission:courses.edit');
+        Route::delete('/{id}', [LessonController::class, 'destroy'])->middleware('permission:courses.delete');
+        Route::get('/syllabus/{syllabusId}', [LessonController::class, 'getBySyllabus']);
+    });
+
+    // ====== Curriculum Routes (Require Permission) ======
+    Route::prefix('curriculum')->middleware('permission:courses.view')->group(function () {
+        Route::get('/', [CurriculumController::class, 'index']);
+        Route::get('/search', [CurriculumController::class, 'search']);
+        Route::get('/active', [CurriculumController::class, 'getActive']);
+        Route::post('/', [CurriculumController::class, 'store'])->middleware('permission:courses.create');
+        Route::get('/{id}', [CurriculumController::class, 'show']);
+        Route::put('/{id}', [CurriculumController::class, 'update'])->middleware('permission:courses.edit');
+        Route::delete('/{id}', [CurriculumController::class, 'destroy'])->middleware('permission:courses.delete');
+        Route::get('/department/{department}', [CurriculumController::class, 'getByDepartment']);
     });
 });
 
