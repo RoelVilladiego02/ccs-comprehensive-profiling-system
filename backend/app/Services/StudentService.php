@@ -138,7 +138,7 @@ class StudentService
     public function getStudentsByAffiliation(string $affiliationType): Collection
     {
         return Student::whereHas('affiliations', function ($query) use ($affiliationType) {
-            $query->where('affiliation_type', 'like', "%{$affiliationType}%");
+            $query->where('organization_type', 'like', "%{$affiliationType}%");
         })
         ->with('affiliations')
         ->get();
@@ -236,7 +236,7 @@ class StudentService
             });
         })
         ->whereHas('affiliations', function ($query) use ($affiliationType) {
-            $query->where('affiliation_type', 'like', "%{$affiliationType}%");
+            $query->where('organization_type', 'like', "%{$affiliationType}%");
         })
         ->with('affiliations')
         ->distinct()

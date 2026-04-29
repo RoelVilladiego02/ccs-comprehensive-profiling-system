@@ -621,7 +621,7 @@ function EligibilityReports() {
                     <div className="affiliations-list">
                       {selectedStudent.affiliations.map((affiliation, idx) => (
                         <div key={idx} className="affiliation-item">
-                          {typeof affiliation === 'string' ? affiliation : (affiliation?.affiliation_name || affiliation?.name || 'Unknown')}
+                          {typeof affiliation === 'string' ? affiliation : (affiliation?.organization_name || 'Unknown')}
                         </div>
                       ))}
                     </div>
