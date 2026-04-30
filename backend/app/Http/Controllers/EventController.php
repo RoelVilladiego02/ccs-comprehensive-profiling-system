@@ -250,8 +250,18 @@ class EventController extends Controller
      * POST /api/events/{eventId}/register/{studentId}
      * Register student for event
      */
-    public function registerStudent(int $eventId, int $studentId): JsonResponse
+    public function registerStudent(Request $request, int $eventId, int $studentId): JsonResponse
     {
+        $user = $request->user();
+        
+        // Authorization: Students can only register themselves, admins/staff can register anyone
+        if ($user->hasRole('Student') && $user->id !== $studentId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Forbidden - You can only register yourself for events',
+            ], 403);
+        }
+
         $success = $this->eventService->registerStudentForEvent($studentId, $eventId);
 
         if (!$success) {
@@ -271,8 +281,18 @@ class EventController extends Controller
      * DELETE /api/events/{eventId}/unregister/{studentId}
      * Unregister student from event
      */
-    public function unregisterStudent(int $eventId, int $studentId): JsonResponse
+    public function unregisterStudent(Request $request, int $eventId, int $studentId): JsonResponse
     {
+        $user = $request->user();
+        
+        // Authorization: Students can only unregister themselves, admins/staff can unregister anyone
+        if ($user->hasRole('Student') && $user->id !== $studentId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Forbidden - You can only unregister yourself from events',
+            ], 403);
+        }
+
         $success = $this->eventService->unregisterStudentFromEvent($studentId, $eventId);
 
         if (!$success) {
