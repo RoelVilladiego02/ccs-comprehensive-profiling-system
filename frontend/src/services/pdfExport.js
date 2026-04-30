@@ -91,7 +91,7 @@ export const exportEligibilityReportToPDF = async (reportType, students, filters
     doc.setFontSize(11)
     doc.setFont(undefined, 'bold')
     doc.setTextColor(...colors.primary)
-    doc.text('📋 Report Criteria', margin, yPosition)
+    doc.text('REPORT CRITERIA', margin, yPosition)
     yPosition += 6
 
     doc.setFontSize(9)
@@ -140,7 +140,7 @@ export const exportEligibilityReportToPDF = async (reportType, students, filters
     // ============================================================================
     doc.setFontSize(11)
     doc.setFont(undefined, 'bold')
-    doc.text('📊 Summary', margin, yPosition)
+    doc.text('SUMMARY', margin, yPosition)
     yPosition += 6
 
     doc.setFontSize(9)
@@ -413,7 +413,7 @@ export const exportStudentProfilePDF = (student) => {
     doc.setFontSize(11)
     doc.setFont(undefined, 'bold')
     doc.setTextColor(...colors.primary)
-    doc.text('👤 PERSONAL INFORMATION', margin, yPosition)
+    doc.text('PERSONAL INFORMATION', margin, yPosition)
     yPosition += 6
 
     // Create info box
@@ -466,7 +466,7 @@ export const exportStudentProfilePDF = (student) => {
     doc.setFontSize(11)
     doc.setFont(undefined, 'bold')
     doc.setTextColor(...colors.primary)
-    doc.text('🎓 ACADEMIC PERFORMANCE', margin, yPosition)
+    doc.text('ACADEMIC PERFORMANCE', margin, yPosition)
     yPosition += 6
 
     // GPA and Violations in colored boxes
@@ -516,7 +516,7 @@ export const exportStudentProfilePDF = (student) => {
       doc.setFontSize(11)
       doc.setFont(undefined, 'bold')
       doc.setTextColor(...colors.primary)
-      doc.text('🎯 SKILLS', margin, yPosition)
+      doc.text('SKILLS', margin, yPosition)
       yPosition += 6
 
       doc.setFontSize(9)
@@ -548,7 +548,7 @@ export const exportStudentProfilePDF = (student) => {
       doc.setFontSize(11)
       doc.setFont(undefined, 'bold')
       doc.setTextColor(...colors.primary)
-      doc.text('🏢 AFFILIATIONS', margin, yPosition)
+      doc.text('AFFILIATIONS', margin, yPosition)
       yPosition += 6
 
       doc.setFontSize(9)
