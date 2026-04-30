@@ -3,6 +3,10 @@ import '../styles/Module.css'
 import { courseAPI, lessonAPI, curriculumAPI } from '../services/api'
 
 function InstructionModule({ userData, onLogout }) {
+  const userRole = userData?.roles?.[0]?.role_name?.toLowerCase() || 'student'
+  const isAdmin = userRole === 'admin' || userRole === 'staff'
+  const isStudent = userRole === 'student'
+  
   const [activeTab, setActiveTab] = useState('syllabus')
   const [courses, setCourses] = useState([])
   const [lessons, setLessons] = useState([])
@@ -377,19 +381,21 @@ function InstructionModule({ userData, onLogout }) {
           <div className="module-content">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2>Lesson Management</h2>
-              <button
-                onClick={() => openLessonModal()}
-                style={{
-                  background: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  padding: '10px 20px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                ➕ Add Lesson
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => openLessonModal()}
+                  style={{
+                    background: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ➕ Add Lesson
+                </button>
+              )}
             </div>
             {loading ? (
               <p style={{ textAlign: 'center', color: '#999' }}>Loading lessons...</p>
@@ -421,18 +427,24 @@ function InstructionModule({ userData, onLogout }) {
                           </span>
                         </td>
                         <td>
-                          <button
-                            onClick={() => openLessonModal(lesson)}
-                            style={{ marginRight: '5px', padding: '5px 10px', background: '#28a745', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteLesson(lesson.lesson_id)}
-                            style={{ padding: '5px 10px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
-                          >
-                            Delete
-                          </button>
+                          {isAdmin ? (
+                            <>
+                              <button
+                                onClick={() => openLessonModal(lesson)}
+                                style={{ marginRight: '5px', padding: '5px 10px', background: '#28a745', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteLesson(lesson.lesson_id)}
+                                style={{ padding: '5px 10px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          ) : (
+                            <span style={{ color: '#999', fontSize: '0.9em' }}>View Only</span>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -447,19 +459,21 @@ function InstructionModule({ userData, onLogout }) {
           <div className="module-content">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2>Curriculum Management</h2>
-              <button
-                onClick={() => openCurriculumModal()}
-                style={{
-                  background: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  padding: '10px 20px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                ➕ Add Curriculum
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => openCurriculumModal()}
+                  style={{
+                    background: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ➕ Add Curriculum
+                </button>
+              )}
             </div>
             {loading ? (
               <p style={{ textAlign: 'center', color: '#999' }}>Loading curriculum...</p>
@@ -493,18 +507,24 @@ function InstructionModule({ userData, onLogout }) {
                           </span>
                         </td>
                         <td>
-                          <button
-                            onClick={() => openCurriculumModal(curr)}
-                            style={{ marginRight: '5px', padding: '5px 10px', background: '#28a745', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteCurriculum(curr.curriculum_id)}
-                            style={{ padding: '5px 10px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
-                          >
-                            Delete
-                          </button>
+                          {isAdmin ? (
+                            <>
+                              <button
+                                onClick={() => openCurriculumModal(curr)}
+                                style={{ marginRight: '5px', padding: '5px 10px', background: '#28a745', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteCurriculum(curr.curriculum_id)}
+                                style={{ padding: '5px 10px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          ) : (
+                            <span style={{ color: '#999', fontSize: '0.9em' }}>View Only</span>
+                          )}
                         </td>
                       </tr>
                     ))}
