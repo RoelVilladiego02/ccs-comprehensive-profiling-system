@@ -13,7 +13,9 @@ class LessonService
      */
     public function getAllLessons(int $perPage = 15): LengthAwarePaginator
     {
-        return Lesson::with('syllabus')->paginate($perPage);
+        return Lesson::with(['syllabus', 'faculty'])
+            ->orderBy('lesson_id', 'desc')
+            ->paginate($perPage);
     }
 
     /**
@@ -21,7 +23,7 @@ class LessonService
      */
     public function getLessonById(int $lessonId): ?Lesson
     {
-        return Lesson::with('syllabus')->find($lessonId);
+        return Lesson::with(['syllabus', 'faculty'])->find($lessonId);
     }
 
     /**
@@ -91,7 +93,8 @@ class LessonService
     public function getLessonsByFaculty(int $facultyId, int $perPage = 15): LengthAwarePaginator
     {
         return Lesson::where('faculty_id', $facultyId)
-            ->with('syllabus', 'faculty')
+            ->with(['syllabus', 'faculty'])
+            ->orderBy('lesson_id', 'desc')
             ->paginate($perPage);
     }
 
