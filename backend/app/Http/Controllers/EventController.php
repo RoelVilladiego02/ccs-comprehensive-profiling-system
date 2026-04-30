@@ -255,12 +255,22 @@ class EventController extends Controller
         $user = $request->user();
         
         // Authorization: Students can only register themselves, admins/staff can register anyone
-        // Check if user is not admin/staff and is trying to register someone else
-        if ($user && !$user->hasAnyRole(['Admin', 'Staff']) && $user->id !== $studentId) {
+        if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Forbidden - You can only register yourself for events',
-            ], 403);
+                'message' => 'Unauthorized - Please log in',
+            ], 401);
+        }
+        
+        // Check if user is a student trying to register someone else (or not admin/staff)
+        if (!$user->hasAnyRole(['Admin', 'Staff'])) {
+            $userStudent = $user->student;
+            if (!$userStudent || $userStudent->student_id !== $studentId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Forbidden - You can only register yourself for events',
+                ], 403);
+            }
         }
 
         $success = $this->eventService->registerStudentForEvent($studentId, $eventId);
@@ -287,12 +297,22 @@ class EventController extends Controller
         $user = $request->user();
         
         // Authorization: Students can only unregister themselves, admins/staff can unregister anyone
-        // Check if user is not admin/staff and is trying to unregister someone else
-        if ($user && !$user->hasAnyRole(['Admin', 'Staff']) && $user->id !== $studentId) {
+        if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Forbidden - You can only unregister yourself from events',
-            ], 403);
+                'message' => 'Unauthorized - Please log in',
+            ], 401);
+        }
+        
+        // Check if user is a student trying to unregister someone else (or not admin/staff)
+        if (!$user->hasAnyRole(['Admin', 'Staff'])) {
+            $userStudent = $user->student;
+            if (!$userStudent || $userStudent->student_id !== $studentId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Forbidden - You can only unregister yourself from events',
+                ], 403);
+            }
         }
 
         $success = $this->eventService->unregisterStudentFromEvent($studentId, $eventId);

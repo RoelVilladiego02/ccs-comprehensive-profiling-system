@@ -27,6 +27,13 @@ class LessonController extends Controller
         $user = $request->user();
         $perPage = $request->query('per_page', 15);
 
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized - Please log in',
+            ], 401);
+        }
+
         // Admin and Staff see all lessons
         if ($user->hasAnyRole(['Admin', 'Staff'])) {
             $lessons = $this->lessonService->getAllLessons($perPage);
@@ -37,7 +44,7 @@ class LessonController extends Controller
             if (!$faculty) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Faculty profile not found',
+                    'message' => 'Faculty profile not found for this user',
                 ], 404);
             }
             $lessons = $this->lessonService->getLessonsByFaculty($faculty->faculty_id, $perPage);
@@ -48,14 +55,14 @@ class LessonController extends Controller
             if (!$student) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Student profile not found',
+                    'message' => 'Student profile not found for this user',
                 ], 404);
             }
             $lessons = $this->lessonService->getLessonsForStudent($student->student_id, $perPage);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized role',
+                'message' => 'Unauthorized role - User must have Admin, Staff, Faculty, or Student role',
             ], 403);
         }
 

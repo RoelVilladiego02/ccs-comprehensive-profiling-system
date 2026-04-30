@@ -199,8 +199,8 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::delete('/{violationId}', [ViolationController::class, 'destroy'])->middleware('permission:violations.delete');
     });
 
-    // ====== Events Routes (Require Permission) ======
-    Route::prefix('events')->group(function () {
+    // ====== Events Routes (Require Authentication) ======
+    Route::prefix('events')->middleware('auth:sanctum')->group(function () {
         // Public/View endpoints - accessible to all authenticated users
         Route::get('/', [EventController::class, 'index']);
         Route::get('/search', [EventController::class, 'search']);
