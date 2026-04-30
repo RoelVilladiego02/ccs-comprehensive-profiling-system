@@ -199,7 +199,7 @@ class EventSeeder extends Seeder
      */
     private function randomParticipationStatus(): string
     {
-        $statuses = ['Registered', 'Attended', 'Participated', 'Completed', 'Absent', 'Excused'];
+        $statuses = ['Registered', 'Attended', 'Absent', 'Cancelled'];
         return $statuses[array_rand($statuses)];
     }
 
