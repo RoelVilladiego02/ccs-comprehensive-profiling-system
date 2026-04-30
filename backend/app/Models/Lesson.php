@@ -16,6 +16,7 @@ class Lesson extends Model
 
     protected $fillable = [
         'syllabus_id',
+        'faculty_id',
         'lesson_number',
         'title',
         'content',
@@ -32,5 +33,10 @@ class Lesson extends Model
     public function syllabus(): BelongsTo
     {
         return $this->belongsTo(Syllabus::class, 'syllabus_id', 'syllabus_id');
+    }
+
+    public function faculty(): BelongsTo
+    {
+        return $this->belongsTo(Faculty::class, 'faculty_id', 'faculty_id');
     }
 }

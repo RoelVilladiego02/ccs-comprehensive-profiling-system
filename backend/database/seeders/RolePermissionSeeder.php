@@ -111,7 +111,8 @@ class RolePermissionSeeder extends Seeder
 
         // Assign relevant permissions to Faculty
         $facultyPermissions = [
-            'students.view', 'courses.view', 'classes.view', 'classes.manage_own',
+            'students.view', 'courses.view', 'courses.create', 'courses.edit', 'courses.delete',
+            'classes.view', 'classes.manage_own',
             'enrollments.view',
             'grades.view', 'grades.create', 'grades.edit',
             'attendance.view', 'attendance.create', 'attendance.edit',
