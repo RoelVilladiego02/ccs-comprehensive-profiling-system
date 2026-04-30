@@ -3,6 +3,7 @@ import '../styles/StudentDashboard.css'
 import StudentTable from './StudentTable'
 import FilterPanel from './FilterPanel'
 import SearchBar from './SearchBar'
+import EventsModule from './EventsModule'
 import EligibilityReports from './EligibilityReports'
 import { studentAPI } from '../services/api'
 import Sidebar from './Sidebar'
@@ -433,6 +434,8 @@ function StaffDashboard({ userData, onLogout }) {
         return renderStudents()
       case 'attendance':
         return renderAttendance()
+      case 'events':
+        return <EventsModule userData={userData} onLogout={onLogout} />
       case 'eligibility-reports':
         return <EligibilityReports />
       case 'reports':

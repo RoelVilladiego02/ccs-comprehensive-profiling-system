@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import '../styles/StudentDashboard.css'
 import { studentProfileAPI, skillsAPI, affiliationsAPI, nonAcademicHistoryAPI } from '../services/api'
+import EventsModule from './EventsModule'
 import Sidebar from './Sidebar'
 
 function StudentDashboard({ userData, onLogout }) {
@@ -989,6 +990,10 @@ function StudentDashboard({ userData, onLogout }) {
                     )}
                   </section>
                 </div>
+              )}
+
+              {activeSection === 'events' && (
+                <EventsModule userData={userData} onLogout={onLogout} />
               )}
             </>
         )}

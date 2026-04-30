@@ -6,6 +6,7 @@ import FacultyStudentsView from './FacultyStudentsView'
 import FacultyGradeManagement from './FacultyGradeManagement'
 import FacultyAttendanceManagement from './FacultyAttendanceManagement'
 import InstructionModule from './InstructionModule'
+import EventsModule from './EventsModule'
 import { classAPI } from '../services/api'
 
 function FacultyDashboard({ userData, onLogout }) {
@@ -168,6 +169,12 @@ function FacultyDashboard({ userData, onLogout }) {
         {activeSection === 'instruction' && (
           <div style={{ padding: '0' }}>
             <InstructionModule userData={userData} onLogout={onLogout} />
+          </div>
+        )}
+
+        {activeSection === 'events' && (
+          <div style={{ padding: '0' }}>
+            <EventsModule userData={userData} onLogout={onLogout} />
           </div>
         )}
       </div>

@@ -10,6 +10,7 @@ import StaffDashboard from './components/StaffDashboard'
 import Login from './components/Login'
 import InstructionModule from './components/InstructionModule'
 import SchedulingModule from './components/SchedulingModule'
+import EventsModule from './components/EventsModule'
 import EligibilityReports from './components/EligibilityReports'
 
 function App() {
@@ -200,6 +201,11 @@ function App() {
         <Route path="/scheduling" element={
           isAuthenticated 
             ? <SchedulingModule userData={userData} onLogout={handleLogout} /> 
+            : <Navigate to="/login" />
+        } />
+        <Route path="/events" element={
+          isAuthenticated 
+            ? <EventsModule userData={userData} onLogout={handleLogout} /> 
             : <Navigate to="/login" />
         } />
         <Route path="/eligibility-reports" element={

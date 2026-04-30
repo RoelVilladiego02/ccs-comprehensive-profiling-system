@@ -9,6 +9,7 @@ import DeleteConfirmModal from './DeleteConfirmModal'
 import Pagination from './Pagination'
 import SchedulingModule from './SchedulingModule'
 import AdminFacultyManagement from './AdminFacultyManagement'
+import EventsModule from './EventsModule'
 import EligibilityReports from './EligibilityReports'
 import { studentAPI, facultyAPI, courseAPI } from '../services/api'
 import Sidebar from './Sidebar'
@@ -1213,6 +1214,8 @@ function AdminDashboard({ userData, onLogout }) {
         return renderCourses()
       case 'scheduling':
         return renderScheduling()
+      case 'events':
+        return <EventsModule userData={userData} onLogout={onLogout} />
       case 'eligibility-reports':
         return <EligibilityReports />
       case 'settings':

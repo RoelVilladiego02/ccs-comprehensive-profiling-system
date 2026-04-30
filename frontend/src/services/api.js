@@ -248,4 +248,28 @@ export const skillsAPI = {
   deleteSkill:      (studentId, skillId)        => apiClient.delete(`/students/${studentId}/skills/${skillId}`),
 }
 
+// ---------------------------------------------------------------------------
+// Events endpoints
+// ---------------------------------------------------------------------------
+export const eventAPI = {
+  getAll:              ()                       => apiClient.get('/events'),
+  search:              (query)                  => apiClient.get('/events/search', { params: { q: query } }),
+  getById:             (eventId)                => apiClient.get(`/events/${eventId}`),
+  getUpcoming:         ()                       => apiClient.get('/events/upcoming'),
+  getPast:             ()                       => apiClient.get('/events/past'),
+  getByType:           (type)                   => apiClient.get(`/events/type/${type}`),
+  getByStatus:         (status)                 => apiClient.get(`/events/status/${status}`),
+  create:              (data)                   => apiClient.post('/events', data),
+  update:              (eventId, data)          => apiClient.put(`/events/${eventId}`, data),
+  delete:              (eventId)                => apiClient.delete(`/events/${eventId}`),
+  getEventStudents:    (eventId)                => apiClient.get(`/events/${eventId}/students`),
+  getStudentsByStatus: (eventId, status)        => apiClient.get(`/events/${eventId}/students/${status}`),
+  registerStudent:     (eventId, studentId)     => apiClient.post(`/events/${eventId}/register/${studentId}`),
+  unregisterStudent:   (eventId, studentId)     => apiClient.delete(`/events/${eventId}/unregister/${studentId}`),
+  updateParticipation: (eventId, studentId, data) => apiClient.put(`/events/${eventId}/students/${studentId}/participation-status`, data),
+  recordPoints:        (eventId, studentId, data) => apiClient.put(`/events/${eventId}/students/${studentId}/points`, data),
+  getStatistics:       (eventId)                => apiClient.get(`/events/${eventId}/statistics`),
+  getTopPerformers:    (eventId)                => apiClient.get(`/events/${eventId}/top-performers`),
+}
+
 export default apiClient
