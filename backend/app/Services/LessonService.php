@@ -84,4 +84,54 @@ class LessonService
             ->with('syllabus')
             ->get();
     }
+
+    /**
+     * Get lessons for faculty (only their own lessons)
+     */
+    public function getLessonsByFaculty(int $facultyId, int $perPage = 15): LengthAwarePaginator
+    {
+        return Lesson::where('faculty_id', $facultyId)
+            ->with('syllabus', 'faculty')
+            ->paginate($perPage);
+    }
+
+    /**
+     * Get lessons by syllabus for faculty
+     */
+    public function getLessonsBySyllabusForFaculty(int $syllabusId, int $facultyId): Collection
+    {
+        return Lesson::where('syllabus_id', $syllabusId)
+            ->where('faculty_id', $facultyId)
+            ->orderBy('lesson_number', 'asc')
+            ->get();
+    }
+
+    /**
+     * Get lessons for students based on their enrolled classes
+     */
+    public function getLessonsForStudent(int $studentId, int $perPage = 15): LengthAwarePaginator
+    {
+        return Lesson::with('syllabus', 'faculty')
+            ->whereHas('syllabus.course.classes.students', function ($query) use ($studentId) {
+                $query->where('student_id', $studentId);
+            })
+            ->paginate($perPage);
+    }
+
+    /**
+     * Get lessons by class section for students
+     */
+    public function getLessonsByClassForStudent(int $classId, int $studentId): Collection
+    {
+        // Get the class and verify student is enrolled
+        return Lesson::whereHas('syllabus.course.classes', function ($query) use ($classId, $studentId) {
+            $query->where('class_id', $classId)
+                ->whereHas('students', function ($q) use ($studentId) {
+                    $q->where('student_id', $studentId);
+                });
+        })
+            ->orderBy('lesson_number', 'asc')
+            ->get();
+    }
 }
+
