@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { studentAPI, studentProfileAPI } from '../services/api'
+import { exportEligibilityReportToPDF, exportStudentProfilePDF } from '../services/pdfExport'
 import '../styles/EligibilityReports.css'
 
 function EligibilityReports() {
@@ -31,6 +32,10 @@ function EligibilityReports() {
   // Modal state
   const [showModal, setShowModal] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState(null)
+
+  // PDF export state
+  const [isExporting, setIsExporting] = useState(false)
+  const [exportMessage, setExportMessage] = useState(null)
 
   // ============================================================================
   // LOAD AVAILABLE SKILLS AND AFFILIATIONS (BOTH FORMATS)
@@ -209,6 +214,58 @@ function EligibilityReports() {
   const closeModal = () => {
     setShowModal(false)
     setSelectedStudent(null)
+  }
+
+  // ============================================================================
+  // PDF EXPORT HANDLER
+  // ============================================================================
+  const handleExportPDF = async () => {
+    if (reportResults.length === 0) {
+      setExportMessage({ type: 'error', text: 'No results to export' })
+      setTimeout(() => setExportMessage(null), 3000)
+      return
+    }
+
+    setIsExporting(true)
+    try {
+      const filters = {
+        selectedSkill,
+        selectedAffiliation,
+        minGPA,
+        maxViolations,
+        enrollmentStatus,
+      }
+
+      const result = await exportEligibilityReportToPDF(reportType, reportResults, filters)
+
+      if (result.success) {
+        setExportMessage({ type: 'success', text: result.message })
+      } else {
+        setExportMessage({ type: 'error', text: result.error })
+      }
+    } catch (error) {
+      console.error('Export error:', error)
+      setExportMessage({ type: 'error', text: 'Failed to export PDF' })
+    } finally {
+      setIsExporting(false)
+      setTimeout(() => setExportMessage(null), 4000)
+    }
+  }
+
+  // Export individual student profile
+  const handleExportStudentProfile = (student) => {
+    try {
+      const result = exportStudentProfilePDF(student)
+      if (result.success) {
+        setExportMessage({ type: 'success', text: result.message })
+      } else {
+        setExportMessage({ type: 'error', text: result.error })
+      }
+    } catch (error) {
+      console.error('Export error:', error)
+      setExportMessage({ type: 'error', text: 'Failed to export student profile' })
+    }
+    setTimeout(() => setExportMessage(null), 3000)
   }
 
   // ============================================================================
@@ -538,20 +595,36 @@ function EligibilityReports() {
               </div>
             )}
 
+            {exportMessage && (
+              <div className={`alert alert-${exportMessage.type}`}>
+                {exportMessage.type === 'success' ? '✅' : '⚠️'} {exportMessage.text}
+              </div>
+            )}
+
             {reportGenerated && reportResults.length > 0 && (
               <div className="results-header">
-                <h2>
-                  📈 Results: <strong>{reportResults.length}</strong> students
-                </h2>
-                <p>
-                  {reportType === 'skill' && `Skill: ${selectedSkill}`}
-                  {reportType === 'affiliation' && `Affiliation: ${selectedAffiliation}`}
-                  {reportType === 'combined' && `Skill/Affiliation + GPA ≥ ${minGPA}`}
-                  {reportType === 'academic' && `Academic Status: ${enrollmentStatus} | GPA ≥ ${minGPA}`}
-                </p>
-                <p className="pagination-info">
-                  Showing {startIndex + 1} to {Math.min(endIndex, reportResults.length)} of {reportResults.length} students
-                </p>
+                <div className="results-title-section">
+                  <h2>
+                    📈 Results: <strong>{reportResults.length}</strong> students
+                  </h2>
+                  <p>
+                    {reportType === 'skill' && `Skill: ${selectedSkill}`}
+                    {reportType === 'affiliation' && `Affiliation: ${selectedAffiliation}`}
+                    {reportType === 'combined' && `Skill/Affiliation + GPA ≥ ${minGPA}`}
+                    {reportType === 'academic' && `Academic Status: ${enrollmentStatus} | GPA ≥ ${minGPA}`}
+                  </p>
+                  <p className="pagination-info">
+                    Showing {startIndex + 1} to {Math.min(endIndex, reportResults.length)} of {reportResults.length} students
+                  </p>
+                </div>
+                <button
+                  className="btn-export-pdf"
+                  onClick={handleExportPDF}
+                  disabled={isExporting}
+                  title="Export current report as PDF"
+                >
+                  {isExporting ? '⏳ Exporting...' : '📥 Export as PDF'}
+                </button>
               </div>
             )}
 
@@ -935,6 +1008,13 @@ function EligibilityReports() {
               </div>
 
               <div className="modal-footer">
+                <button 
+                  className="modal-btn-export" 
+                  onClick={() => handleExportStudentProfile(selectedStudent)}
+                  title="Export this student's profile as PDF"
+                >
+                  📥 Export Profile
+                </button>
                 <button className="modal-btn-close" onClick={closeModal}>
                   Close
                 </button>

@@ -340,6 +340,7 @@
   margin-bottom: 20px;
   font-size: 0.9rem;
   border-left: 4px solid;
+  animation: slideDown 0.3s ease;
 }
 
 .alert-error {
@@ -348,11 +349,36 @@
   color: #333;
 }
 
+.alert-success {
+  background: #f0fdf4;
+  border-color: #4caf50;
+  color: #1b5e20;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Results Header */
 .results-header {
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 2px solid #f7f6f3;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.results-title-section {
+  flex: 1;
 }
 
 .results-header h2 {
@@ -378,6 +404,40 @@
   color: #999 !important;
   margin-top: 8px !important;
   font-weight: 500 !important;
+}
+
+/* Export PDF Button */
+.btn-export-pdf {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ff6414 0%, #ff5200 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 100, 20, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-export-pdf:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 100, 20, 0.35);
+  background: linear-gradient(135deg, #ff7a2f 0%, #ff6414 100%);
+}
+
+.btn-export-pdf:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 100, 20, 0.2);
+}
+
+.btn-export-pdf:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 /* Results Table */
@@ -880,6 +940,33 @@
   padding: 16px 28px;
   border-top: 1px solid #e2e0db;
   background-color: #f7f6f3;
+}
+
+.modal-btn-export {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #ff6414 0%, #ff5200 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.modal-btn-export:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 100, 20, 0.3);
+  background: linear-gradient(135deg, #ff7a2f 0%, #ff6414 100%);
+}
+
+.modal-btn-export:active {
+  transform: translateY(0);
 }
 
 .modal-btn-close {
