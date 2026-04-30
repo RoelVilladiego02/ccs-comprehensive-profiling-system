@@ -272,4 +272,32 @@ export const eventAPI = {
   getTopPerformers:    (eventId)                => apiClient.get(`/events/${eventId}/top-performers`),
 }
 
+// ---------------------------------------------------------------------------
+// Lessons endpoints
+// ---------------------------------------------------------------------------
+export const lessonAPI = {
+  getAll:           ()              => apiClient.get('/lessons'),
+  search:           (query)         => apiClient.get('/lessons/search', { params: { q: query } }),
+  getActive:        ()              => apiClient.get('/lessons/active'),
+  getById:          (id)            => apiClient.get(`/lessons/${id}`),
+  create:           (data)          => apiClient.post('/lessons', data),
+  update:           (id, data)      => apiClient.put(`/lessons/${id}`, data),
+  delete:           (id)            => apiClient.delete(`/lessons/${id}`),
+  getBySyllabus:    (syllabusId)    => apiClient.get(`/lessons/syllabus/${syllabusId}`),
+}
+
+// ---------------------------------------------------------------------------
+// Curriculum endpoints
+// ---------------------------------------------------------------------------
+export const curriculumAPI = {
+  getAll:           ()              => apiClient.get('/curriculum'),
+  search:           (query)         => apiClient.get('/curriculum/search', { params: { q: query } }),
+  getActive:        ()              => apiClient.get('/curriculum/active'),
+  getById:          (id)            => apiClient.get(`/curriculum/${id}`),
+  create:           (data)          => apiClient.post('/curriculum', data),
+  update:           (id, data)      => apiClient.put(`/curriculum/${id}`, data),
+  delete:           (id)            => apiClient.delete(`/curriculum/${id}`),
+  getByDepartment:  (department)    => apiClient.get(`/curriculum/department/${department}`),
+}
+
 export default apiClient

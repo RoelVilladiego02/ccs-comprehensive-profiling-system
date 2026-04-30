@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import '../styles/Module.css'
-import { courseAPI } from '../services/api'
+import { courseAPI, lessonAPI, curriculumAPI } from '../services/api'
 
 function InstructionModule({ userData, onLogout }) {
   const [activeTab, setActiveTab] = useState('syllabus')
@@ -68,15 +68,9 @@ function InstructionModule({ userData, onLogout }) {
     try {
       setLoading(true)
       setError('')
-      // Assuming you have a lessonAPI, otherwise create it
-      const response = await fetch('/api/lessons', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-      const data = await response.json()
-      if (data.success) {
-        setLessons(data.data || [])
+      const response = await lessonAPI.getAll()
+      if (response.data.success || response.data.data) {
+        setLessons(response.data.data || [])
       } else {
         setError('Failed to load lessons')
       }
@@ -92,14 +86,9 @@ function InstructionModule({ userData, onLogout }) {
     try {
       setLoading(true)
       setError('')
-      const response = await fetch('/api/curriculum', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-      const data = await response.json()
-      if (data.success) {
-        setCurriculum(data.data || [])
+      const response = await curriculumAPI.getAll()
+      if (response.data.success || response.data.data) {
+        setCurriculum(response.data.data || [])
       } else {
         setError('Failed to load curriculum')
       }
@@ -119,16 +108,8 @@ function InstructionModule({ userData, onLogout }) {
     }
 
     try {
-      const response = await fetch('/api/lessons', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(lessonForm),
-      })
-      const data = await response.json()
-      if (data.success) {
+      const response = await lessonAPI.create(lessonForm)
+      if (response.data.success) {
         setShowLessonModal(false)
         setLessonForm({
           syllabus_id: '',
@@ -140,11 +121,13 @@ function InstructionModule({ userData, onLogout }) {
           is_active: true,
         })
         fetchLessons()
+        setError('')
       } else {
-        setError(data.message || 'Failed to create lesson')
+        setError(response.data.message || 'Failed to create lesson')
       }
     } catch (err) {
-      setError('Error creating lesson: ' + err.message)
+      console.error('Error creating lesson:', err)
+      setError('Error creating lesson: ' + (err.response?.data?.message || err.message))
     }
   }
 
@@ -156,16 +139,8 @@ function InstructionModule({ userData, onLogout }) {
     }
 
     try {
-      const response = await fetch(`/api/lessons/${editingLesson.lesson_id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(lessonForm),
-      })
-      const data = await response.json()
-      if (data.success) {
+      const response = await lessonAPI.update(editingLesson.lesson_id, lessonForm)
+      if (response.data.success) {
         setShowLessonModal(false)
         setEditingLesson(null)
         setLessonForm({
@@ -178,11 +153,13 @@ function InstructionModule({ userData, onLogout }) {
           is_active: true,
         })
         fetchLessons()
+        setError('')
       } else {
-        setError(data.message || 'Failed to update lesson')
+        setError(response.data.message || 'Failed to update lesson')
       }
     } catch (err) {
-      setError('Error updating lesson: ' + err.message)
+      console.error('Error updating lesson:', err)
+      setError('Error updating lesson: ' + (err.response?.data?.message || err.message))
     }
   }
 
@@ -190,20 +167,16 @@ function InstructionModule({ userData, onLogout }) {
     if (!window.confirm('Are you sure you want to delete this lesson?')) return
 
     try {
-      const response = await fetch(`/api/lessons/${lessonId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-      const data = await response.json()
-      if (data.success) {
+      const response = await lessonAPI.delete(lessonId)
+      if (response.data.success) {
         fetchLessons()
+        setError('')
       } else {
-        setError(data.message || 'Failed to delete lesson')
+        setError(response.data.message || 'Failed to delete lesson')
       }
     } catch (err) {
-      setError('Error deleting lesson: ' + err.message)
+      console.error('Error deleting lesson:', err)
+      setError('Error deleting lesson: ' + (err.response?.data?.message || err.message))
     }
   }
 
@@ -215,16 +188,8 @@ function InstructionModule({ userData, onLogout }) {
     }
 
     try {
-      const response = await fetch('/api/curriculum', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(curriculumForm),
-      })
-      const data = await response.json()
-      if (data.success) {
+      const response = await curriculumAPI.create(curriculumForm)
+      if (response.data.success) {
         setShowCurriculumModal(false)
         setCurriculumForm({
           curriculum_code: '',
@@ -235,11 +200,13 @@ function InstructionModule({ userData, onLogout }) {
           is_active: true,
         })
         fetchCurriculum()
+        setError('')
       } else {
-        setError(data.message || 'Failed to create curriculum')
+        setError(response.data.message || 'Failed to create curriculum')
       }
     } catch (err) {
-      setError('Error creating curriculum: ' + err.message)
+      console.error('Error creating curriculum:', err)
+      setError('Error creating curriculum: ' + (err.response?.data?.message || err.message))
     }
   }
 
@@ -251,16 +218,8 @@ function InstructionModule({ userData, onLogout }) {
     }
 
     try {
-      const response = await fetch(`/api/curriculum/${editingCurriculum.curriculum_id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(curriculumForm),
-      })
-      const data = await response.json()
-      if (data.success) {
+      const response = await curriculumAPI.update(editingCurriculum.curriculum_id, curriculumForm)
+      if (response.data.success) {
         setShowCurriculumModal(false)
         setEditingCurriculum(null)
         setCurriculumForm({
@@ -272,11 +231,13 @@ function InstructionModule({ userData, onLogout }) {
           is_active: true,
         })
         fetchCurriculum()
+        setError('')
       } else {
-        setError(data.message || 'Failed to update curriculum')
+        setError(response.data.message || 'Failed to update curriculum')
       }
     } catch (err) {
-      setError('Error updating curriculum: ' + err.message)
+      console.error('Error updating curriculum:', err)
+      setError('Error updating curriculum: ' + (err.response?.data?.message || err.message))
     }
   }
 
@@ -284,20 +245,16 @@ function InstructionModule({ userData, onLogout }) {
     if (!window.confirm('Are you sure you want to delete this curriculum?')) return
 
     try {
-      const response = await fetch(`/api/curriculum/${curriculumId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-      const data = await response.json()
-      if (data.success) {
+      const response = await curriculumAPI.delete(curriculumId)
+      if (response.data.success) {
         fetchCurriculum()
+        setError('')
       } else {
-        setError(data.message || 'Failed to delete curriculum')
+        setError(response.data.message || 'Failed to delete curriculum')
       }
     } catch (err) {
-      setError('Error deleting curriculum: ' + err.message)
+      console.error('Error deleting curriculum:', err)
+      setError('Error deleting curriculum: ' + (err.response?.data?.message || err.message))
     }
   }
 

@@ -88,7 +88,14 @@ function EventsModule({ userData, onLogout }) {
     }
 
     try {
-      const response = await eventAPI.create(eventForm)
+      // Convert time format from HH:mm to H:i:s
+      const formData = {
+        ...eventForm,
+        start_time: eventForm.start_time ? `${eventForm.start_time}:00` : '',
+        end_time: eventForm.end_time ? `${eventForm.end_time}:00` : '',
+      }
+      
+      const response = await eventAPI.create(formData)
       if (response.data.success) {
         setShowEventModal(false)
         setEventForm({
@@ -124,7 +131,14 @@ function EventsModule({ userData, onLogout }) {
     }
 
     try {
-      const response = await eventAPI.update(editingEvent.event_id, eventForm)
+      // Convert time format from HH:mm to H:i:s
+      const formData = {
+        ...eventForm,
+        start_time: eventForm.start_time ? `${eventForm.start_time}:00` : '',
+        end_time: eventForm.end_time ? `${eventForm.end_time}:00` : '',
+      }
+      
+      const response = await eventAPI.update(editingEvent.event_id, formData)
       if (response.data.success) {
         setShowEventModal(false)
         setEditingEvent(null)
@@ -376,7 +390,18 @@ function EventsModule({ userData, onLogout }) {
 
       <div className="events-grid">
         {getFilteredEvents(events).length === 0 ? (
-          <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#999' }}>No events found</p>
+          <div style={{
+            gridColumn: '1 / -1',
+            textAlign: 'center',
+            padding: '60px 20px',
+            background: 'var(--color-gray-50)',
+            borderRadius: '8px',
+            border: '1px solid var(--color-gray-200)'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '16px' }}>📅</div>
+            <h3 style={{ color: 'var(--color-gray-600)', fontSize: '1.2rem', margin: '0 0 8px 0' }}>No Events Available</h3>
+            <p style={{ color: 'var(--color-gray-500)', margin: '0' }}>There are currently no events to manage. Create a new event to get started.</p>
+          </div>
         ) : (
           getFilteredEvents(events).map(event => renderEventCard(event, false))
         )}
@@ -409,7 +434,24 @@ function EventsModule({ userData, onLogout }) {
 
       <div className="events-grid">
         {getFilteredEvents(eventList).length === 0 ? (
-          <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#999' }}>No events found</p>
+          <div style={{
+            gridColumn: '1 / -1',
+            textAlign: 'center',
+            padding: '60px 20px',
+            background: 'var(--color-gray-50)',
+            borderRadius: '8px',
+            border: '1px solid var(--color-gray-200)'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🎉</div>
+            <h3 style={{ color: 'var(--color-gray-600)', fontSize: '1.2rem', margin: '0 0 8px 0' }}>
+              {activeTab === 'upcoming' ? 'No Upcoming Events' : 'No Past Events'}
+            </h3>
+            <p style={{ color: 'var(--color-gray-500)', margin: '0' }}>
+              {activeTab === 'upcoming' 
+                ? 'There are no upcoming events scheduled right now. Check back soon or stay tuned for announcements!' 
+                : 'No past events to display. Events you have attended will appear here.'}
+            </p>
+          </div>
         ) : (
           getFilteredEvents(eventList).map(event => renderEventCard(event, true))
         )}
