@@ -24,6 +24,9 @@ class DatabaseSeeder extends Seeder
             ClassSeeder::class,        // Now has students to enroll
             GradesSeeder::class,       // Seeds midterm and final grades
             UserAccountSeeder::class,  // Creates login accounts for all faculty and students
+            CurriculumSeeder::class,   // Seeds curriculum data
+            LessonSeeder::class,       // Seeds lessons with faculty associations
+            EventSeeder::class,        // Seeds events with student registrations
         ]);
     }
 }
