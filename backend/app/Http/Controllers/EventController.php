@@ -255,7 +255,8 @@ class EventController extends Controller
         $user = $request->user();
         
         // Authorization: Students can only register themselves, admins/staff can register anyone
-        if ($user->hasRole('Student') && $user->id !== $studentId) {
+        // Check if user is not admin/staff and is trying to register someone else
+        if ($user && !$user->hasAnyRole(['Admin', 'Staff']) && $user->id !== $studentId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Forbidden - You can only register yourself for events',
@@ -286,7 +287,8 @@ class EventController extends Controller
         $user = $request->user();
         
         // Authorization: Students can only unregister themselves, admins/staff can unregister anyone
-        if ($user->hasRole('Student') && $user->id !== $studentId) {
+        // Check if user is not admin/staff and is trying to unregister someone else
+        if ($user && !$user->hasAnyRole(['Admin', 'Staff']) && $user->id !== $studentId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Forbidden - You can only unregister yourself from events',

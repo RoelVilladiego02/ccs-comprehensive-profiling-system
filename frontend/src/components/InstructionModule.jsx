@@ -5,6 +5,8 @@ import { courseAPI, lessonAPI, curriculumAPI } from '../services/api'
 function InstructionModule({ userData, onLogout }) {
   const userRole = userData?.roles?.[0]?.role_name?.toLowerCase() || 'student'
   const isAdmin = userRole === 'admin' || userRole === 'staff'
+  const isFaculty = userRole === 'faculty'
+  const isCanManage = isAdmin || isFaculty
   const isStudent = userRole === 'student'
   
   const [activeTab, setActiveTab] = useState('syllabus')
@@ -381,7 +383,7 @@ function InstructionModule({ userData, onLogout }) {
           <div className="module-content">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2>Lesson Management</h2>
-              {isAdmin && (
+              {isCanManage && (
                 <button
                   onClick={() => openLessonModal()}
                   style={{
@@ -427,7 +429,7 @@ function InstructionModule({ userData, onLogout }) {
                           </span>
                         </td>
                         <td>
-                          {isAdmin ? (
+                          {isCanManage ? (
                             <>
                               <button
                                 onClick={() => openLessonModal(lesson)}
@@ -459,7 +461,7 @@ function InstructionModule({ userData, onLogout }) {
           <div className="module-content">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2>Curriculum Management</h2>
-              {isAdmin && (
+              {isCanManage && (
                 <button
                   onClick={() => openCurriculumModal()}
                   style={{
@@ -507,7 +509,7 @@ function InstructionModule({ userData, onLogout }) {
                           </span>
                         </td>
                         <td>
-                          {isAdmin ? (
+                          {isCanManage ? (
                             <>
                               <button
                                 onClick={() => openCurriculumModal(curr)}
